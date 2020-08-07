@@ -245,9 +245,6 @@ class CSTR(ODE_NonAutonomous):
         self.nu = 1
         self.nd = 2
         # default simulation setup
-        self.ninit = 0
-        self.nsim = 1001
-        self.ts = 0.1
         # Step cooling temperature to 295
         u_ss = 300.0
         U = np.ones(self.nsim - 1) * u_ss
@@ -259,7 +256,7 @@ class CSTR(ODE_NonAutonomous):
         U[650:750] = 303.0
         U[750:850] = 306.0
         U[850:] = 300.0
-        self.U = U
+        self.U = U.reshape(-1, 1)
 
     def equations(self, x, t, u):
         # Inputs (1):

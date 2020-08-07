@@ -4,6 +4,8 @@ Building thermal envelope models
 # TODO: check loaded Ts value - not correct for some building models
 
 """
+import os
+
 import numpy as np
 from scipy.io import loadmat
 
@@ -16,27 +18,29 @@ class BuildingEnvelope(SSM):
     """
     building envelope heat transfer model
     linear building envelope dynamics and bilinear heat flow input dynamics
-    different building types are stored in ./parameters/buildings/*.mat
+    different building types are stored in ./emulators/buildings/*.mat
     models obtained from: https://github.com/drgona/BeSim
     """
     def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=True):
-        super().__init__(nsim=nsim, ninit=ninit)
         self.system = system
         self.linear = linear
+        self.resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'parameters/buildings')
+        super().__init__(nsim=nsim, ninit=ninit)
 
+    # parameters of the dynamical system
     def parameters(self, system='Reno_full', linear=True):
         # file paths for different building models
-        systems = {'SimpleSingleZone': './parameters/buildings/SimpleSingleZone.mat',
-                   'Reno_full': './parameters/buildings/Reno_full.mat',
-                   'Reno_ROM40': './parameters/buildings/Reno_ROM40.mat',
-                   'RenoLight_full': './parameters/buildings/RenoLight_full.mat',
-                   'RenoLight_ROM40': './parameters/buildings/RenoLight_ROM40.mat',
-                   'Old_full': './parameters/buildings/Old_full.mat',
-                   'Old_ROM40': './parameters/buildings/Old_ROM40.mat',
-                   'HollandschHuys_full': './parameters/buildings/HollandschHuys_full.mat',
-                   'HollandschHuys_ROM100': './parameters/buildings/HollandschHuys_ROM100.mat',
-                   'Infrax_full': './parameters/buildings/Infrax_full.mat',
-                   'Infrax_ROM100': './parameters/buildings/Infrax_ROM100.mat'
+        systems = {'SimpleSingleZone': os.path.join(self.resource_path, 'SimpleSingleZone.mat'),
+                   'Reno_full': os.path.join(self.resource_path, 'Reno_full.mat'),
+                   'Reno_ROM40': os.path.join(self.resource_path, 'Reno_ROM40.mat'),
+                   'RenoLight_full': os.path.join(self.resource_path, 'RenoLight_full.mat'),
+                   'RenoLight_ROM40': os.path.join(self.resource_path, 'RenoLight_ROM40.mat'),
+                   'Old_full': os.path.join(self.resource_path, 'Old_full.mat'),
+                   'Old_ROM40': os.path.join(self.resource_path, 'Old_ROM40.mat'),
+                   'HollandschHuys_full': os.path.join(self.resource_path, 'HollandschHuys_full.mat'),
+                   'HollandschHuys_ROM100': os.path.join(self.resource_path, 'HollandschHuys_ROM100.mat'),
+                   'Infrax_full': os.path.join(self.resource_path, 'Infrax_full.mat'),
+                   'Infrax_ROM100': os.path.join(self.resource_path, 'Infrax_ROM100.mat')
                    }
         self.system = system
         self.linear = linear  # if True use only linear building envelope model with Q as U
