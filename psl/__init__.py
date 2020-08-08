@@ -4,6 +4,7 @@ from .emulator import *
 from .gym import *
 from .linear import *
 from .nonautonomous import *
+from .perturb import *
 from .plot import *
 
 

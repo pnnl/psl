@@ -10,7 +10,7 @@ import numpy as np
 import gym
 
 # local imports
-from slip.emulator import EmulatorBase
+from psl.emulator import EmulatorBase
 
 
 class GymWrapper(EmulatorBase):

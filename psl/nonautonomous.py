@@ -10,7 +10,7 @@ import numpy as np
 from scipy.integrate import odeint
 
 # local imports
-from slip.emulator import ODE_NonAutonomous
+from psl.emulator import ODE_NonAutonomous
 
 
 class SEIR_population(ODE_NonAutonomous):

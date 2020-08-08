@@ -10,8 +10,8 @@ import numpy as np
 from scipy.io import loadmat
 
 # local imports
-from slip.emulator import SSM
-from slip.perturb import Periodic, RandomWalk
+from psl.emulator import SSM
+from psl.perturb import Periodic, RandomWalk
 
 
 class BuildingEnvelope(SSM):

@@ -5,21 +5,21 @@ requirements = [
 ]
 
 setup(
-    name='slip',
+    name='psl',
     description="dynamic Systems Library in Python",
     license="MIT",
     author="Aaron Tuor",
     author_email='aarontuor@gmail.com',
-    url='https://github.com/aarontuor/slip',
-    packages=['slip'],
-    package_data={'slip': ['slip/parameters/buildings/*']},
+    url='https://github.com/aarontuor/psl',
+    packages=['psl'],
+    package_data={'psl': ['psl/parameters/buildings/*']},
     entry_points={
         'console_scripts': [
-            'slip=slip.cli:cli'
+            'psl=psl.cli:cli'
         ]
     },
     install_requires=requirements,
-    keywords='slip',
+    keywords='psl',
     classifiers=[
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.6',

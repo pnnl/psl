@@ -11,7 +11,7 @@ Nonlinear ODEs
 https://en.wikipedia.org/wiki/List_of_nonlinear_ordinary_differential_equations
 https://en.wikipedia.org/wiki/List_of_dynamical_systems_and_differential_equations_topics
 """
-from slip.emulator import ODE_Autonomous
+from psl.emulator import ODE_Autonomous
 
 
 class LogisticGrowth(ODE_Autonomous):

@@ -5,7 +5,7 @@ import numpy as np
 import control
 
 #  local imports
-from slip.emulator import EmulatorBase
+from psl.emulator import EmulatorBase
 
 
 class ExpGrowth(EmulatorBase):
