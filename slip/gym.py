@@ -70,7 +70,6 @@ class GymWrapper(EmulatorBase):
             if N == nsim:
                 break
         Xout = np.asarray(X)
-        Yout = np.asarray(Reward).reshape(-1,1)
+        Yout = np.asarray(Reward).reshape(-1, 1)
         Uout = np.asarray(U)
-        Dout = None
-        return Xout, Yout, Uout, Dout
+        return {'X': Xout, 'Y': Yout, 'U': Uout}

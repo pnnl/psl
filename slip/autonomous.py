@@ -24,7 +24,6 @@ class LogisticGrowth(ODE_Autonomous):
         self.k = 2
         self.x0 = 1
         self.nx = 1
-        self.nsim = 1000
 
     def equations(self, x):
         pass
@@ -46,7 +45,7 @@ class LogisticGrowth(ODE_Autonomous):
         for k in range(nsim):
             x = self.equations(x)
             X.append(x)  # updated states trajectories
-        return np.asarray(X)
+        return {'Y': np.asarray(X)}
 
 
 class UniversalOscillator(ODE_Autonomous):
@@ -61,9 +60,6 @@ class UniversalOscillator(ODE_Autonomous):
         self.mu = 2
         self.omega = 1
         self.x0 = [1.0, 0.0]
-        # default simulation setup
-        self.nsim = 10001
-        self.ts = 0.01
 
     def equations(self, x, t):
         # Derivatives
@@ -85,9 +81,6 @@ class Lorenz96(ODE_Autonomous):
         self.F = 8  # Forcing
         self.x0 = self.F*np.ones(self.N)
         self.x0[19] += 0.01  # Add small perturbation to random variable
-        # default simulation setup
-        self.nsim = 5001
-        self.ts = 0.01
 
     def equations(self, x, t):
         # Compute state derivatives
@@ -119,9 +112,6 @@ class LorenzSystem(ODE_Autonomous):
         self.sigma = 10.0
         self.beta = 8.0 / 3.0
         self.x0 = [1.0, 1.0, 1.0]
-        # default simulation setup
-        self.nsim = 5001
-        self.ts = 0.01
 
     def equations(self, x, t):
         # Derivatives
@@ -143,9 +133,6 @@ class VanDerPol(ODE_Autonomous):
         super().parameters()
         self.mu = 1.0
         self.x0 = [1, 2]
-        # default simulation setup
-        self.nsim = 401
-        self.ts = 0.1
 
     def equations(self, x, t):
         # Derivatives
@@ -164,9 +151,7 @@ class ThomasAttractor(ODE_Autonomous):
     def parameters(self):
         super().parameters()
         self.b = 0.208186
-        self.x0 = [1,-1,1]
-        # default simulation setup
-        self.nsim = 5001
+        self.x0 = [1, -1, 1]
 
     def equations(self, x, t):
         # Derivatives
@@ -188,10 +173,7 @@ class RosslerAttractor(ODE_Autonomous):
         self.a = 0.2
         self.b = 0.2
         self.c = 5.7
-        self.x0 = [0,0,0]
-        # default simulation setup
-        self.nsim = 20001
-        self.ts = 0.01
+        self.x0 = [0, 0, 0]
 
     def equations(self, x, t):
         # Derivatives
@@ -209,14 +191,11 @@ class LotkaVolterra(ODE_Autonomous):
     """
 
     def parameters(self):
-        super().parameters()
         self.a = 1.
         self.b = 0.1
         self.c = 1.5
         self.d = 0.75
         self.x0 = [5, 100]
-        # default simulation setup
-        self.nsim = 2001
 
     def equations(self, x, t):
         # Derivatives
@@ -233,12 +212,9 @@ class Brusselator1D(ODE_Autonomous):
     """
 
     def parameters(self):
-        super().parameters()
         self.a = 1.0
         self.b = 3.0
         self.x0 = [1.0, 1.0]
-        # default simulation setup
-        self.nsim = 501
 
     def equations(self, x, t):
         # Derivatives
@@ -264,9 +240,6 @@ class ChuaCircuit(ODE_Autonomous):
         self.m0 = -1.143
         self.m1 = -0.714
         self.x0 = [0.7, 0.0, 0.0]
-        # default simulation setup
-        self.nsim = 10001
-        self.ts = 0.01
 
     def equations(self, x, t):
         fx = self.m1*x[0] + 0.5*(self.m0 - self.m1)*(np.abs(x[0] + 1) - np.abs(x[0] - 1))
@@ -292,9 +265,6 @@ class Duffing(ODE_Autonomous):
         self.gamma = 8
         self.omega = 0.5
         self.x0 = [1.0, 0.0]
-        # default simulation setup
-        self.nsim = 10001
-        self.ts = 0.01
 
     def equations(self, x, t):
         # Derivatives

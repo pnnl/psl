@@ -39,7 +39,7 @@ class ExpGrowth(EmulatorBase):
         for k in range(nsim):
             x = self.equations(x)
             X.append(x)  # updated states trajectories
-        return np.asarray(X)
+        return {'X': np.asarray(X)}
 
 
 """
@@ -130,6 +130,4 @@ class LinCartPole(EmulatorBase):
                 break
         Xout = np.asarray(X)
         Yout = np.asarray(Y)
-        Uout = None
-        Dout = None
-        return Xout, Yout, Uout, Dout
+        return {'X': Xout, 'Y': Yout}

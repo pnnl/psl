@@ -101,7 +101,7 @@ class SEIR_population(ODE_NonAutonomous):
             N += 1
             if N == nsim:
                 break
-        return np.asarray(X)
+        return {'Y': np.asarray(X)}
 
 
 class Tank(ODE_NonAutonomous):
@@ -159,7 +159,7 @@ class Tank(ODE_NonAutonomous):
             N += 1
             if N == nsim:
                 break
-        return np.asarray(X)
+        return {'Y': np.asarray(X)}
 
 
 class TwoTank(ODE_NonAutonomous):
@@ -299,7 +299,6 @@ class HindmarshRose(ODE_NonAutonomous):
     """
 
     def parameters(self):
-        super().parameters()
         self.a = 1
         self.b = 2.6
         self.c = 1
@@ -311,7 +310,6 @@ class HindmarshRose(ODE_NonAutonomous):
         self.umax = 10
         self.x0 = np.asarray([-5,-10,0])
         # default simulation setup
-        self.nsim = 5001
         self.U = 3 * np.asarray([np.ones((self.nsim - 1))]).T
         self.nu = 1
         self.nx = 3

@@ -1,4 +1,3 @@
-from ._version import get_versions
 from .autonomous import *
 from .building import *
 from .emulator import *
@@ -7,9 +6,6 @@ from .linear import *
 from .nonautonomous import *
 from .plot import *
 
-
-__version__ = get_versions()['version']
-del get_versions
 
 systems = {# non-autonomous ODEs
            'CSTR': CSTR,

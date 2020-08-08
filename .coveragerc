@@ -1,7 +1,0 @@
-[report]
-omit =
-    setup.py
-    slip/__main__.py
-    slip/_version.py
-    versioneer.py
-    tests/*

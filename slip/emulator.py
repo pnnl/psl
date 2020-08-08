@@ -80,7 +80,7 @@ class SSM(EmulatorBase):
         Yout = np.asarray(Y).reshape(nsim, self.ny)
         Uout = np.asarray(U).reshape(nsim, self.nu) if U is not None else None
         Dout = np.asarray(D).reshape(nsim, self.nd) if D is not None else None
-        return Xout, Yout, Uout, Dout
+        return {'X': Xout, 'Y': Yout, 'U': Uout, 'D': Dout}
 
 
 class ODE_Autonomous(EmulatorBase):
@@ -123,11 +123,8 @@ class ODE_Autonomous(EmulatorBase):
             xdot = odeint(self.equations, x, dT)
             x = xdot[-1]
             X.append(x)  # updated states trajectories
-        Xout = np.asarray(X)
         Yout = np.asarray(X)
-        Uout = None
-        Dout = None
-        return Xout, Yout, Uout, Dout
+        return {'Y': Yout}
 
 
 class ODE_NonAutonomous(EmulatorBase, ABC):
@@ -176,9 +173,7 @@ class ODE_NonAutonomous(EmulatorBase, ABC):
             N += 1
             if N == nsim:
                 break
-        Xout = np.asarray(X)
         Yout = np.asarray(X)
         Uout = np.asarray(U)
-        Dout = None
-        return Xout, Yout, Uout, Dout
+        return {'Y': Yout, 'U': Uout}
 
