@@ -21,7 +21,7 @@ if __name__ == '__main__':
             psl.plot.pltPhase(X=out['Y'])
             plt.close('all')
         elif isinstance(system(), psl.ODE_NonAutonomous):
-            model = system()
+            model = system(nsim=12000)
             out = model.simulate()  # simulate open loop
             psl.plot.pltOL(Y=out['Y'], U=out['U'])  # plot trajectories
             psl.plot.pltPhase(X=out['Y'])

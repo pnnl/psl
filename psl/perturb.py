@@ -74,6 +74,36 @@ def Step(nx=1, nsim=100, tstep=50, xmax=1, xmin=0):
     return np.asarray(Signal).T
 
 
+
+def Steps(nx=1, nsim=100, values=None, randsteps=5, xmax=1, xmin=0):
+    """
+
+    :param nx: (int) Number signals
+    :param nsim: (int) Number time steps
+    :param values: (list/ndarray) sequence of step changes, e.g., [0.4, 0.8, 1, 0.7, 0.3, 0.0]
+    :param randsteps: (int) number of random step changes if values is None
+    :param xmax: (int/ndarray) signal maximum value
+    :param xmin: (int/ndarray) signal minimum value
+    :return:
+    """
+
+    if values is None:
+        values = np.round(np.random.rand(randsteps), 3)
+    if type(values) is not np.ndarray:
+        values = np.asarray([values]).ravel()
+    if type(xmax) is not np.ndarray:
+        xmax = np.asarray(nx*[xmax]).ravel()
+    if type(xmin) is not np.ndarray:
+        xmin = np.asarray(nx*[xmin]).ravel()
+
+    step_length = int(np.ceil(nsim/len(values)))
+    signal = np.ones([nx, nsim])
+    for j in range(nx):
+        for k in range(len(values)):
+            signal[j, k*step_length:(k+1)*step_length] = values[k]*(xmax[j]-xmin[j])+xmin[j]
+    return signal.T
+
+
 def Ramp():
     """
     ramp change

@@ -11,6 +11,7 @@ from scipy.integrate import odeint
 
 # local imports
 from psl.emulator import ODE_NonAutonomous
+from psl.perturb import Steps
 
 
 class SEIR_population(ODE_NonAutonomous):
@@ -171,18 +172,17 @@ class TwoTank(ODE_NonAutonomous):
 
     def parameters(self):
         super().parameters()
+        self.ts = 1
         self.c1 = 0.08  # inlet valve coefficient
         self.c2 = 0.04  # tank outlet coefficient
         # Initial Conditions for the States
         self.x0 = np.asarray([0, 0])
         # default simulation setup
-        pump = np.empty((self.nsim - 1))
-        pump[0] = 0
-        pump[1:501] = 0.5
-        pump[251:551] = 0.1
-        pump[551: self.nsim - 1] = 0.2
-        valve = np.zeros((self.nsim - 1))
-        self.U = np.vstack([pump, valve]).T
+        pump = Steps(nx=1, nsim=self.nsim, values=None,
+                     randsteps=int(np.ceil(self.nsim/400)), xmax=0.5, xmin=0)
+        valve = Steps(nx=1, nsim=self.nsim, values=None,
+                      randsteps=int(np.ceil(self.nsim/400)), xmax=0.4, xmin=0)
+        self.U = np.vstack([pump.T, valve.T]).T
         self.nu = 2
         self.nx = 2
 
@@ -237,26 +237,16 @@ class CSTR(ODE_NonAutonomous):
         self.x0[0] = self.Ca_ss
         self.x0[1] = self.T_ss
         # Steady State Initial Condition for the Uncontrolled Inputs
-        self.u_ss = 300.0 # cooling jacket Temperature (K)
-        self.Tf = 350 # Feed Temperature (K)
-        self.Caf = 1 # Feed Concentration (mol/m^3)
+        self.u_ss = 300.0  # cooling jacket Temperature (K)
+        self.Tf = 350  # Feed Temperature (K)
+        self.Caf = 1  # Feed Concentration (mol/m^3)
         # dimensions
         self.nx = 2
         self.nu = 1
         self.nd = 2
         # default simulation setup
-        # Step cooling temperature to 295
-        u_ss = 300.0
-        U = np.ones(self.nsim - 1) * u_ss
-        U[50:150] = 303.0
-        U[150:250] = 297.0
-        U[250:350] = 295.0
-        U[350:450] = 298.0
-        U[450:550] = 298.0
-        U[650:750] = 303.0
-        U[750:850] = 306.0
-        U[850:] = 300.0
-        self.U = U.reshape(-1, 1)
+        self.U = self.u_ss + Steps(nx=1, nsim=self.nsim, values=None,
+                     randsteps=int(np.ceil(self.nsim / 100)), xmax=6, xmin=-6)
 
     def equations(self, x, t, u):
         # Inputs (1):
