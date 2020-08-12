@@ -41,10 +41,11 @@ def WhiteNoise(nx=1, nsim=100, xmax=1, xmin=0):
     :param xmax: (int/list/ndarray) signal maximum value
     :param xmin: (int/list/ndarray) signal minimum value
     """
+
     if type(xmax) is not np.ndarray:
-        xmax = np.asarray([xmax]).ravel()
+        xmax = np.asarray(nx*[xmax]).ravel()
     if type(xmin) is not np.ndarray:
-        xmin = np.asarray([xmin]).ravel()
+        xmin = np.asarray(nx*[xmin]).ravel()
     Signal = []
     for k in range(nx):
         signal = xmin[k] + (xmax[k] - xmin[k])*np.random.rand(nsim)
@@ -62,9 +63,9 @@ def Step(nx=1, nsim=100, tstep=50, xmax=1, xmin=0):
     :param xmin: (int/list/ndarray) signal minimum value
     """
     if type(xmax) is not np.ndarray:
-        xmax = np.asarray([xmax]).ravel()
+        xmax = np.asarray(nx * [xmax]).ravel()
     if type(xmin) is not np.ndarray:
-        xmin = np.asarray([xmin]).ravel()
+        xmin = np.asarray(nx * [xmin]).ravel()
     Signal = []
     for k in range(nx):
         signal = np.ones(nsim)
