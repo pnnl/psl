@@ -146,20 +146,18 @@ def Periodic(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, form='sin'):
     return np.asarray(Signal).T
 
   
-def CubicSpline(nsim=10, values=None, xmin=0, xmax=1):
+def SplineSignal(nsim=10, values=None, xmin=0, xmax=1):
     """
     Generates a smooth cubic spline trajectory by interpolating
     between data points
     """
     if values is None:
-        values = [rd.triangular(xmin, xmax) for _ in range(5)]
-    dt = int(np.ceil(nsim/len(values)))
-    timestamp = np.arange(0, nsim, dt)
-    tck = interpolate.splrep(timestamp, values)
-    unew = np.arange(0, nsim-1)
-    out = interpolate.splev(unew, tck)
-
-    return out
+        values = [rd.triangular(xmin, xmax) for _ in range(25)]
+    dt = int(np.ceil(nsim / len(values)))
+    dt_time = np.arange(0, nsim, dt)
+    cs = interpolate.CubicSpline(dt_time, values)
+    time = np.arange(0, nsim - 1)
+    return cs(time)
 
 def SignalComposite():
     """
