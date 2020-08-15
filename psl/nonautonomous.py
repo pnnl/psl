@@ -274,6 +274,106 @@ class CSTR(ODE_NonAutonomous):
         xdot[1] = dTdt
         return xdot
 
+      
+class UAV3D_kin(ODE_NonAutonomous):
+    """
+    Dubins 3D model -- UAV kinematic model with no wind
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 6    # Number of states
+        self.nu = 3    # Number of control inputs
+        self.g = 9.81  # Acceleration due to gravity (m/s^2)
+
+        # Initial Conditions for the States
+        self.x0 = np.array([5, 10, 15, 0, np.pi / 18, 9])
+
+    # equations defining the dynamical system
+    def equations(self, x, t, U):
+        """
+        # States (4): [x, y, z, psi]
+        # Inputs (3): [V, phi, gamma]
+        """
+
+        # equations
+
+        # Inputs
+        V = U[0]
+        phi = U[1]
+        gamma = U[2]
+        dx_dt = np.zeros(6)
+
+        dx_dt[0] = V * np.cos(x[3]) * np.cos(gamma)
+        dx_dt[1] = V * np.sin(x[3]) * np.cos(gamma)
+        dx_dt[2] = V * np.sin(gamma)
+        dx_dt[3] = (self.g/V) * (np.tan(phi))
+
+        return dx_dt
+
+
+      
+class UAV3D_dyn(ODE_NonAutonomous):
+    """
+    UAV dynamic guidance model with no wind
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 6    # Number of states
+        self.nu = 3    # Number of control inputs
+        self.g = 9.81  # Acceleration due to gravity (m/s^2)
+        self.W = 10.0  # Weight of the aircraft (kg)
+        self.rho = 1.2 # Air density at sea level (kg/m^3); varies with altitude
+        self.S = 10.0  # Wing area (m^2)
+        self.lenF = 2  # Fuselage length
+        self.b = 7.0  # Wingspan (m)
+        self.AR = self.b**2 / self.S  # Aspect Ratio of the wing
+        self.eps = 0.92  # Oswald efficiency factor (from Atlantik Solar UAV)
+        self.K = 1 / (self.eps * np.pi * self.AR)  # aerodynamic coefficient
+
+        # Initial Conditions for the States
+        self.x0 = np.array([5, 10, 15, 0, np.pi / 18, 9])
+
+    # equations defining the dynamical system
+    def equations(self, x, t, U):
+        """
+        States (6): [x, y, z, psi, gamma, V]
+        Inputs (3): [T, phi, load]
+        load = Lift force / Weight
+
+        """
+
+        # equations
+        V = x[5]
+        T = U[0]
+        phi = U[1]
+        load = U[2]
+        Re = 1.225 * V * self.lenF / 1.725e-5  # Reynolds number at V m / s
+        CD0 = 0.074 * Re ** (-0.2)  # parasitic drag
+        CL = 2 * load * self.W / self.rho * V ** 2 * self.S  # Lift coefficient
+        CD = CD0 + self.K * CL**2     # Drag coefficient
+        drag = self.rho * V ** 2 * self.S * CD   # Total drag
+        # T = D         # For level flight
+
+        dx_dt = np.zeros(6)
+
+        dx_dt[0] = V * np.cos(x[3]) * np.cos(x[4])
+        dx_dt[1] = V * np.sin(x[3]) * np.cos(x[4])
+        dx_dt[2] = V * np.sin(x[4])
+        dx_dt[3] = (self.g/V) * (load * np.sin(phi)) / np.cos(x[4])
+        dx_dt[4] = (self.g/V) * (load * np.cos(phi) - np.cos(x[4]))
+        dx_dt[5] = self.g * ((T - drag)/self.W - np.sin(x[4]))
+
+        return dx_dt
+
+      
 """
 Chaotic nonlinear ODEs 
 
