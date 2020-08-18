@@ -12,6 +12,7 @@ from scipy.integrate import odeint
 # local imports
 from psl.emulator import ODE_NonAutonomous
 from psl.perturb import Steps
+from psl.perturb import SplineSignal
 
 
 class SEIR_population(ODE_NonAutonomous):
@@ -294,15 +295,11 @@ class UAV3D_kin(ODE_NonAutonomous):
         self.x0 = np.array([5, 10, 15, 0, np.pi/18, 9])
 
         # default simulation setup
-        self.V = SplineSignal(nsim=self.nsim, values=[9.5, 11, 15, 14, 14, 12, 10, 9.5, 10, 10, 10, 10],
-                              xmin=9.5, xmax=15)
-        self.phi = SplineSignal(nsim=nsim, values=[0.0, 0.0, -0.01, 0.01, 0.0, 0.01, 0.01, 0.0],
-                                xmin=phi_min, xmax=phi_max)
-        self.gamma = SplineSignal(nsim=nsim, values=[0, 0.01, 0.01, 0.01, 0.01, -0.01, 0.01],
-                                  xmin=gam_min, xmax=gam_max)
+        self.V = SplineSignal(nsim=self.nsim, values=[9.5, 11, 15, 14, 14, 12, 10, 9.5, 10, 10, 10, 10])
+        self.phi = SplineSignal(nsim=self.nsim, values=[0.0, 0.0, -0.01, 0.01, 0.0, 0.01, 0.01, 0.0])
+        self.gamma = SplineSignal(nsim=self.nsim, values=[0, 0.01, 0.01, 0.01, 0.01, -0.01, 0.01])
 
         self.U = zip(self.V, self.phi, self.gamma)
-
 
     # equations defining the dynamical system
     def equations(self, x, t, U):
@@ -311,14 +308,12 @@ class UAV3D_kin(ODE_NonAutonomous):
         # Inputs (3): [V, phi, gamma]
         """
 
-        # equations
-
         # Inputs
         V = U[0]
         phi = U[1]
         gamma = U[2]
-        dx_dt = np.zeros(6)
 
+        dx_dt = np.zeros(6)
         dx_dt[0] = V * np.cos(x[3]) * np.cos(gamma)
         dx_dt[1] = V * np.sin(x[3]) * np.cos(gamma)
         dx_dt[2] = V * np.sin(gamma)
