@@ -301,8 +301,7 @@ class UAV3D_kin(ODE_NonAutonomous):
         self.gamma = SplineSignal(nsim=nsim, values=[0, 0.01, 0.01, 0.01, 0.01, -0.01, 0.01],
                                   xmin=gam_min, xmax=gam_max)
 
-        self.U =
-
+        self.U = zip(self.V, self.phi, self.gamma)
 
 
     # equations defining the dynamical system
