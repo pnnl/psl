@@ -288,9 +288,22 @@ class UAV3D_kin(ODE_NonAutonomous):
         self.nx = 6    # Number of states
         self.nu = 3    # Number of control inputs
         self.g = 9.81  # Acceleration due to gravity (m/s^2)
+        self.vmin = 9.5   # Minimum airspeed for stable flight (m/s)
 
         # Initial Conditions for the States
-        self.x0 = np.array([5, 10, 15, 0, np.pi / 18, 9])
+        self.x0 = np.array([5, 10, 15, 0, np.pi/18, 9])
+
+        # default simulation setup
+        self.V = SplineSignal(nsim=self.nsim, values=[9.5, 11, 15, 14, 14, 12, 10, 9.5, 10, 10, 10, 10],
+                              xmin=9.5, xmax=15)
+        self.phi = SplineSignal(nsim=nsim, values=[0.0, 0.0, -0.01, 0.01, 0.0, 0.01, 0.01, 0.0],
+                                xmin=phi_min, xmax=phi_max)
+        self.gamma = SplineSignal(nsim=nsim, values=[0, 0.01, 0.01, 0.01, 0.01, -0.01, 0.01],
+                                  xmin=gam_min, xmax=gam_max)
+
+        self.U =
+
+
 
     # equations defining the dynamical system
     def equations(self, x, t, U):

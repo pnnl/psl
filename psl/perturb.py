@@ -3,6 +3,8 @@ Base Control Profiles for System excitation
 """
 
 import numpy as np
+import random as rd
+from scipy import interpolate
 
 
 def RandomWalk(nx=1, nsim=100, xmax=1, xmin=0, sigma=0.05):
