@@ -281,8 +281,8 @@ class UAV3D_kin(ODE_NonAutonomous):
     Dubins 3D model -- UAV kinematic model with no wind
     """
 
-    def __init__(self):
-        super().__init__()
+    # def __init__(self):
+    #     super().__init__()
 
     # parameters of the dynamical system
     def parameters(self):
@@ -299,19 +299,19 @@ class UAV3D_kin(ODE_NonAutonomous):
         self.phi = SplineSignal(nsim=self.nsim, values=[0.0, 0.0, -0.01, 0.01, 0.0, 0.01, 0.01, 0.0])
         self.gamma = SplineSignal(nsim=self.nsim, values=[0, 0.01, 0.01, 0.01, 0.01, -0.01, 0.01])
 
-        self.U = zip(self.V, self.phi, self.gamma)
+        self.U = np.vstack([self.V, self.phi, self.gamma]).T
 
     # equations defining the dynamical system
-    def equations(self, x, t, U):
+    def equations(self, x, t, u):
         """
         # States (4): [x, y, z, psi]
         # Inputs (3): [V, phi, gamma]
         """
 
         # Inputs
-        V = U[0]
-        phi = U[1]
-        gamma = U[2]
+        V = u[0]
+        phi = u[1]
+        gamma = u[2]
 
         dx_dt = np.zeros(6)
         dx_dt[0] = V * np.cos(x[3]) * np.cos(gamma)
@@ -322,7 +322,6 @@ class UAV3D_kin(ODE_NonAutonomous):
         return dx_dt
 
 
-      
 class UAV3D_dyn(ODE_NonAutonomous):
     """
     UAV dynamic guidance model with no wind

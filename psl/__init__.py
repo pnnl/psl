@@ -11,6 +11,7 @@ from .plot import *
 systems = {# non-autonomous ODEs
            'CSTR': CSTR,
            'TwoTank': TwoTank,
+           'UAV3D_kin': UAV3D_kin,
            # autonomous chaotic ODEs
            'LorenzSystem': LorenzSystem,
            'Lorenz96': Lorenz96,
