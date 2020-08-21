@@ -281,9 +281,6 @@ class UAV3D_kin(ODE_NonAutonomous):
     Dubins 3D model -- UAV kinematic model with no wind
     """
 
-    # def __init__(self):
-    #     super().__init__()
-
     # parameters of the dynamical system
     def parameters(self):
         self.nx = 6    # Number of states
@@ -320,7 +317,6 @@ class UAV3D_kin(ODE_NonAutonomous):
         dx_dt[3] = (self.g/V) * (np.tan(phi))
 
         return dx_dt
-
 
       
 class UAV3D_dyn(ODE_NonAutonomous):
