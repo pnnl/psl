@@ -322,6 +322,7 @@ class UAV3D_kin(ODE_NonAutonomous):
         return dx_dt
 
 
+      
 class UAV3D_dyn(ODE_NonAutonomous):
     """
     UAV dynamic guidance model with no wind
