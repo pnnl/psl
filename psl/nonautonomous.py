@@ -292,12 +292,16 @@ class UAV3D_kin(ODE_NonAutonomous):
         self.vmin = 9.5   # Minimum airspeed for stable flight (m/s)
 
         # Initial Conditions for the States
-        self.x0 = np.array([5, 10, 15, 0, np.pi/18, 9])
+        self.x0 = np.array([5, 10, 15, 0])
 
         # default simulation setup
-        self.V = SplineSignal(nsim=self.nsim, values=[9.5, 11, 15, 14, 14, 12, 10, 9.5, 10, 10, 10, 10])
-        self.phi = SplineSignal(nsim=self.nsim, values=[0.0, 0.0, -0.01, 0.01, 0.0, 0.01, 0.01, 0.0])
-        self.gamma = SplineSignal(nsim=self.nsim, values=[0, 0.01, 0.01, 0.01, 0.01, -0.01, 0.01])
+        # self.V = SplineSignal(nsim=self.nsim, values=[9.5, 15, 15, 12, 18, 10, 16, 9.5, 17, 9.5, 18, 10])
+        # self.phi = SplineSignal(nsim=self.nsim, values=[0.0, 0.01, -0.01, 0.02, -0.1, 0.1, 0.01, 0.0])
+        # self.gamma = SplineSignal(nsim=self.nsim, values=[0, 0.01, 0.01, 0.01, 0.01, -0.01, 0.01])
+
+        self.V = SplineSignal(nsim=self.nsim, values=None, xmin=9.5, xmax=18)
+        self.phi = SplineSignal(nsim=self.nsim, values=None, xmin=-45*np.pi/180, xmax=45*np.pi/180)
+        self.gamma = SplineSignal(nsim=self.nsim, values=None, xmin=-10*np.pi/180, xmax=10*np.pi/180)
 
         self.U = np.vstack([self.V, self.phi, self.gamma]).T
 
@@ -313,7 +317,7 @@ class UAV3D_kin(ODE_NonAutonomous):
         phi = u[1]
         gamma = u[2]
 
-        dx_dt = np.zeros(6)
+        dx_dt = np.zeros(4)
         dx_dt[0] = V * np.cos(x[3]) * np.cos(gamma)
         dx_dt[1] = V * np.sin(x[3]) * np.cos(gamma)
         dx_dt[2] = V * np.sin(gamma)

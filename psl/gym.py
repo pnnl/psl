@@ -8,9 +8,12 @@ Wrapper for OpenAI gym environments
 
 import numpy as np
 import gym
+import random
 
 # local imports
 from psl.emulator import EmulatorBase
+from psl.perturb import SplineSignal
+from psl.perturb import Steps
 
 
 class GymWrapper(EmulatorBase):
@@ -19,11 +22,11 @@ class GymWrapper(EmulatorBase):
     https://gym.openai.com/read-only.html
     https://github.com/openai/gym
     """
-    def __init__(self, nsim=1000, ninit=0, system='CartPole-v1'):
+    def __init__(self, nsim=1000, ninit=0, system='Pendulum-v0'):
         super().__init__(nsim=nsim, ninit=ninit)
         self.system = system
 
-    def parameters(self, system='CartPole-v1'):
+    def parameters(self, system='Pendulum-v0'):
         self.system = system
         self.env = gym.make(self.system)
         self.env.reset()  # to reset the environment state
@@ -33,6 +36,16 @@ class GymWrapper(EmulatorBase):
         self.nu = np.asarray([self.action_sample]).shape[0]
         #     default simulation setup
         self.U = np.zeros([(self.nsim - 1), self.nu])
+        self.U[int(self.nsim/8)] = 0.1
+        # randomIndList =[]
+        # for i in range(0, 100):
+        #     # any random numbers from 0 to 1000
+        #     ind = random.randint(0, self.nsim-1)
+        #     self.U[ind] = random.uniform(-1, 1)
+        self.U = Steps(nx=1, nsim=self.nsim, values=None,
+                       randsteps=int(np.ceil(self.nsim/40)), xmax=0.5, xmin=-0.5)
+        # self.U = SplineSignal(nsim=self.nsim, values=None, xmin=-2.0, xmax=2.0)
+        # print(self.U.shape)
         if type(self.action_sample) == int:
             self.U = self.U.astype(int)
 
@@ -40,6 +53,7 @@ class GymWrapper(EmulatorBase):
         if type(self.action_sample) == int:
             u = u.item()
         self.env.state = x
+        print(u)
         x, reward, done, info = self.env.step(u)
         return x, reward
 
