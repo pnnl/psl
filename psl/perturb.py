@@ -137,12 +137,16 @@ def Periodic(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, form='sin'):
     samples_period = nsim// numPeriods
     leftover = nsim % numPeriods
     Signal = []
+    extraPeriods = 0
+    if leftover > samples_period:
+        extraPeriods = leftover//samples_period
+        leftover = leftover % samples_period
     for k in range(nx):
         if form == 'sin':
             base = xmin[k] + (xmax[k] - xmin[k])*(0.5 + 0.5 * np.sin(np.arange(0, 2 * np.pi, 2 * np.pi / samples_period)))
         elif form == 'cos':
             base = xmin[k] + (xmax[k] - xmin[k])*(0.5 + 0.5 * np.cos(np.arange(0, 2 * np.pi, 2 * np.pi / samples_period)))
-        signal = np.tile(base, numPeriods)
+        signal = np.tile(base, numPeriods+extraPeriods)
         signal = np.append(signal, base[0:leftover])
         Signal.append(signal)
     return np.asarray(Signal).T
