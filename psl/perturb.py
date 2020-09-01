@@ -126,6 +126,7 @@ def Periodic(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, form='sin'):
     :param xmin: (int/list/ndarray) signal minimum value
     :param form: (str) form of the periodic signal 'sin' or 'cos'
     """
+    assert nsim >= numPeriods, 'numPeriods must be smaller than nsim'
     if type(xmax) is not np.ndarray:
         xmax = np.asarray([xmax]*nx).ravel()
     if type(xmin) is not np.ndarray:
