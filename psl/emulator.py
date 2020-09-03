@@ -124,7 +124,7 @@ class ODE_Autonomous(EmulatorBase):
             x = xdot[-1]
             X.append(x)  # updated states trajectories
         Yout = np.asarray(X)
-        return {'Y': Yout}
+        return {'Y': Yout, 'X': np.asarray(X)}
 
 
 class ODE_NonAutonomous(EmulatorBase, ABC):
@@ -175,5 +175,5 @@ class ODE_NonAutonomous(EmulatorBase, ABC):
                 break
         Yout = np.asarray(X)
         Uout = np.asarray(U)
-        return {'Y': Yout, 'U': Uout}
+        return {'Y': Yout, 'U': Uout, 'X': np.asarray(X)}
 
