@@ -408,7 +408,7 @@ class HindmarshRose(ODE_NonAutonomous):
         self.umax = 10
         self.x0 = np.asarray([-5,-10,0])
         # default simulation setup
-        self.U = 3 * np.asarray([np.ones((self.nsim - 1))]).T
+        self.U = 3 * np.asarray([np.ones((self.nsim))]).T
         self.nu = 1
         self.nx = 3
 
