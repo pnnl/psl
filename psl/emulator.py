@@ -118,7 +118,7 @@ class ODE_Autonomous(EmulatorBase):
         # time interval
         t = np.arange(0, nsim+1) * ts + ninit
         X = []
-        for N in range(nsim-1):
+        for N in range(nsim):
             dT = [t[N], t[N + 1]]
             xdot = odeint(self.equations, x, dT)
             x = xdot[-1]
