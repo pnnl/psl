@@ -122,6 +122,7 @@ class Tank(ODE_NonAutonomous):
         self.x0 = 0
         # initial valve position
         self.u0 = 10
+        self.nx = 1
 
     def equations(self, x, t, pump, valve):
         # States (1): level in the tanks

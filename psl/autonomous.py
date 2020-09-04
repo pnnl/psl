@@ -60,6 +60,7 @@ class UniversalOscillator(ODE_Autonomous):
         self.mu = 2
         self.omega = 1
         self.x0 = [1.0, 0.0]
+        self.nx = 2
 
     def equations(self, x, t):
         # Derivatives
@@ -81,6 +82,7 @@ class Lorenz96(ODE_Autonomous):
         self.F = 8  # Forcing
         self.x0 = self.F*np.ones(self.N)
         self.x0[19] += 0.01  # Add small perturbation to random variable
+        self.nx = self.N
 
     def equations(self, x, t):
         # Compute state derivatives
@@ -112,6 +114,7 @@ class LorenzSystem(ODE_Autonomous):
         self.sigma = 10.0
         self.beta = 8.0 / 3.0
         self.x0 = [1.0, 1.0, 1.0]
+        self.nx = 3
 
     def equations(self, x, t):
         # Derivatives
@@ -133,6 +136,7 @@ class VanDerPol(ODE_Autonomous):
         super().parameters()
         self.mu = 1.0
         self.x0 = [1, 2]
+        self.nx = 2
 
     def equations(self, x, t):
         # Derivatives
@@ -152,6 +156,7 @@ class ThomasAttractor(ODE_Autonomous):
         super().parameters()
         self.b = 0.208186
         self.x0 = [1, -1, 1]
+        self.nx = 3
 
     def equations(self, x, t):
         # Derivatives
@@ -174,6 +179,7 @@ class RosslerAttractor(ODE_Autonomous):
         self.b = 0.2
         self.c = 5.7
         self.x0 = [0, 0, 0]
+        self.nx = 3
 
     def equations(self, x, t):
         # Derivatives
@@ -196,6 +202,7 @@ class LotkaVolterra(ODE_Autonomous):
         self.c = 1.5
         self.d = 0.75
         self.x0 = [5, 100]
+        self.nx = 2
 
     def equations(self, x, t):
         # Derivatives
@@ -215,6 +222,7 @@ class Brusselator1D(ODE_Autonomous):
         self.a = 1.0
         self.b = 3.0
         self.x0 = [1.0, 1.0]
+        self.nx = 2
 
     def equations(self, x, t):
         # Derivatives
@@ -240,6 +248,7 @@ class ChuaCircuit(ODE_Autonomous):
         self.m0 = -1.143
         self.m1 = -0.714
         self.x0 = [0.7, 0.0, 0.0]
+        self.nx = 3
 
     def equations(self, x, t):
         fx = self.m1*x[0] + 0.5*(self.m0 - self.m1)*(np.abs(x[0] + 1) - np.abs(x[0] - 1))
@@ -265,6 +274,7 @@ class Duffing(ODE_Autonomous):
         self.gamma = 8
         self.omega = 0.5
         self.x0 = [1.0, 0.0]
+        self.nx = 2
 
     def equations(self, x, t):
         # Derivatives
