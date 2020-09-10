@@ -284,41 +284,96 @@ class UAV3D_kin(ODE_NonAutonomous):
 
     # parameters of the dynamical system
     def parameters(self):
-        self.nx = 6    # Number of states
+        self.nx = 4    # Number of states
         self.nu = 3    # Number of control inputs
         self.g = 9.81  # Acceleration due to gravity (m/s^2)
         self.vmin = 9.5   # Minimum airspeed for stable flight (m/s)
+        self.h = 10    # Minimum altitude to avoid crash (m)
+        self.ts = 0.1
 
         # Initial Conditions for the States
-        self.x0 = np.array([5, 10, 15, 0])
+        self.x0 = np.array([5, 10, 50, 0])
 
         # default simulation setup
-        # self.V = SplineSignal(nsim=self.nsim, values=[9.5, 15, 15, 12, 18, 10, 16, 9.5, 17, 9.5, 18, 10])
-        # self.phi = SplineSignal(nsim=self.nsim, values=[0.0, 0.01, -0.01, 0.02, -0.1, 0.1, 0.01, 0.0])
-        # self.gamma = SplineSignal(nsim=self.nsim, values=[0, 0.01, 0.01, 0.01, 0.01, -0.01, 0.01])
 
-        self.V = SplineSignal(nsim=self.nsim, values=None, xmin=9.5, xmax=18)
-        self.phi = SplineSignal(nsim=self.nsim, values=None, xmin=-45*np.pi/180, xmax=45*np.pi/180)
-        self.gamma = SplineSignal(nsim=self.nsim, values=None, xmin=-10*np.pi/180, xmax=10*np.pi/180)
+        seed = 1
+        headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi/180.0)
+        gammVec = np.multiply([0.0, 5.0, 10.0, -5.0, 0.0, 9.0, -1.0, 0.0, 3.0, -1.0, 0.0], np.pi/180.0)
+        self.V = SplineSignal(nsim=self.nsim, values=None, xmin=9, xmax=15, rseed=seed)
+        self.phi = SplineSignal(nsim=self.nsim, values=None, xmin=-20*np.pi/180, xmax=20*np.pi/180, rseed=seed)
+        self.gamma = SplineSignal(nsim=self.nsim, values=gammVec, xmin=-10*np.pi/180, xmax=10*np.pi/180, rseed=seed)
 
-        self.U = np.vstack([self.V, self.phi, self.gamma]).T
+        # Transformed inputs
+        U1 = np.multiply(self.V, np.cos(self.gamma))
+        U2 = np.multiply(self.V, np.sin(self.gamma))
+        U3 = self.g * np.divide(np.tan(self.phi), self.V)
+        # U3 = SplineSignal(nsim=self.nsim, values=headVec * 3, xmin=-20 * np.pi / 180, xmax=20 * np.pi / 180, rseed=seed)
+
+        # self.U = np.vstack([self.V, self.phi, self.gamma]).T
+        self.U = np.vstack([U1, U2, U3]).T
 
     # equations defining the dynamical system
     def equations(self, x, t, u):
         """
-        # States (4): [x, y, z, psi]
+        # States (4): [x, y, z]
         # Inputs (3): [V, phi, gamma]
+        # Transformed Inputs (3): [U1, U2, U3]
+        """
+
+        U1 = u[0]
+        U2 = u[1]
+        U3 = u[2]
+
+        dx_dt = np.zeros(4)
+        dx_dt[0] = U1 * np.cos(x[3])
+        dx_dt[1] = U1 * np.sin(x[3])
+        dx_dt[2] = U2
+        if x[2] <= self.h:
+            dx_dt[2] = 0.0
+        dx_dt[3] = U3
+
+        return dx_dt
+
+
+class UAV2D_kin(ODE_NonAutonomous):
+    """
+    Dubins 2D model -- UAV kinematic model with no wind
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 4    # Number of states
+        self.nu = 1    # Number of control inputs
+        self.g = 9.81  # Acceleration due to gravity (m/s^2)
+        self.vmin = 9.5   # Minimum airspeed for stable flight (m/s)
+        self.h = 10    # Minimum altitude to avoid crash (m)
+        self.ts = 0.1
+
+        self.V = 10   # Constant velocity  (m/s^2)
+
+        # Initial Conditions for the States
+        self.x0 = np.array([5, 10, 10, 0])
+
+        seed = 3
+        self.phi = SplineSignal(nsim=self.nsim, values=None, xmin=-45*np.pi/180, xmax=45*np.pi/180, rseed=seed)
+
+        self.U = self.phi
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        # States (3): [x, y, z, psi]
+        # Inputs (1): [phi]
         """
 
         # Inputs
-        V = u[0]
-        phi = u[1]
-        gamma = u[2]
+        V = self.V
+        phi = u
 
         dx_dt = np.zeros(4)
-        dx_dt[0] = V * np.cos(x[3]) * np.cos(gamma)
-        dx_dt[1] = V * np.sin(x[3]) * np.cos(gamma)
-        dx_dt[2] = V * np.sin(gamma)
+        dx_dt[0] = V * np.cos(x[3])
+        dx_dt[1] = V * np.sin(x[3])
+        dx_dt[2] = 0.0
         dx_dt[3] = (self.g/V) * (np.tan(phi))
 
         return dx_dt
