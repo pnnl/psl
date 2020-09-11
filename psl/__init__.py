@@ -42,6 +42,5 @@ systems = {# non-autonomous ODEs
            'HollandschHuys_full': BuildingEnvelope,
            'HollandschHuys_ROM100': BuildingEnvelope,
            'Infrax_full': BuildingEnvelope,
-           'Infrax_ROM100': BuildingEnvelope,
-           'UAV3D_kin': UAV3D_kin
+           'Infrax_ROM100': BuildingEnvelope
            }

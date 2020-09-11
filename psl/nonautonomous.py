@@ -296,9 +296,9 @@ class UAV3D_kin(ODE_NonAutonomous):
 
         # default simulation setup
 
-        seed = 1
+        seed = 2
         headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi/180.0)
-        gammVec = np.multiply([0.0, 5.0, 10.0, -5.0, 0.0, 9.0, -1.0, 0.0, 3.0, -1.0, 0.0], np.pi/180.0)
+        gammVec = np.multiply([0.0, 5.0, 10.0, -5.0, 0.0, 9.0, -1.0, 0.0, 3.0, -1.0, 0.0, 3.0, -1.0], np.pi/180.0)
         self.V = SplineSignal(nsim=self.nsim, values=None, xmin=9, xmax=15, rseed=seed)
         self.phi = SplineSignal(nsim=self.nsim, values=None, xmin=-20*np.pi/180, xmax=20*np.pi/180, rseed=seed)
         self.gamma = SplineSignal(nsim=self.nsim, values=gammVec, xmin=-10*np.pi/180, xmax=10*np.pi/180, rseed=seed)
@@ -378,14 +378,67 @@ class UAV2D_kin(ODE_NonAutonomous):
 
         return dx_dt
 
+class UAV3D_reduced(ODE_NonAutonomous):
+    """
+    Reduced Dubins 3D model -- UAV kinematic model with transformed inputs
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 3    # Number of states
+        self.nu = 3    # Number of control inputs
+        self.g = 9.81  # Acceleration due to gravity (m/s^2)
+        self.vmin = 9.5   # Minimum airspeed for stable flight (m/s)
+        self.h = 10    # Minimum altitude to avoid crash (m)
+        self.ts = 0.1
+
+        # Initial Conditions for the States
+        self.x0 = np.array([5, 10, 50])
+
+        # default simulation setup
+
+        seed = 2
+        headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi/180.0)
+        gammVec = np.multiply([0.0, 5.0, 10.0, -5.0, 0.0, 9.0, -1.0, 0.0, 3.0, -1.0, 0.0], np.pi/180.0)
+        self.V = SplineSignal(nsim=self.nsim, values=None, xmin=9, xmax=15, rseed=seed)
+        self.phi = SplineSignal(nsim=self.nsim, values=None, xmin=-20*np.pi/180, xmax=20*np.pi/180, rseed=seed)
+        self.gamma = SplineSignal(nsim=self.nsim, values=gammVec, xmin=-10*np.pi/180, xmax=10*np.pi/180, rseed=seed)
+
+        # Transformed inputs
+        U1 = np.multiply(self.V, np.cos(self.gamma))
+        U2 = np.multiply(self.V, np.sin(self.gamma))
+        # U3 = self.g * np.divide(np.tan(self.phi), self.V)
+        U3 = SplineSignal(nsim=self.nsim, values=headVec * 3, xmin=-20 * np.pi / 180, xmax=20 * np.pi / 180, rseed=seed)
+
+        # self.U = np.vstack([self.V, self.phi, self.gamma]).T
+        self.U = np.vstack([U1, U2, U3]).T
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        # States (4): [x, y, z]
+        # Inputs (3): [V, phi, gamma]
+        # Transformed Inputs (3): [U1, U2, U3]
+        """
+
+        U1 = u[0]
+        U2 = u[1]
+        U3 = u[2]
+
+        dx_dt = np.zeros(3)
+        dx_dt[0] = U1 * np.cos(U3)
+        dx_dt[1] = U1 * np.sin(U3)
+        dx_dt[2] = U2
+        if x[2] <= self.h:
+            dx_dt[2] = 0.0
+
+        return dx_dt
+
       
 class UAV3D_dyn(ODE_NonAutonomous):
     """
     UAV dynamic guidance model with no wind
     """
-
-    def __init__(self):
-        super().__init__()
 
     # parameters of the dynamical system
     def parameters(self):
@@ -400,9 +453,19 @@ class UAV3D_dyn(ODE_NonAutonomous):
         self.AR = self.b**2 / self.S  # Aspect Ratio of the wing
         self.eps = 0.92  # Oswald efficiency factor (from Atlantik Solar UAV)
         self.K = 1 / (self.eps * np.pi * self.AR)  # aerodynamic coefficient
+        self.ts = 0.1
 
         # Initial Conditions for the States
-        self.x0 = np.array([5, 10, 15, 0, np.pi / 18, 9])
+        self.x0 = np.array([5, 10, 15, 0, np.pi/18, 9])
+
+        seed = 2
+        headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi / 180.0)
+        loadVec = [1.0, 1.5, 1.0, 0.5, 0.1, 1.5, 1.0, 1.25, 1.0, 0.9, 1.0]
+        T = SplineSignal(nsim=self.nsim, values=None, xmin=1, xmax=50, rseed=seed)
+        phi = SplineSignal(nsim=self.nsim, values=None, xmin=-10 * np.pi / 180, xmax=10 * np.pi / 180, rseed=seed)
+        load = SplineSignal(nsim=self.nsim, values=loadVec, xmin=0, xmax=3, rseed=seed)
+
+        self.U = np.vstack([T, phi, load]).T
 
     # equations defining the dynamical system
     def equations(self, x, t, U):
@@ -418,12 +481,13 @@ class UAV3D_dyn(ODE_NonAutonomous):
         T = U[0]
         phi = U[1]
         load = U[2]
+        load = 1.0
         Re = 1.225 * V * self.lenF / 1.725e-5  # Reynolds number at V m / s
-        CD0 = 0.074 * Re ** (-0.2)  # parasitic drag
+        CD0 = 0.015  # 0.074 * Re ** (-0.2)  # parasitic drag
         CL = 2 * load * self.W / self.rho * V ** 2 * self.S  # Lift coefficient
         CD = CD0 + self.K * CL**2     # Drag coefficient
         drag = self.rho * V ** 2 * self.S * CD   # Total drag
-        # T = D         # For level flight
+        T = drag         # For level flight
 
         dx_dt = np.zeros(6)
 
