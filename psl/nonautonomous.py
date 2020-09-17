@@ -296,11 +296,13 @@ class UAV3D_kin(ODE_NonAutonomous):
 
         # default simulation setup
 
-        seed = 2
+        seed = 1
         headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi/180.0)
         gammVec = np.multiply([0.0, 5.0, 10.0, -5.0, 0.0, 9.0, -1.0, 0.0, 3.0, -1.0, 0.0, 3.0, -1.0], np.pi/180.0)
-        self.V = SplineSignal(nsim=self.nsim, values=None, xmin=9, xmax=15, rseed=seed)
-        self.phi = SplineSignal(nsim=self.nsim, values=None, xmin=-20*np.pi/180, xmax=20*np.pi/180, rseed=seed)
+        velVec = [9.5, 16.0, 10.0, 11.0, 10.0, 11.5, 9.5, 15.0, 16.0, 13.0, 12.0, 12.0, 9.0]
+        self.V = SplineSignal(nsim=self.nsim, values=velVec * 9, xmin=9, xmax=15, rseed=seed)
+        heading = SplineSignal(nsim=self.nsim, values=headVec * 9, xmin=-20*np.pi/180, xmax=20*np.pi/180, rseed=seed)
+        self.phi = np.append([0.0], np.diff(heading)/self.ts)
         self.gamma = SplineSignal(nsim=self.nsim, values=gammVec, xmin=-10*np.pi/180, xmax=10*np.pi/180, rseed=seed)
 
         # Transformed inputs
@@ -461,7 +463,7 @@ class UAV3D_dyn(ODE_NonAutonomous):
         seed = 2
         headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi / 180.0)
         loadVec = [1.0, 1.5, 1.0, 0.5, 0.1, 1.5, 1.0, 1.25, 1.0, 0.9, 1.0]
-        T = SplineSignal(nsim=self.nsim, values=None, xmin=1, xmax=50, rseed=seed)
+        T = SplineSignal(nsim=self.nsim, values=None, xmin=100, xmax=500, rseed=seed)
         phi = SplineSignal(nsim=self.nsim, values=None, xmin=-10 * np.pi / 180, xmax=10 * np.pi / 180, rseed=seed)
         load = SplineSignal(nsim=self.nsim, values=loadVec, xmin=0, xmax=3, rseed=seed)
 
