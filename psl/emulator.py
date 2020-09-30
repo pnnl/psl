@@ -3,6 +3,7 @@ Base Classes for dynamic systems emulators
 
 """
 from abc import ABC, abstractmethod
+import random
 import numpy as np
 from scipy.integrate import odeint
 
@@ -11,8 +12,10 @@ class EmulatorBase(ABC):
     """
     base class of the emulator
     """
-    def __init__(self, nsim=1001, ninit=0, ts=0.1):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
         super().__init__()
+        random.seed(seed)
+        np.random.seed(seed)
         self.nsim, self.ninit, self.ts = nsim, ninit, ts
         self.parameters()
 
