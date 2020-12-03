@@ -126,7 +126,7 @@ class ODE_Autonomous(EmulatorBase):
             xdot = odeint(self.equations, x, dT)
             x = xdot[-1]
             X.append(x)  # updated states trajectories
-        Yout = np.asarray(X)
+        Yout = np.asarray(X).reshape(nsim, -1)
         return {'Y': Yout, 'X': np.asarray(X)}
 
 
@@ -176,7 +176,7 @@ class ODE_NonAutonomous(EmulatorBase, ABC):
             N += 1
             if N == nsim:
                 break
-        Yout = np.asarray(X)
-        Uout = np.asarray(U)
+        Yout = np.asarray(X).reshape(nsim, -1)
+        Uout = np.asarray(U).reshape(nsim, -1)
         return {'Y': Yout, 'U': Uout, 'X': np.asarray(X)}
 

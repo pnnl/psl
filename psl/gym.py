@@ -22,7 +22,7 @@ class GymWrapper(EmulatorBase):
     https://gym.openai.com/read-only.html
     https://github.com/openai/gym
     """
-    def __init__(self, nsim=1000, ninit=0, system='Pendulum-v0'):
+    def __init__(self, nsim=1000, ninit=0, system='Pendulum-v0', seed=59):
         super().__init__(nsim=nsim, ninit=ninit)
         self.system = system
 
@@ -53,7 +53,6 @@ class GymWrapper(EmulatorBase):
         if type(self.action_sample) == int:
             u = u.item()
         self.env.state = x
-        print(u)
         x, reward, done, info = self.env.step(u)
         return x, reward
 

@@ -21,7 +21,7 @@ class BuildingEnvelope(SSM):
     different building types are stored in ./emulators/buildings/*.mat
     models obtained from: https://github.com/drgona/BeSim
     """
-    def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=True):
+    def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=True, seed=59):
         self.system = system
         self.linear = linear
         self.resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'parameters/buildings')
