@@ -1,12 +1,15 @@
 import psl
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import os
 
 
 if __name__ == '__main__':
     """
     Tests
     """
+
+    os.mkdir("./figs")
 
     for name, system in psl.systems.items():
         print(name)
