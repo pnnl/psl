@@ -14,40 +14,6 @@ https://en.wikipedia.org/wiki/List_of_dynamical_systems_and_differential_equatio
 from psl.emulator import ODE_Autonomous
 
 
-class LogisticGrowth(ODE_Autonomous):
-    """
-    logistic growth linear ODE
-    https://en.wikipedia.org/wiki/Logistic_function
-    """
-
-    def parameters(self):
-        self.k = 2
-        self.x0 = 1
-        self.nx = 1
-
-    def equations(self, x):
-        pass
-
-    def simulate(self, ninit=None, nsim=None, x0=None):
-        """
-        :param nsim: (int) Number of steps for open loop response
-        :param x: (ndarray, shape=(self.nx)) Initial state. If not give will use internal state.
-        :return: The response trajectories,  X
-        """
-        if nsim is None:
-            nsim = self.nsim
-        if x0 is None:
-            x = self.x0
-        else:
-            assert x0.shape[0] == self.nx, "Mismatch in x0 size"
-            x = x0
-        X= []
-        for k in range(nsim):
-            x = self.equations(x)
-            X.append(x)  # updated states trajectories
-        return {'Y': np.asarray(X)}
-
-
 class UniversalOscillator(ODE_Autonomous):
     """
     Hharmonic oscillator

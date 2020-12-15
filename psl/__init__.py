@@ -1,8 +1,5 @@
 from .autonomous import *
-from .building import *
 from .emulator import *
-from .gym import *
-from .linear import *
 from .nonautonomous import *
 from .datasets import *
 from .perturb import *
@@ -11,11 +8,15 @@ from .plot import *
 emulators = {
     # non-autonomous ODEs
     "CSTR": CSTR,
+    "Tank": Tank,
     "TwoTank": TwoTank,
     "UAV3D_kin": UAV3D_kin,
     "UAV2D_kin": UAV2D_kin,
+    "UAV3D_reduced": UAV3D_reduced,
+    "SEIR_population": SEIR_population,
 
     # autonomous chaotic ODEs
+    "UniversalOscillator": UniversalOscillator,
     "LorenzSystem": LorenzSystem,
     "Lorenz96": Lorenz96,
     "VanDerPol": VanDerPol,
@@ -25,7 +26,6 @@ emulators = {
     "Brusselator1D": Brusselator1D,
     "ChuaCircuit": ChuaCircuit,
     "Duffing": Duffing,
-    "UniversalOscillator": UniversalOscillator,
 
     # non-autonomous chaotic ODEs
     "HindmarshRose": HindmarshRose,
