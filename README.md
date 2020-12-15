@@ -1,4 +1,4 @@
-# SLiP: Systems Library in Python
+# PSL: Python Systems Library
 
 ### TODO
     [ ] generate meaningful reference and input signals for each emulator
