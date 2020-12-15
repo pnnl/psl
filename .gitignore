@@ -1,0 +1,5 @@
+**/build
+**/dist
+**/psl.egg-info
+**/__pycache__
+**/.vscode
