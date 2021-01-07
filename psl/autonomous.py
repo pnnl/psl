@@ -36,6 +36,24 @@ class UniversalOscillator(ODE_Autonomous):
         return dx
 
 
+class Pendulum(ODE_Autonomous):
+    """
+    Simple pendulum.
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html
+    """
+    def parameters(self):
+        super().parameters()
+        self.g = 9.81
+        self.f = 3.
+        self.nx = 2
+        self.x0 = [0., 1.]
+
+    def equations(self, x, t):
+        theta = x[0]
+        omega = x[1]
+        return [omega, -self.f*omega - self.g*np.sin(theta)]
+
+
 class Lorenz96(ODE_Autonomous):
     """
     Lorenz 96 model
