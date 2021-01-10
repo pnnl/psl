@@ -8,7 +8,7 @@ setup(
     name='psl',
     description="dynamic Systems Library in Python",
     license="MIT",
-    author="Aaron Tuor",
+    author="Aaron Tuor, Jan Drgona, Elliott Skomski, Soumya Vasisht",
     author_email='aarontuor@gmail.com',
     url='https://github.com/aarontuor/psl',
     packages=['psl'],

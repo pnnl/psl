@@ -14,40 +14,6 @@ https://en.wikipedia.org/wiki/List_of_dynamical_systems_and_differential_equatio
 from psl.emulator import ODE_Autonomous
 
 
-class LogisticGrowth(ODE_Autonomous):
-    """
-    logistic growth linear ODE
-    https://en.wikipedia.org/wiki/Logistic_function
-    """
-
-    def parameters(self):
-        self.k = 2
-        self.x0 = 1
-        self.nx = 1
-
-    def equations(self, x):
-        pass
-
-    def simulate(self, ninit=None, nsim=None, x0=None):
-        """
-        :param nsim: (int) Number of steps for open loop response
-        :param x: (ndarray, shape=(self.nx)) Initial state. If not give will use internal state.
-        :return: The response trajectories,  X
-        """
-        if nsim is None:
-            nsim = self.nsim
-        if x0 is None:
-            x = self.x0
-        else:
-            assert x0.shape[0] == self.nx, "Mismatch in x0 size"
-            x = x0
-        X= []
-        for k in range(nsim):
-            x = self.equations(x)
-            X.append(x)  # updated states trajectories
-        return {'Y': np.asarray(X)}
-
-
 class UniversalOscillator(ODE_Autonomous):
     """
     Hharmonic oscillator
@@ -68,6 +34,24 @@ class UniversalOscillator(ODE_Autonomous):
         dx2 = -2*self.mu*x[1] - x[0] + np.cos(self.omega*t)
         dx = [dx1, dx2]
         return dx
+
+
+class Pendulum(ODE_Autonomous):
+    """
+    Simple pendulum.
+    https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html
+    """
+    def parameters(self):
+        super().parameters()
+        self.g = 9.81
+        self.f = 3.
+        self.nx = 2
+        self.x0 = [0., 1.]
+
+    def equations(self, x, t):
+        theta = x[0]
+        omega = x[1]
+        return [omega, -self.f*omega - self.g*np.sin(theta)]
 
 
 class Lorenz96(ODE_Autonomous):
