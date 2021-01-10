@@ -1,24 +1,27 @@
 """
-wrapper for emulator dynamical models
-Internal Emulators - in house ground truth equations
-External Emulators - third party models
+Nonlinear ODEs. Wrapper for emulator dynamical models
+
+    + Internal Emulators - in house ground truth equations
+    + External Emulators - third party models
+
+References:
+
+    + https://en.wikipedia.org/wiki/List_of_nonlinear_ordinary_differential_equations
+    + https://en.wikipedia.org/wiki/List_of_dynamical_systems_and_differential_equations_topics
+
 """
 import numpy as np
 
-"""
-Nonlinear ODEs
 
-https://en.wikipedia.org/wiki/List_of_nonlinear_ordinary_differential_equations
-https://en.wikipedia.org/wiki/List_of_dynamical_systems_and_differential_equations_topics
-"""
 from psl.emulator import ODE_Autonomous
 
 
 class UniversalOscillator(ODE_Autonomous):
     """
-    Hharmonic oscillator
-    https://en.wikipedia.org/wiki/Harmonic_oscillator
-    https://sam-dolan.staff.shef.ac.uk/mas212/notebooks/ODE_Example.html
+    Harmonic oscillator
+
+    + https://en.wikipedia.org/wiki/Harmonic_oscillator
+    + https://sam-dolan.staff.shef.ac.uk/mas212/notebooks/ODE_Example.html
     """
 
     def parameters(self):
@@ -39,7 +42,8 @@ class UniversalOscillator(ODE_Autonomous):
 class Pendulum(ODE_Autonomous):
     """
     Simple pendulum.
-    https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html
+
+    + https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html
     """
     def parameters(self):
         super().parameters()
@@ -57,7 +61,8 @@ class Pendulum(ODE_Autonomous):
 class Lorenz96(ODE_Autonomous):
     """
     Lorenz 96 model
-    https://en.wikipedia.org/wiki/Lorenz_96_model
+
+    + https://en.wikipedia.org/wiki/Lorenz_96_model
     """
 
     def parameters(self):
@@ -86,10 +91,11 @@ class Lorenz96(ODE_Autonomous):
 class LorenzSystem(ODE_Autonomous):
     """
     Lorenz System
-    https://en.wikipedia.org/wiki/Lorenz_system#Analysis
-    # https://ipywidgets.readthedocs.io/en/stable/examples/Lorenz%20Differential%20Equations.html
-    # https://scipython.com/blog/the-lorenz-attractor/
-    # https://matplotlib.org/3.1.0/gallery/mplot3d/lorenz_attractor.html
+
+    + https://en.wikipedia.org/wiki/Lorenz_system#Analysis
+    + https://ipywidgets.readthedocs.io/en/stable/examples/Lorenz%20Differential%20Equations.html
+    + https://scipython.com/blog/the-lorenz-attractor/
+    + https://matplotlib.org/3.1.0/gallery/mplot3d/lorenz_attractor.html
     """
 
     def parameters(self):
@@ -112,8 +118,9 @@ class LorenzSystem(ODE_Autonomous):
 class VanDerPol(ODE_Autonomous):
     """
     Van der Pol oscillator
-    https://en.wikipedia.org/wiki/Van_der_Pol_oscillator
-    http://kitchingroup.cheme.cmu.edu/blog/2013/02/02/Solving-a-second-order-ode/
+
+    + https://en.wikipedia.org/wiki/Van_der_Pol_oscillator
+    + http://kitchingroup.cheme.cmu.edu/blog/2013/02/02/Solving-a-second-order-ode/
     """
 
     def parameters(self):
@@ -133,7 +140,8 @@ class VanDerPol(ODE_Autonomous):
 class ThomasAttractor(ODE_Autonomous):
     """
     Thomas' cyclically symmetric attractor
-    https://en.wikipedia.org/wiki/Thomas%27_cyclically_symmetric_attractor
+
+    + https://en.wikipedia.org/wiki/Thomas%27_cyclically_symmetric_attractor
     """
 
     def parameters(self):
@@ -154,7 +162,8 @@ class ThomasAttractor(ODE_Autonomous):
 class RosslerAttractor(ODE_Autonomous):
     """
     Rössler attractor
-    https://en.wikipedia.org/wiki/R%C3%B6ssler_attractor
+
+    + https://en.wikipedia.org/wiki/R%C3%B6ssler_attractor
     """
 
     def parameters(self):
@@ -177,7 +186,8 @@ class RosslerAttractor(ODE_Autonomous):
 class LotkaVolterra(ODE_Autonomous):
     """
     Lotka–Volterra equations, also known as the predator–prey equations
-    https://en.wikipedia.org/wiki/Lotka%E2%80%93Volterra_equations
+
+    + https://en.wikipedia.org/wiki/Lotka%E2%80%93Volterra_equations
     """
 
     def parameters(self):
@@ -199,7 +209,8 @@ class LotkaVolterra(ODE_Autonomous):
 class Brusselator1D(ODE_Autonomous):
     """
     Brusselator
-    https://en.wikipedia.org/wiki/Brusselator
+
+    + https://en.wikipedia.org/wiki/Brusselator
     """
 
     def parameters(self):
@@ -219,8 +230,9 @@ class Brusselator1D(ODE_Autonomous):
 class ChuaCircuit(ODE_Autonomous):
     """
     Chua's circuit
-    https://en.wikipedia.org/wiki/Chua%27s_circuit
-    https://www.chuacircuits.com/matlabsim.php
+
+    + https://en.wikipedia.org/wiki/Chua%27s_circuit
+    + https://www.chuacircuits.com/matlabsim.php
     """
 
     def parameters(self):
@@ -247,7 +259,8 @@ class ChuaCircuit(ODE_Autonomous):
 class Duffing(ODE_Autonomous):
     """
     Duffing equation
-    https://en.wikipedia.org/wiki/Duffing_equation
+
+    + https://en.wikipedia.org/wiki/Duffing_equation
     """
 
     def parameters(self):

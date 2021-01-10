@@ -11,10 +11,12 @@ from scipy import signal as sig
 def RandomWalk(nx=1, nsim=100, xmax=1, xmin=0, sigma=0.05, rseed=1):
     """
 
-    :param nx:
-    :param nsim:
-    :param xmax:
-    :param xmin:
+    :param nx: (int) State space dimension
+    :param nsim: (int) Number of simulation steps
+    :param xmax: (float) Upper bound on state values
+    :param xmin: (float) Lower bound on state values
+    :param sigma: (float) Variance of normal distribution
+    :param rseed: (int) Set random seed
     :return:
     """
 
@@ -46,6 +48,7 @@ def WhiteNoise(nx=1, nsim=100, xmax=1, xmin=0, rseed=1):
     :param nsim: (int) Number time steps
     :param xmax: (int/list/ndarray) signal maximum value
     :param xmin: (int/list/ndarray) signal minimum value
+    :param rsee: (int) Set random seed
     """
 
     rd.seed(rseed)
@@ -69,6 +72,7 @@ def Step(nx=1, nsim=100, tstep=50, xmax=1, xmin=0, rseed=1):
     :param tstep: (int) time of the step
     :param xmax: (int/list/ndarray) signal maximum value
     :param xmin: (int/list/ndarray) signal minimum value
+    :param rseed: (int) Set random seed
     """
 
     rd.seed(rseed)
@@ -86,7 +90,6 @@ def Step(nx=1, nsim=100, tstep=50, xmax=1, xmin=0, rseed=1):
     return np.asarray(Signal).T
 
 
-
 def Steps(nx=1, nsim=100, values=None, randsteps=5, xmax=1, xmin=0, rseed=1):
     """
 
@@ -96,6 +99,7 @@ def Steps(nx=1, nsim=100, values=None, randsteps=5, xmax=1, xmin=0, rseed=1):
     :param randsteps: (int) number of random step changes if values is None
     :param xmax: (int/ndarray) signal maximum value
     :param xmin: (int/ndarray) signal minimum value
+    :param rseed: (int) Set random seed
     :return:
     """
 
@@ -126,6 +130,7 @@ def sawtooth(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, rseed=1):
     :param numPeriods: (int) Number of periods
     :param xmax: (int/list/ndarray) signal maximum value
     :param xmin: (int/list/ndarray) signal minimum value
+    :param rseed: (int) Set random seed
     """
 
     rd.seed(rseed)
@@ -156,6 +161,7 @@ def Periodic(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, form='sin', rseed=1):
     :param xmax: (int/list/ndarray) signal maximum value
     :param xmin: (int/list/ndarray) signal minimum value
     :param form: (str) form of the periodic signal 'sin' or 'cos'
+    :param rseed: (int) Set random seed
     """
 
     rd.seed(rseed)
@@ -189,8 +195,14 @@ def Periodic(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, form='sin', rseed=1):
   
 def SplineSignal(nsim=500, values=None, xmin=0, xmax=1, rseed=1):
     """
-    Generates a smooth cubic spline trajectory by interpolating
-    between data points
+    Generates a smooth cubic spline trajectory by interpolating between data points
+
+    :param nsim: (int) Number of simulation steps
+    :param values: (np.array) values to interpolate
+    :param xmin: (float) Minimum value of time series
+    :param xmax: (float) Maximum value of time series
+    :param rseed: (int) Set random seed.
+    :return:
     """
     if values is None:
         rd.seed(rseed)
