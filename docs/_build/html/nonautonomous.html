@@ -1,0 +1,460 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Nonautonomous &mdash; PSL 0.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/lorenz.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Perturb" href="perturb.html" />
+    <link rel="prev" title="Emulator" href="emulator.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PSL
+          
+
+          
+            
+            <img src="_static/lorenz.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Docs:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="autonomous.html">Autonomous</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emulator.html">Emulator</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Nonautonomous</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perturb.html">Perturb</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PSL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Nonautonomous</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/nonautonomous.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-nonautonomous">
+<span id="nonautonomous"></span><h1>Nonautonomous<a class="headerlink" href="#module-nonautonomous" title="Permalink to this headline">¶</a></h1>
+<p>Non-autonomous dynamic systems.</p>
+<dl class="simple">
+<dt>Chaotic nonlinear ODEs</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/List_of_chaotic_maps">https://en.wikipedia.org/wiki/List_of_chaotic_maps</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt id="nonautonomous.BuildingEnvelope">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">BuildingEnvelope</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">system</span><span class="o">=</span><span class="default_value">'Reno_full'</span></em>, <em class="sig-param"><span class="n">linear</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#BuildingEnvelope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.BuildingEnvelope" title="Permalink to this definition">¶</a></dt>
+<dd><p>building envelope heat transfer model
+linear building envelope dynamics and bilinear heat flow input dynamics
+different building types are stored in ./emulators/buildings/<a href="#id1"><span class="problematic" id="id2">*</span></a>.mat
+models obtained from:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/drgona/BeSim">https://github.com/drgona/BeSim</a></p></li>
+</ul>
+<dl class="py method">
+<dt id="nonautonomous.BuildingEnvelope.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">u</span></em>, <em class="sig-param"><span class="n">d</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#BuildingEnvelope.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.BuildingEnvelope.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.BuildingEnvelope.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system</span><span class="o">=</span><span class="default_value">'Reno_full'</span></em>, <em class="sig-param"><span class="n">linear</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#BuildingEnvelope.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.BuildingEnvelope.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nonautonomous.CSTR">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">CSTR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#CSTR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.CSTR" title="Permalink to this definition">¶</a></dt>
+<dd><p>CSTR model
+Original code obtained from APMonitor:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://apmonitor.com/do/index.php/Main/NonlinearControl">http://apmonitor.com/do/index.php/Main/NonlinearControl</a></p></li>
+</ul>
+<dl class="py method">
+<dt id="nonautonomous.CSTR.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#CSTR.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.CSTR.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.CSTR.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#CSTR.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.CSTR.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nonautonomous.HindmarshRose">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">HindmarshRose</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#HindmarshRose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.HindmarshRose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hindmarsh–Rose model of neuronal activity</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Hindmarsh%E2%80%93Rose_model">https://en.wikipedia.org/wiki/Hindmarsh%E2%80%93Rose_model</a></p></li>
+<li><p><a class="reference external" href="https://demonstrations.wolfram.com/HindmarshRoseNeuronModel/">https://demonstrations.wolfram.com/HindmarshRoseNeuronModel/</a></p></li>
+</ul>
+<dl class="py method">
+<dt id="nonautonomous.HindmarshRose.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#HindmarshRose.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.HindmarshRose.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.HindmarshRose.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#HindmarshRose.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.HindmarshRose.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nonautonomous.SEIR_population">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">SEIR_population</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#SEIR_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.SEIR_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Susceptible, Exposed, Infected, and Recovered (SEIR) population population model. Used to model COVID-19 spread.
+Source of the model:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://apmonitor.com/do/index.php/Main/COVID-19Response">https://apmonitor.com/do/index.php/Main/COVID-19Response</a></p></li>
+</ul>
+<p>states:</p>
+<ul class="simple">
+<li><p>Susceptible (s): population fraction that is susceptible to the virus</p></li>
+<li><p>Exposed (e): population fraction is infected with the virus but does not transmit to others</p></li>
+<li><p>Infectious (i): population fraction that is infected and can infect others</p></li>
+<li><p>Recovered (r): population fraction recovered from infection and is immune from further infection</p></li>
+</ul>
+<dl class="py method">
+<dt id="nonautonomous.SEIR_population.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#SEIR_population.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.SEIR_population.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>Inputs (1): social distancing (u=0 (none), u=1 (total isolation))</p></li>
+<li><p>States (4):</p></li>
+<li><p>Susceptible (s): population fraction that is susceptible to the virus</p></li>
+<li><p>Exposed (e): population fraction is infected with the virus but does not transmit to others</p></li>
+<li><p>Infectious (i): population fraction that is infected and can infect others</p></li>
+<li><p>Recovered (r): population fraction recovered from infection and is immune from further infection</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.SEIR_population.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#SEIR_population.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.SEIR_population.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nonautonomous.Tank">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">Tank</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Tank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.Tank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single Tank model
+Original code obtained from APMonitor:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://apmonitor.com/pdc/index.php/Main/TankLevel">https://apmonitor.com/pdc/index.php/Main/TankLevel</a></p></li>
+</ul>
+<dl class="py method">
+<dt id="nonautonomous.Tank.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Tank.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.Tank.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (1): level in the tanks</p></li>
+<li><p>Inputs u(1): c - valve coefficient (kg/s / %open)</p></li>
+<li><p>Inputs u(2): valve in % [0-100]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.Tank.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Tank.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.Tank.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nonautonomous.TwoTank">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">TwoTank</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#TwoTank"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.TwoTank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Two Tank model
+Original code obtained from APMonitor:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://apmonitor.com/do/index.php/Main/LevelControl">https://apmonitor.com/do/index.php/Main/LevelControl</a></p></li>
+</ul>
+<dl class="py method">
+<dt id="nonautonomous.TwoTank.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#TwoTank.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.TwoTank.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.TwoTank.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#TwoTank.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.TwoTank.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nonautonomous.UAV2D_kin">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">UAV2D_kin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV2D_kin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV2D_kin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dubins 2D model – UAV kinematic model with no wind</p>
+<dl class="py method">
+<dt id="nonautonomous.UAV2D_kin.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV2D_kin.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV2D_kin.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (3): [x, y, z, psi]</p></li>
+<li><p>Inputs (1): [phi]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.UAV2D_kin.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV2D_kin.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV2D_kin.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nonautonomous.UAV3D_dyn">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">UAV3D_dyn</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_dyn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV3D_dyn" title="Permalink to this definition">¶</a></dt>
+<dd><p>UAV dynamic guidance model with no wind</p>
+<dl class="py method">
+<dt id="nonautonomous.UAV3D_dyn.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">U</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_dyn.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV3D_dyn.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (6): [x, y, z, psi, gamma, V]</p></li>
+<li><p>Inputs (3): [T, phi, load]</p></li>
+<li><p>load = Lift force / Weight</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.UAV3D_dyn.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_dyn.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV3D_dyn.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nonautonomous.UAV3D_kin">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">UAV3D_kin</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_kin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV3D_kin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dubins 3D model – UAV kinematic model with no wind</p>
+<dl class="py method">
+<dt id="nonautonomous.UAV3D_kin.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_kin.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV3D_kin.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (4): [x, y, z]</p></li>
+<li><p>Inputs (3): [V, phi, gamma]</p></li>
+<li><p>Transformed Inputs (3): [U1, U2, U3]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.UAV3D_kin.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_kin.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV3D_kin.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nonautonomous.UAV3D_reduced">
+<em class="property">class </em><code class="sig-prename descclassname">nonautonomous.</code><code class="sig-name descname">UAV3D_reduced</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_reduced"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV3D_reduced" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduced Dubins 3D model – UAV kinematic model with transformed inputs</p>
+<dl class="py method">
+<dt id="nonautonomous.UAV3D_reduced.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_reduced.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV3D_reduced.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (4): [x, y, z]</p></li>
+<li><p>Inputs (3): [V, phi, gamma]</p></li>
+<li><p>Transformed Inputs (3): [U1, U2, U3]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nonautonomous.UAV3D_reduced.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_reduced.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nonautonomous.UAV3D_reduced.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="perturb.html" class="btn btn-neutral float-right" title="Perturb" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="emulator.html" class="btn btn-neutral float-left" title="Emulator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Aaron Tuor, Elliott Skomski, Jan Drgona, Soumya Vasisht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

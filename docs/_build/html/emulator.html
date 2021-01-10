@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Emulator &mdash; PSL 0.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/lorenz.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Nonautonomous" href="nonautonomous.html" />
+    <link rel="prev" title="Autonomous" href="autonomous.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PSL
+          
+
+          
+            
+            <img src="_static/lorenz.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Docs:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="autonomous.html">Autonomous</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Emulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nonautonomous.html">Nonautonomous</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perturb.html">Perturb</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PSL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Emulator</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/emulator.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-emulator">
+<span id="emulator"></span><h1>Emulator<a class="headerlink" href="#module-emulator" title="Permalink to this headline">¶</a></h1>
+<p>Base Classes for dynamic systems emulators</p>
+<dl class="py class">
+<dt id="emulator.EmulatorBase">
+<em class="property">class </em><code class="sig-prename descclassname">emulator.</code><code class="sig-name descname">EmulatorBase</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#EmulatorBase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.EmulatorBase" title="Permalink to this definition">¶</a></dt>
+<dd><p>base class of the emulator</p>
+<dl class="py method">
+<dt id="emulator.EmulatorBase.equations">
+<em class="property">abstract </em><code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#EmulatorBase.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.EmulatorBase.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="emulator.EmulatorBase.parameters">
+<em class="property">abstract </em><code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#EmulatorBase.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.EmulatorBase.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="emulator.EmulatorBase.simulate">
+<em class="property">abstract </em><code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#EmulatorBase.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.EmulatorBase.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>N-step forward simulation of the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="emulator.GymWrapper">
+<em class="property">class </em><code class="sig-prename descclassname">emulator.</code><code class="sig-name descname">GymWrapper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1000</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">system</span><span class="o">=</span><span class="default_value">'Pendulum-v0'</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#GymWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.GymWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for OpenAI gym environments</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://gym.openai.com/read-only.html">https://gym.openai.com/read-only.html</a></p></li>
+<li><p><a class="reference external" href="https://github.com/openai/gym">https://github.com/openai/gym</a></p></li>
+</ul>
+</div></blockquote>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">Todo</p>
+<p>Include visualization option for the trajectories or render of OpenAI gym.</p>
+</div>
+<dl class="py method">
+<dt id="emulator.GymWrapper.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">u</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#GymWrapper.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.GymWrapper.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="emulator.GymWrapper.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">system</span><span class="o">=</span><span class="default_value">'Pendulum-v0'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#GymWrapper.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.GymWrapper.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="emulator.GymWrapper.simulate">
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">U</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#GymWrapper.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.GymWrapper.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsim</strong> – (int) Number of steps for open loop response</p></li>
+<li><p><strong>U</strong> – (ndarray, shape=(self.nu)) control actions</p></li>
+<li><p><strong>x0</strong> – (ndarray, shape=(self.nx)) Initial state. If not give will use internal state.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The response trajectories,  X</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="emulator.ODE_Autonomous">
+<em class="property">class </em><code class="sig-prename descclassname">emulator.</code><code class="sig-name descname">ODE_Autonomous</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#ODE_Autonomous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.ODE_Autonomous" title="Permalink to this definition">¶</a></dt>
+<dd><p>base class autonomous ODE</p>
+<dl class="py method">
+<dt id="emulator.ODE_Autonomous.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#ODE_Autonomous.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.ODE_Autonomous.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="emulator.ODE_Autonomous.simulate">
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#ODE_Autonomous.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.ODE_Autonomous.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsim</strong> – (int) Number of steps for open loop response</p></li>
+<li><p><strong>ninit</strong> – (float) initial simulation time</p></li>
+<li><p><strong>ts</strong> – (float) step size, sampling time</p></li>
+<li><p><strong>x0</strong> – (float) state initial conditions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The response matrices, i.e. X</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="emulator.ODE_NonAutonomous">
+<em class="property">class </em><code class="sig-prename descclassname">emulator.</code><code class="sig-name descname">ODE_NonAutonomous</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#ODE_NonAutonomous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.ODE_NonAutonomous" title="Permalink to this definition">¶</a></dt>
+<dd><p>base class autonomous ODE</p>
+<dl class="py method">
+<dt id="emulator.ODE_NonAutonomous.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#ODE_NonAutonomous.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.ODE_NonAutonomous.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="emulator.ODE_NonAutonomous.simulate">
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">U</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#ODE_NonAutonomous.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.ODE_NonAutonomous.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsim</strong> – (int) Number of steps for open loop response</p></li>
+<li><p><strong>ninit</strong> – (float) initial simulation time</p></li>
+<li><p><strong>ts</strong> – (float) step size, sampling time</p></li>
+<li><p><strong>x0</strong> – (float) state initial conditions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>X, Y, U, D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="emulator.SSM">
+<em class="property">class </em><code class="sig-prename descclassname">emulator.</code><code class="sig-name descname">SSM</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">1001</span></em>, <em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">ts</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">seed</span><span class="o">=</span><span class="default_value">59</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#SSM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.SSM" title="Permalink to this definition">¶</a></dt>
+<dd><p>base class state space model</p>
+<dl class="py method">
+<dt id="emulator.SSM.parameters">
+<code class="sig-name descname">parameters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#SSM.parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.SSM.parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize parameters of the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="emulator.SSM.simulate">
+<code class="sig-name descname">simulate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">ninit</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nsim</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">U</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">D</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">x0</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/emulator.html#SSM.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#emulator.SSM.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsim</strong> – (int) Number of steps for open loop response</p></li>
+<li><p><strong>U</strong> – (ndarray, shape=(nsim, self.nu)) control signals</p></li>
+<li><p><strong>D</strong> – (ndarray, shape=(nsim, self.nd)) measured disturbance signals</p></li>
+<li><p><strong>x0</strong> – (ndarray, shape=(self.nx)) Initial state.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The response matrices, i.e. X, Y, U, D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="nonautonomous.html" class="btn btn-neutral float-right" title="Nonautonomous" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="autonomous.html" class="btn btn-neutral float-left" title="Autonomous" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2021, Aaron Tuor, Elliott Skomski, Jan Drgona, Soumya Vasisht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
