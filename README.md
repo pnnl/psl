@@ -1,5 +1,7 @@
 # PSL: Python Systems Library
 
+## [Complete documentation](https://pnnl.github.io/psl/)
+
 ### TODO
     [ ] generate meaningful reference and input signals for each emulator
     [ ] include Nonlinear PDEs - https://en.wikipedia.org/wiki/List_of_nonlinear_partial_differential_equations
