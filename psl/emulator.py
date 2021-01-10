@@ -59,7 +59,7 @@ class SSM(EmulatorBase):
         :param nsim: (int) Number of steps for open loop response
         :param U: (ndarray, shape=(nsim, self.nu)) control signals
         :param D: (ndarray, shape=(nsim, self.nd)) measured disturbance signals
-        :param x: (ndarray, shape=(self.nx)) Initial state.
+        :param x0: (ndarray, shape=(self.nx)) Initial state.
         :return: The response matrices, i.e. X, Y, U, D
         """
         if ninit is None:
@@ -103,7 +103,6 @@ class ODE_Autonomous(EmulatorBase):
         :param ninit: (float) initial simulation time
         :param ts: (float) step size, sampling time
         :param x0: (float) state initial conditions
-        :param x: (ndarray, shape=(self.nx)) states
         :return: The response matrices, i.e. X
         """
 
@@ -147,7 +146,6 @@ class ODE_NonAutonomous(EmulatorBase, ABC):
         :param ninit: (float) initial simulation time
         :param ts: (float) step size, sampling time
         :param x0: (float) state initial conditions
-        :param x: (ndarray, shape=(self.nx)) states
         :return: X, Y, U, D
         """
 
@@ -186,10 +184,14 @@ class ODE_NonAutonomous(EmulatorBase, ABC):
 
 class GymWrapper(EmulatorBase):
     """
-    wrapper for OpenAI gym environments
-    https://gym.openai.com/read-only.html
-    https://github.com/openai/gym
-    # TODO: include visualization option for the trajectories or render of OpenAI gym
+    Wrapper for OpenAI gym environments
+
+        + https://gym.openai.com/read-only.html
+        + https://github.com/openai/gym
+
+    .. todo::
+        Include visualization option for the trajectories or render of OpenAI gym.
+
     """
     def __init__(self, nsim=1000, ninit=0, system='Pendulum-v0', seed=59):
         super().__init__(nsim=nsim, ninit=ninit)

@@ -1,6 +1,8 @@
 """
 Non-autonomous dynamic systems.
 
+Chaotic nonlinear ODEs
+    + https://en.wikipedia.org/wiki/List_of_chaotic_maps
 """
 import numpy as np
 from scipy.io import loadmat
@@ -16,16 +18,17 @@ from psl.perturb import Periodic, RandomWalk
 
 class SEIR_population(ODE_NonAutonomous):
     """
-    Susceptible, Exposed, Infected, and Recovered (SEIR) population population model
-    COVID19 spread
-    source of the model:
-    https://apmonitor.com/do/index.php/Main/COVID-19Response
+    Susceptible, Exposed, Infected, and Recovered (SEIR) population population model. Used to model COVID-19 spread.
+    Source of the model:
+
+    + https://apmonitor.com/do/index.php/Main/COVID-19Response
 
     states:
-    Susceptible (s): population fraction that is susceptible to the virus
-    Exposed (e): population fraction is infected with the virus but does not transmit to others
-    Infectious (i): population fraction that is infected and can infect others
-    Recovered (r): population fraction recovered from infection and is immune from further infection
+
+    + Susceptible (s): population fraction that is susceptible to the virus
+    + Exposed (e): population fraction is infected with the virus but does not transmit to others
+    + Infectious (i): population fraction that is infected and can infect others
+    + Recovered (r): population fraction recovered from infection and is immune from further infection
     """
 
     def parameters(self):
@@ -51,12 +54,16 @@ class SEIR_population(ODE_NonAutonomous):
                      randsteps=int(np.ceil(self.nsim / 100)), xmax=1, xmin=0)
 
     def equations(self, x, t, u):
-        # Inputs (1): social distancing (u=0 (none), u=1 (total isolation))
-        # States (4):
-        # Susceptible (s): population fraction that is susceptible to the virus
-        # Exposed (e): population fraction is infected with the virus but does not transmit to others
-        # Infectious (i): population fraction that is infected and can infect others
-        # Recovered (r): population fraction recovered from infection and is immune from further infection
+        """
+
+        +  Inputs (1): social distancing (u=0 (none), u=1 (total isolation))
+        +  States (4):
+        +  Susceptible (s): population fraction that is susceptible to the virus
+        +  Exposed (e): population fraction is infected with the virus but does not transmit to others
+        +  Infectious (i): population fraction that is infected and can infect others
+        +  Recovered (r): population fraction recovered from infection and is immune from further infection
+        """
+
         s = x[0]
         e = x[1]
         i = x[2]
@@ -74,8 +81,9 @@ class SEIR_population(ODE_NonAutonomous):
 class Tank(ODE_NonAutonomous):
     """
     Single Tank model
-    original code obtained from APMonitor:
-    https://apmonitor.com/pdc/index.php/Main/TankLevel
+    Original code obtained from APMonitor:
+
+    + https://apmonitor.com/pdc/index.php/Main/TankLevel
     """
 
     def parameters(self):
@@ -93,9 +101,13 @@ class Tank(ODE_NonAutonomous):
         self.nx = 1
 
     def equations(self, x, t, u):
-        # States (1): level in the tanks
-        # Inputs u(1): c - valve coefficient (kg/s / %open)
-        # Inputs u(2): valve in % [0-100]
+        """
+
+        + States (1): level in the tanks
+        + Inputs u(1): c - valve coefficient (kg/s / %open)
+        + Inputs u(2): valve in % [0-100]
+        """
+
         c = u[0]
         valve = u[1]
         # equations
@@ -108,8 +120,9 @@ class Tank(ODE_NonAutonomous):
 class TwoTank(ODE_NonAutonomous):
     """
     Two Tank model
-    original code obtained from APMonitor:
-    https://apmonitor.com/do/index.php/Main/LevelControl
+    Original code obtained from APMonitor:
+
+    + https://apmonitor.com/do/index.php/Main/LevelControl
     """
 
     def parameters(self):
@@ -149,8 +162,9 @@ class TwoTank(ODE_NonAutonomous):
 class CSTR(ODE_NonAutonomous):
     """
     CSTR model
-    original code obtained from APMonitor:
-    http://apmonitor.com/do/index.php/Main/NonlinearControl
+    Original code obtained from APMonitor:
+
+    + http://apmonitor.com/do/index.php/Main/NonlinearControl
     """
 
     def parameters(self):
@@ -257,9 +271,9 @@ class UAV3D_kin(ODE_NonAutonomous):
     # equations defining the dynamical system
     def equations(self, x, t, u):
         """
-        # States (4): [x, y, z]
-        # Inputs (3): [V, phi, gamma]
-        # Transformed Inputs (3): [U1, U2, U3]
+        + States (4): [x, y, z]
+        + Inputs (3): [V, phi, gamma]
+        + Transformed Inputs (3): [U1, U2, U3]
         """
 
         U1 = u[0]
@@ -304,8 +318,8 @@ class UAV2D_kin(ODE_NonAutonomous):
     # equations defining the dynamical system
     def equations(self, x, t, u):
         """
-        # States (3): [x, y, z, psi]
-        # Inputs (1): [phi]
+        + States (3): [x, y, z, psi]
+        + Inputs (1): [phi]
         """
 
         # Inputs
@@ -359,9 +373,9 @@ class UAV3D_reduced(ODE_NonAutonomous):
     # equations defining the dynamical system
     def equations(self, x, t, u):
         """
-        # States (4): [x, y, z]
-        # Inputs (3): [V, phi, gamma]
-        # Transformed Inputs (3): [U1, U2, U3]
+        + States (4): [x, y, z]
+        + Inputs (3): [V, phi, gamma]
+        + Transformed Inputs (3): [U1, U2, U3]
         """
 
         U1 = u[0]
@@ -412,9 +426,9 @@ class UAV3D_dyn(ODE_NonAutonomous):
     # equations defining the dynamical system
     def equations(self, x, t, U):
         """
-        States (6): [x, y, z, psi, gamma, V]
-        Inputs (3): [T, phi, load]
-        load = Lift force / Weight
+        + States (6): [x, y, z, psi, gamma, V]
+        + Inputs (3): [T, phi, load]
+        + load = Lift force / Weight
 
         """
 
@@ -453,8 +467,9 @@ https://en.wikipedia.org/wiki/List_of_chaotic_maps
 class HindmarshRose(ODE_NonAutonomous):
     """
     Hindmarsh–Rose model of neuronal activity
-    https://en.wikipedia.org/wiki/Hindmarsh%E2%80%93Rose_model
-    https://demonstrations.wolfram.com/HindmarshRoseNeuronModel/
+
+    + https://en.wikipedia.org/wiki/Hindmarsh%E2%80%93Rose_model
+    + https://demonstrations.wolfram.com/HindmarshRoseNeuronModel/
     """
 
     def parameters(self):
@@ -486,9 +501,7 @@ class HindmarshRose(ODE_NonAutonomous):
 
 """
 Building thermal dynamics ODEs 
-
 """
-
 
 
 class BuildingEnvelope(SSM):
@@ -496,7 +509,9 @@ class BuildingEnvelope(SSM):
     building envelope heat transfer model
     linear building envelope dynamics and bilinear heat flow input dynamics
     different building types are stored in ./emulators/buildings/*.mat
-    models obtained from: https://github.com/drgona/BeSim
+    models obtained from:
+
+    + https://github.com/drgona/BeSim
     """
     def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=True, seed=59):
         self.system = system
