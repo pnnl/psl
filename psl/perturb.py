@@ -5,9 +5,10 @@ Base Control Profiles for System excitation
 import numpy as np
 import random as rd
 from scipy import interpolate
+from scipy import signal as sig
 
 
-def RandomWalk(nx=1, nsim=100, xmax=1, xmin=0, sigma=0.05):
+def RandomWalk(nx=1, nsim=100, xmax=1, xmin=0, sigma=0.05, rseed=1):
     """
 
     :param nx:
@@ -16,6 +17,9 @@ def RandomWalk(nx=1, nsim=100, xmax=1, xmin=0, sigma=0.05):
     :param xmin:
     :return:
     """
+
+    rd.seed(rseed)
+
     if type(xmax) is not np.ndarray:
         xmax = np.asarray(nx*[xmax]).ravel()
     if type(xmin) is not np.ndarray:
@@ -35,7 +39,7 @@ def RandomWalk(nx=1, nsim=100, xmax=1, xmin=0, sigma=0.05):
     return np.asarray(Signals).T
 
 
-def WhiteNoise(nx=1, nsim=100, xmax=1, xmin=0):
+def WhiteNoise(nx=1, nsim=100, xmax=1, xmin=0, rseed=1):
     """
     White Noise
     :param nx: (int) Number signals
@@ -43,6 +47,8 @@ def WhiteNoise(nx=1, nsim=100, xmax=1, xmin=0):
     :param xmax: (int/list/ndarray) signal maximum value
     :param xmin: (int/list/ndarray) signal minimum value
     """
+
+    rd.seed(rseed)
 
     if type(xmax) is not np.ndarray:
         xmax = np.asarray(nx*[xmax]).ravel()
@@ -55,7 +61,7 @@ def WhiteNoise(nx=1, nsim=100, xmax=1, xmin=0):
     return np.asarray(Signal).T
 
 
-def Step(nx=1, nsim=100, tstep=50, xmax=1, xmin=0):
+def Step(nx=1, nsim=100, tstep=50, xmax=1, xmin=0, rseed=1):
     """
     step change
     :param nx: (int) Number signals
@@ -64,6 +70,9 @@ def Step(nx=1, nsim=100, tstep=50, xmax=1, xmin=0):
     :param xmax: (int/list/ndarray) signal maximum value
     :param xmin: (int/list/ndarray) signal minimum value
     """
+
+    rd.seed(rseed)
+
     if type(xmax) is not np.ndarray:
         xmax = np.asarray(nx * [xmax]).ravel()
     if type(xmin) is not np.ndarray:
@@ -78,7 +87,7 @@ def Step(nx=1, nsim=100, tstep=50, xmax=1, xmin=0):
 
 
 
-def Steps(nx=1, nsim=100, values=None, randsteps=5, xmax=1, xmin=0):
+def Steps(nx=1, nsim=100, values=None, randsteps=5, xmax=1, xmin=0, rseed=1):
     """
 
     :param nx: (int) Number signals
@@ -89,6 +98,8 @@ def Steps(nx=1, nsim=100, values=None, randsteps=5, xmax=1, xmin=0):
     :param xmin: (int/ndarray) signal minimum value
     :return:
     """
+
+    rd.seed(rseed)
 
     if values is None:
         values = np.round(np.random.rand(randsteps), 3)
@@ -107,16 +118,36 @@ def Steps(nx=1, nsim=100, values=None, randsteps=5, xmax=1, xmin=0):
     return signal.T
 
 
-def Ramp():
+def sawtooth(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, rseed=1):
     """
     ramp change
     :param nx: (int) Number signals
     :param nsim: (int) Number time steps
+    :param numPeriods: (int) Number of periods
+    :param xmax: (int/list/ndarray) signal maximum value
+    :param xmin: (int/list/ndarray) signal minimum value
     """
-    pass
+
+    rd.seed(rseed)
+
+    assert nsim >= numPeriods, 'numPeriods must be smaller than nsim'
+    if type(xmax) is not np.ndarray:
+        xmax = np.asarray([xmax] * nx).ravel()
+    if type(xmin) is not np.ndarray:
+        xmin = np.asarray([xmin] * nx).ravel()
+
+    xmax = xmax.reshape(nx)
+    xmin = xmin.reshape(nx)
+
+    t = np.linspace(0, 1, nsim)
+    Signal = []
+    for k in range(nx):
+        signal = xmin[k] + (xmax[k] - xmin[k])*(0.5 * (sig.sawtooth(2 * np.pi * numPeriods * t) + 1))
+        Signal.append(signal)
+    return np.asarray(Signal).T
 
 
-def Periodic(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, form='sin'):
+def Periodic(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, form='sin', rseed=1):
     """
     periodic signals, sine, cosine
     :param nx: (int) Number signals
@@ -126,6 +157,9 @@ def Periodic(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, form='sin'):
     :param xmin: (int/list/ndarray) signal minimum value
     :param form: (str) form of the periodic signal 'sin' or 'cos'
     """
+
+    rd.seed(rseed)
+
     assert nsim >= numPeriods, 'numPeriods must be smaller than nsim'
     if type(xmax) is not np.ndarray:
         xmax = np.asarray([xmax]*nx).ravel()
