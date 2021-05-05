@@ -10,6 +10,7 @@ emulators = {
     "CSTR": CSTR,
     "Tank": Tank,
     "TwoTank": TwoTank,
+    "InvPendulum": InvPendulum,
     "UAV3D_kin": UAV3D_kin,
     "UAV2D_kin": UAV2D_kin,
     "UAV3D_reduced": UAV3D_reduced,
@@ -18,6 +19,7 @@ emulators = {
     # autonomous chaotic ODEs
     "UniversalOscillator": UniversalOscillator,
     "LorenzSystem": LorenzSystem,
+    "Pendulum": Pendulum,
     "Lorenz96": Lorenz96,
     "VanDerPol": VanDerPol,
     "ThomasAttractor": ThomasAttractor,

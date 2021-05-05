@@ -230,7 +230,33 @@ class CSTR(ODE_NonAutonomous):
         xdot[1] = dTdt
         return xdot
 
-      
+
+class InvPendulum(ODE_NonAutonomous):
+    """
+    Inverted Pendulum dynamics
+    states: x = [\theta \dot{\theta}]; \theta is angle from upright equilibrium
+    input: u = input torque
+
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 2  # Number of states
+        self.nu = 1  # Number of control inputs
+        self.g = 9.81  # Acceleration due to gravity (m/s^2)
+        self.L = 0.5  # length of the pole in m
+        self.m = 0.15  # ball mass in kg
+        self.b = 0.1  # friction
+        self.x0 = [0.5, 0.0]
+        self.U = np.zeros(self.nsim)
+
+    def equations(self, x, u):
+        y = [x[1],
+            (self.m * self.g * self.L * np.sin(x[0]) - self.b * x[1]) / (self.m * self.L ** 2)]
+        y[1] = y[1] + (u / (m * L ** 2))
+        return y
+
+
 class UAV3D_kin(ODE_NonAutonomous):
     """
     Dubins 3D model -- UAV kinematic model with no wind
