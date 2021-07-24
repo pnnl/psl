@@ -22,7 +22,8 @@ datasets = {
         "siso_nd_fsw_phase_3": "FSW/siso_no_disturb_by_step/fsw_data_phase_3.csv",
         "siso_nd_fsw_phase_4": "FSW/siso_no_disturb_by_step/fsw_data_phase_4.csv",
         "9bus_test": "9bus_test",
-        "9bus_init": "9bus_perturbed_init_cond/dyn_1.csv",
+        "9bus_init": "9bus_perturbed_init_cond",
+        "200bus_boundary": "ACTIVSg200_case141_data/dyn_202.csv"
     }.items()
 }
 
