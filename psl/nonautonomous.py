@@ -134,9 +134,9 @@ class TwoTank(ODE_NonAutonomous):
         self.x0 = np.asarray([0, 0])
         # default simulation setup
         pump = Steps(nx=1, nsim=self.nsim, values=None,
-                     randsteps=int(np.ceil(self.nsim/400)), xmax=0.5, xmin=0)
+                     randsteps=int(np.ceil(self.nsim/200)), xmax=0.5, xmin=0)
         valve = Steps(nx=1, nsim=self.nsim, values=None,
-                      randsteps=int(np.ceil(self.nsim/400)), xmax=0.4, xmin=0)
+                      randsteps=int(np.ceil(self.nsim/300)), xmax=0.4, xmin=0)
         self.U = np.vstack([pump.T, valve.T]).T
         self.nu = 2
         self.nx = 2
@@ -546,7 +546,11 @@ class BuildingEnvelope(SSM):
         super().__init__(nsim=nsim, ninit=ninit)
 
     # parameters of the dynamical system
-    def parameters(self, system='Reno_full', linear=True):
+    def parameters(self, system=None, linear=True):
+        if system is None:
+            system = self.system
+        if linear is None:
+            linear = self.linear
         # file paths for different building models
         systems = {'SimpleSingleZone': os.path.join(self.resource_path, 'SimpleSingleZone.mat'),
                    'Reno_full': os.path.join(self.resource_path, 'Reno_full.mat'),
