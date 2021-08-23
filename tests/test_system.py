@@ -7,24 +7,22 @@ if __name__ == '__main__':
 
 # choose one key for the system from the dict
 print(psl.systems.keys())
+name = 'TwoTank'
+system = psl.systems[name]
 
-name = 'CSTR'
-system = psl.systems['CSTR']
-
+# instantiate selected system model
 if system is psl.BuildingEnvelope:
-    ninit = 0
-    building = psl.BuildingEnvelope()  # instantiate building class
-    building.parameters(system='HollandschHuys_full', linear=False)  # load model parameters
-    out = building.simulate(ninit=ninit)
-    psl.plot.pltOL(Y=out['Y'], U=out['U'], D=out['D'], X=out['X'])
-    psl.plot.pltPhase(X=out['Y'])
-elif isinstance(system(), psl.ODE_NonAutonomous):
-    model = system(nsim=12000)
-    out = model.simulate()  # simulate open loop
-    psl.plot.pltOL(Y=out['Y'], U=out['U'])  # plot trajectories
-    psl.plot.pltPhase(X=out['Y'])
-elif isinstance(system(), psl.ODE_Autonomous):
+    model = system(system=name)
+else:
     model = system()
-    out = model.simulate()  # simulate open loop
-    psl.plot.pltOL(Y=out['Y'])  # plot trajectories
-    psl.plot.pltPhase(X=out['Y'])
+
+# simulate open loop
+out = model.simulate()
+
+# Plots
+Y = out['Y']
+X = out['X']
+U = out['U'] if 'U' in out.keys() else None
+D = out['D'] if 'D' in out.keys() else None
+psl.plot.pltOL(Y=Y, X=X, U=U, D=D)
+psl.plot.pltPhase(X=Y)
