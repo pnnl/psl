@@ -7,7 +7,7 @@ if __name__ == '__main__':
 
 # choose one key for the system from the dict
 print(psl.systems.keys())
-name = 'TwoTank'
+name = 'Iver_kin'
 system = psl.systems[name]
 
 # instantiate selected system model
