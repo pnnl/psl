@@ -635,7 +635,7 @@ class BuildingEnvelope(SSM):
         y = np.matmul(self.C, x) + self.F.ravel()
         return x, y
 
-class Iver_kin(ODE_NonAutonomous):
+class Iver_kin_reduced(ODE_NonAutonomous):
     """
     Kinetic model of Unmanned Underwater Vehicle (Yan et al 2020) -- UAV kinematic model with **no roll**
     """
@@ -647,7 +647,111 @@ class Iver_kin(ODE_NonAutonomous):
         self.ts = 0.1
 
         # Initial Conditions for the States
-        self.x0 = np.array([0, 0, 0, 0, 0])
+        self.x0 = np.array([1.0, 0, 0, 0, 0])
+
+        seed = 3
+        u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        w = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+
+        self.U = np.vstack( [u, v, w, q, r] ).T
+
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        + States (5): [xi, eta, zeta, theta, psi]
+        + Inputs (5): [u, v, w, q, r]
+        """
+
+
+        dx_dt = np.zeros(5)
+        dx_dt[0] = np.cos( x[4] )*np.cos( x[3] )*u[0] - np.sin( x[4] )*u[1] + np.sin( x[3] )*np.cos( x[4] )*u[2]
+        dx_dt[1] = ( np.sin( x[4] )*np.cos( x[3] )*np.cos( x[4] )*np.sin( x[3] )*np.sin( x[4] ) - np.sin( x[3] ) )*u[0]
+        dx_dt[2] = np.cos( x[3] )*u[2]
+        dx_dt[3] = u[3]
+        dx_dt[4] = u[4]/(np.cos( x[3] ))
+
+        return dx_dt
+
+class Iver_kin(ODE_NonAutonomous):
+    """
+    Kinetic model of Unmanned Underwater Vehicle (Fossen) -- Full UAV kinematic model
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 6    # Number of states
+        self.nu = 6    # Number of control inputs
+        self.ts = 0.1
+
+        # Initial Conditions for the States
+        self.x0 = np.array([1.0, 0, 0, 0, 0, 0])
+
+        seed = 3
+        u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        w = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        p = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+
+        self.U = np.vstack( [u, v, w, p, q, r] ).T
+
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        + States (5): [n, e, d, phi, theta, psi]
+        + Inputs (5): [u, v, w, p, q, r]
+        """
+
+        # States
+        n = x[0]
+        e = x[1]
+        d = x[2]
+        phi = x[3]
+        theta = x[4]
+        psi = x[5]
+
+        # Control
+        uu = u[0]
+        v = u[1]
+        w = u[2]
+        p = u[3]
+        q = u[4]
+        r = u[5]
+
+        dx_dt = np.zeros(6)
+        dx_dt[0] = uu*np.cos( psi )*np.cos( theta ) + v*( np.cos( psi )*np.sin( theta )*np.sin( phi ) - np.sin( psi )*np.cos( phi ) ) + w*( np.sin( psi )*np.sin( phi ) + np.cos( psi )*np.cos( phi )*np.sin( theta ) )
+        dx_dt[1] = uu*( np.sin( psi )*np.cos( theta ) ) + v*( np.cos( psi )*np.cos( phi ) + np.sin( phi )*np.sin( theta )*np.sin( psi ) ) + w*( np.sin( theta )*np.sin( psi )*np.cos( phi ) - np.cos( psi )*np.sin( phi ) )
+        dx_dt[2] = -uu*np.sin( theta ) + v*np.cos( theta )*np.sin( phi ) + w*np.cos( theta )*np.cos( phi )
+        dx_dt[3] = p + q*np.sin ( phi )*np.tan( theta ) + r*np.cos( phi )*np.tan( theta )
+        dx_dt[4] = q*np.cos( phi ) - r*np.sin( phi )
+        dx_dt[5] = q*( np.sin( phi )/np.cos( theta ) ) + r*( np.cos( phi )/np.cos( theta ) )
+
+        return dx_dt
+
+class Iver_dyn(ODE_NonAutonomous):
+    """
+    Dynamic model of Unmanned Underwater Vehicle (Yan et al 2020) --
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 5    # Number of states
+        self.nu = 5    # Number of control inputs
+        self.ts = 0.1
+
+        # Model parameters
+        self.m = 1.0        # Mass of of the vehicle (kg)
+        self.Iy = 0.001     # Moment of inertia about y-axis (kg m^2)
+        self.Iz = 0.001     # Moment of inertia about z-axis (kg m^2)
+
+        # Initial Conditions for the States
+        self.x0 = np.array([1.0, 0, 0, 0, 0])
 
         seed = 3
         u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
