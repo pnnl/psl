@@ -736,46 +736,82 @@ class Iver_kin(ODE_NonAutonomous):
 
 class Iver_dyn(ODE_NonAutonomous):
     """
-    Dynamic model of Unmanned Underwater Vehicle (Yan et al 2020) --
+    Dynamic model of Unmanned Underwater Vehicle (Fossen) -- Includes hydrostatic/dynamic terms, but no ocean current modeling
     """
 
     # parameters of the dynamical system
     def parameters(self):
-        self.nx = 5    # Number of states
-        self.nu = 5    # Number of control inputs
+        self.nx = 12    # Number of states
+        self.nu = 12    # Number of control inputs
         self.ts = 0.1
 
         # Model parameters
         self.m = 1.0        # Mass of of the vehicle (kg)
-        self.Iy = 0.001     # Moment of inertia about y-axis (kg m^2)
-        self.Iz = 0.001     # Moment of inertia about z-axis (kg m^2)
+        self.Ixx = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Iyy = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Izz = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Ixy = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Ixz = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Iyz = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.xg = 0.0       # Center of mass w.r.t x axis, written in body frame (m)
+        self.yg = 0.0       # Center of mass w.r.t y axis, written in body frame (m)
+        self.zg = 0.0       # Center of mass w.r.t z axis, written in body frame (m)
 
         # Initial Conditions for the States
-        self.x0 = np.array([1.0, 0, 0, 0, 0])
+        self.x0 = np.array([1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
         seed = 3
-        u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
-        v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
-        w = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
-        q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
-        r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_X = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        tau_Y = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_Z = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_K = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_M = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_N = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
 
-        self.U = np.vstack( [u, v, w, q, r] ).T
+        self.U = np.vstack( [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N] ).T
 
 
     # equations defining the dynamical system
     def equations(self, x, t, u):
         """
-        + States (5): [xi, eta, zeta, theta, psi]
-        + Inputs (5): [u, v, w, q, r]
+        + States (12): [u, v, w, p, q, r, u_dot, v_dot, w_dot, p_dot, q_dot, r_dot]
+        + Inputs (6): [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N]
         """
 
+        # States
+        uu = x[0]
+        v = x[1]
+        w = x[2]
+        p = x[3]
+        q = x[4]
+        r = x[5]
+        uu_dot = x[6]
+        v_dot = x[7]
+        w_dot = x[8]
+        p_dot = x[9]
+        q_dot = x[10]
+        r_dot = x[11]
 
-        dx_dt = np.zeros(5)
-        dx_dt[0] = np.cos( x[4] )*np.cos( x[3] )*u[0] - np.sin( x[4] )*u[1] + np.sin( x[3] )*np.cos( x[4] )*u[2]
-        dx_dt[1] = ( np.sin( x[4] )*np.cos( x[3] )*np.cos( x[4] )*np.sin( x[3] )*np.sin( x[4] ) - np.sin( x[3] ) )*u[0]
-        dx_dt[2] = np.cos( x[3] )*u[2]
-        dx_dt[3] = u[3]
-        dx_dt[4] = u[4]/(np.cos( x[3] ))
+        # Construct equations of motion in matrix form
+        rbg = np.array([self.xg, self.yg, self.zg ])
+        Io = np.array([ [self.Ixx, -self.Ixy, -self.Ixz], [-self.Ixy, self.Iyy, -self.Iyz], [-self.Ixz, -self.Iyz, self.Izz] ])
+        M_rb = np.block([ [self.m*np.eye(3), -self.m*self.Cross(rbg) ], [self.m*self.Cross(rbg), Io ] ])
+
+        nu1 = np.array([ uu, v, w])
+        nu2 = np.array([ p, q, r])
+        C_rb = np.block([ [self.zeros((3,3)), -self.m*self.Cross(nu1) - self.m*np.multiply( self.Cross(nu2), self.Cross(rbg)) ], [-self.m*self.Cross(nu1) + self.m*np.multiply( self.Cross(rbg), self.Cross(nu2) ), -self.Cross( Io.dot(nu2) )  ] ])
+
+        # State derivatives
+        dx_dt = np.zeros(12)
+        dx_dt[0:6] = x[6:12]
+
 
         return dx_dt
+
+        def Cross(self,x):
+            """
+            + Input: 3d array x
+            + Output: cross product matrix (skew symmetric)
+            """
+
+        return np.array( [ [0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0] ])
