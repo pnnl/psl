@@ -736,13 +736,13 @@ class Iver_kin(ODE_NonAutonomous):
 
 class Iver_dyn(ODE_NonAutonomous):
     """
-    Dynamic model of Unmanned Underwater Vehicle (Fossen) -- Includes hydrostatic/dynamic terms, but no ocean current modeling
+    Dynamic model of Unmanned Underwater Vehicle (Fossen) -- Excludes hydrostatic/dynamic terms, ocean current
     """
 
     # parameters of the dynamical system
     def parameters(self):
-        self.nx = 12    # Number of states
-        self.nu = 12    # Number of control inputs
+        self.nx = 6    # Number of states
+        self.nu = 6    # Number of control inputs
         self.ts = 0.1
 
         # Model parameters
@@ -757,8 +757,9 @@ class Iver_dyn(ODE_NonAutonomous):
         self.yg = 0.0       # Center of mass w.r.t y axis, written in body frame (m)
         self.zg = 0.0       # Center of mass w.r.t z axis, written in body frame (m)
 
+
         # Initial Conditions for the States
-        self.x0 = np.array([1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.x0 = np.array([1.0, 0, 0, 0, 0, 0])
 
         seed = 3
         tau_X = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
@@ -774,7 +775,7 @@ class Iver_dyn(ODE_NonAutonomous):
     # equations defining the dynamical system
     def equations(self, x, t, u):
         """
-        + States (12): [u, v, w, p, q, r, u_dot, v_dot, w_dot, p_dot, q_dot, r_dot]
+        + States (6): [u, v, w, p, q, r]
         + Inputs (6): [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N]
         """
 
@@ -785,33 +786,26 @@ class Iver_dyn(ODE_NonAutonomous):
         p = x[3]
         q = x[4]
         r = x[5]
-        uu_dot = x[6]
-        v_dot = x[7]
-        w_dot = x[8]
-        p_dot = x[9]
-        q_dot = x[10]
-        r_dot = x[11]
+        nu = np.array(x)
+        nu1 = np.array([uu, v, w])
+        nu2 = np.array([p, q, r])
 
         # Construct equations of motion in matrix form
         rbg = np.array([self.xg, self.yg, self.zg ])
         Io = np.array([ [self.Ixx, -self.Ixy, -self.Ixz], [-self.Ixy, self.Iyy, -self.Iyz], [-self.Ixz, -self.Iyz, self.Izz] ])
         M_rb = np.block([ [self.m*np.eye(3), -self.m*self.Cross(rbg) ], [self.m*self.Cross(rbg), Io ] ])
-
-        nu1 = np.array([ uu, v, w])
-        nu2 = np.array([ p, q, r])
-        C_rb = np.block([ [self.zeros((3,3)), -self.m*self.Cross(nu1) - self.m*np.multiply( self.Cross(nu2), self.Cross(rbg)) ], [-self.m*self.Cross(nu1) + self.m*np.multiply( self.Cross(rbg), self.Cross(nu2) ), -self.Cross( Io.dot(nu2) )  ] ])
+        C_rb = np.block([ [np.zeros((3,3)), -self.m*self.Cross(nu1) - self.m*np.multiply( self.Cross(nu2), self.Cross(rbg)) ], [-self.m*self.Cross(nu1) + self.m*np.multiply( self.Cross(rbg), self.Cross(nu2) ), -self.Cross( Io.dot(nu2) )  ] ])
 
         # State derivatives
-        dx_dt = np.zeros(12)
-        dx_dt[0:6] = x[6:12]
+        dx_dt = np.linalg.inv(M_rb).dot( -C_rb.dot(nu) + u  )
 
 
         return dx_dt
 
-        def Cross(self,x):
-            """
-            + Input: 3d array x
-            + Output: cross product matrix (skew symmetric)
-            """
+    def Cross(self,x):
+        """
+        + Input: 3d array x
+        + Output: cross product matrix (skew symmetric)
+        """
 
         return np.array( [ [0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0] ])

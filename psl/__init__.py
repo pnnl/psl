@@ -17,6 +17,7 @@ emulators = {
     "SEIR_population": SEIR_population,
     "Iver_kin_reduced": Iver_kin_reduced,
     "Iver_kin": Iver_kin,
+    "Iver_dyn": Iver_dyn,
 
     # autonomous chaotic ODEs
     "UniversalOscillator": UniversalOscillator,
