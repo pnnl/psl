@@ -812,41 +812,41 @@ class Iver_dyn(ODE_NonAutonomous):
 
 class Iver_dyn_reduced(ODE_NonAutonomous):
     """
-    Dynamic model of Unmanned Underwater Vehicle (Yan et al) -- Excludes rolling...
+    Dynamic model of Unmanned Underwater Vehicle (Yan et al) -- Excludes rolling, includes hydrostate/dynamic terms, no currents
     """
 
     # parameters of the dynamical system
     def parameters(self):
-        self.nx = 5    # Number of states
+        self.nx = 10    # Number of states
         self.nu = 5    # Number of control inputs
         self.ts = 0.1
 
         # Model parameters
-        self.m = 1.0        # Mass of of the vehicle (kg)
-        self.Iyy = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
-        self.Izz = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
-        self.Xu_dot = 0.01  # Hydrodynamic coefficient
-        self.Yv_dot = 0.01  # Hydrodynamic coefficient
-        self.Zw_dot = 0.01  # Hydrodynamic coefficient
-        self.Mq_dot = 0.01  # Hydrodynamic coefficient
-        self.Nr_dot = 0.01  # Hydrodynamic coefficient
-        self.Xu = 0.01      # Hydrodynamic coefficient
-        self.Yv = 0.01      # Hydrodynamic coefficient
-        self.Zw = 0.01      # Hydrodynamic coefficient
-        self.Mq = 0.01      # Hydrodynamic coefficient
-        self.Nr = 0.01      # Hydrodynamic coefficient
-        self.Xuu = 0.01     # Hydrodynamic coefficient
-        self.Yvv = 0.01     # Hydrodynamic coefficient
-        self.Zww = 0.01     # Hydrodynamic coefficient
-        self.Mqq = 0.01     # Hydrodynamic coefficient
-        self.Nrr = 0.01     # Hydrodynamic coefficient
+        self.m = 100.0        # Mass of of the vehicle (kg)
+        self.Iyy = 0.1    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Izz = 0.1    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Xu_dot = 0.0001  # Hydrodynamic coefficient
+        self.Yv_dot = 0.0001  # Hydrodynamic coefficient
+        self.Zw_dot = 0.0001  # Hydrodynamic coefficient
+        self.Mq_dot = 0.0001  # Hydrodynamic coefficient
+        self.Nr_dot = 0.0001  # Hydrodynamic coefficient
+        self.Xu = 0.0001      # Hydrodynamic coefficient
+        self.Yv = 0.0001      # Hydrodynamic coefficient
+        self.Zw = 0.0001      # Hydrodynamic coefficient
+        self.Mq = 0.0001      # Hydrodynamic coefficient
+        self.Nr = 0.0001      # Hydrodynamic coefficient
+        self.Xuu = 0.0001     # Hydrodynamic coefficient
+        self.Yvv = 0.0001     # Hydrodynamic coefficient
+        self.Zww = 0.0001     # Hydrodynamic coefficient
+        self.Mqq = 0.0001     # Hydrodynamic coefficient
+        self.Nrr = 0.0001     # Hydrodynamic coefficient
         self.V = 0.01       # Volume of water displaced by the vehicle
-        self.rho = 0.001    # Density of the water (kg/m^3)
+        self.rho = 1000    # Density of the water (kg/m^3)
         self.g = 9.81       # Acceleration due to gravity (m/s^2)
         self.GML = 0.01     # Vertical metacentric height (m)
 
         # Initial Conditions for the States
-        self.x0 = np.array([1.0, 0, 0, 0, 0])
+        self.x0 = np.array([0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0])
 
         seed = 3
         tau_X = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
@@ -861,39 +861,45 @@ class Iver_dyn_reduced(ODE_NonAutonomous):
     # equations defining the dynamical system
     def equations(self, x, t, u):
         """
-        + States (6): [u, v, w, p, q, r]
-        + Inputs (6): [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N]
+        + States (10): [n, e, d, theta, psi, u, v, w, p, q, r]
+        + Inputs (5): [tau_X, tau_Y, tau_Z, tau_M, tau_N]
         """
 
         # States
-        uu = x[0]
-        v = x[1]
-        w = x[2]
-        q = x[3]
-        r = x[4]
-        nu = np.array(x)
+        n = x[0]
+        e = x[1]
+        d = x[2]
+        theta = x[3]
+        psi = x[4]
+        uu = x[5]
+        v = x[6]
+        w = x[7]
+        q = x[8]
+        r = x[9]
+        eta = np.array([ n, e, d, theta, psi])
+        nu = np.array([ uu, v, w, q, r])
 
+        # Kinematics: dot(eta) = J nu
+        dx_dt = np.zeros(10)
+        dx_dt[0] = np.cos(x[4]) * np.cos(x[3]) * nu[0] - np.sin(x[4]) * nu[1] + np.sin(x[3]) * np.cos(x[4]) * nu[2]
+        dx_dt[1] = (np.sin(x[4]) * np.cos(x[3]) * np.cos(x[4]) * np.sin(x[3]) * np.sin(x[4]) - np.sin(x[3])) * nu[0]
+        dx_dt[2] = np.cos(x[3]) * nu[2]
+        dx_dt[3] = nu[3]
+        dx_dt[4] = nu[4] / (np.cos(x[3]))
 
-        # Construct equations of motion in matrix form
+        # Construct dynamics in matrix form: dot(nu) = inv(M) ( -C nu - D nu - g + tau)
         M_rb = np.diag([ self.m, self.m, self.m, self.Iyy, self.Izz ])
         M_a = np.diag([ -self.Xu_dot, -self.Yv_dot, -self.Zw_dot, -self.Mq_dot, -self.Nr_dot ])
         M = M_rb + M_a
-        C_rb = np.array([ [0, 0, 0, self.m*w, -self.m*v], [0, 0, 0, 0, self.m*u], [0, 0, 0, -self.m*u, 0], [-self.m*w, 0, self.m*u, 0, 0], [self.m*v, -self.m*u, 0, 0, 0] ])
-        C_a = np.array([ [0, 0, 0, -self.Zw_dot*w, self.Yv_dot*v], [0, 0, 0, 0, -self.Xu_dot*u], [0, 0, 0, self.Xu_dot*u, 0],[self.Zw_dot*w, 0, -self.Xu_dot*u, 0, 0], [-self.Yv_dot*v, self.Xu_dot*u, 0, 0, 0] ])
+        C_rb = np.array([ [0, 0, 0, self.m*w, -self.m*v], [0, 0, 0, 0, self.m*uu], [0, 0, 0, -self.m*uu, 0], [-self.m*w, 0, self.m*uu, 0, 0], [self.m*v, -self.m*uu, 0, 0, 0] ])
+        C_a = np.array([ [0, 0, 0, -self.Zw_dot*w, self.Yv_dot*v], [0, 0, 0, 0, -self.Xu_dot*uu], [0, 0, 0, self.Xu_dot*uu, 0],[self.Zw_dot*w, 0, -self.Xu_dot*uu, 0, 0], [-self.Yv_dot*v, self.Xu_dot*uu, 0, 0, 0] ])
         C = C_rb + C_a
         D = np.diag([ self.Xu, self.Yv, self.Zw, self.Mq, self.Nr ]) + np.diag([ self.Xuu, self.Yvv, self.Zww, self.Mqq, self.Nrr ])
-        g = np.array([ 0, 0, 0, self.rho*self.V*self.GML*np.sin(theta)])
-        
-        # State derivatives
-        dx_dt = np.linalg.inv(M).dot( -C.dot(nu) -D.dot(nu) - g + u  )
+        g = np.array([ 0, 0, 0, self.rho*self.V*self.GML*np.sin(theta), 0])
 
+        # State derivatives
+        dx_dt[5:] = np.linalg.inv(M).dot( -C.dot(nu) -D.dot(nu) - g + u  )
 
         return dx_dt
 
-    def Cross(self,x):
-        """
-        + Input: 3d array x
-        + Output: cross product matrix (skew symmetric)
-        """
 
-        return np.array( [ [0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0] ])
