@@ -904,12 +904,12 @@ class Iver_dyn_reduced(ODE_NonAutonomous):
 
 class Iver_dyn_simplified(ODE_NonAutonomous):
     """
-    Dynamic model of Unmanned Underwater Vehicle (Stankiewicz et al) -- Excludes rolling, sway, currents, Includes: hydrostate/dynamic terms, control surface deflections/propeller thrust
+    Dynamic model of Unmanned Underwater Vehicle (modified from Stankiewicz et al) -- Excludes rolling, sway, currents, Includes: hydrostate/dynamic terms, control surface deflections/propeller thrust, and actuator dynamics
     """
 
     # parameters of the dynamical system
     def parameters(self):
-        self.nx = 9    # Number of states
+        self.nx = 12    # Number of states (including actuator dynamics)
         self.nu = 3    # Number of control inputs
         self.ts = 0.1
 
@@ -924,14 +924,17 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         self.k = 0.519          # Hydrodynamic coefficient (m/s^2)
         self.b = 3.096          # Hydrodynamic coefficient (1/m^2)
         self.c = 0.065          # Hydrodynamic coefficient (1/m^2)
+        self.K_delta_u = -1.0   # Thruster dynamic coefficient
+        self.K_delta_q = -1.0   # Elevator deflection dynamic coefficient
+        self.K_delta_r = -1.0   # Rudder deflection dynamic coefficient
 
         # Initial Conditions for the States
-        self.x0 = np.array([0, 0, 0, 0, 0, 0.01, 0, 0, 0])
+        self.x0 = np.array([0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0])
 
         seed = 3
-        delta_u = SplineSignal(nsim=self.nsim, values=None, xmin= 0.0, xmax=0.05, rseed=seed)
-        delta_q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.05, xmax=0.05, rseed=seed)
-        delta_r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.05, xmax=0.05, rseed=seed)
+        delta_u = SplineSignal(nsim=self.nsim, values=None, xmin= 0.0, xmax=1.0, rseed=seed)
+        delta_q = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=seed)
+        delta_r = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=seed)
 
         self.U = np.vstack( [delta_u, delta_q, delta_r] ).T
 
@@ -939,8 +942,8 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
     # equations defining the dynamical system
     def equations(self, x, t, u):
         """
-        + States (9): [px, py, pz, theta, psi, uu, w, q, r]
-        + Inputs (3): [delta_u, delta_q, delta_r] (deflection rates, normalized)
+        + States (12): [px, py, pz, theta, psi, uu, w, q, r, delta_u, delta_q, delta_r]
+        + Inputs (3): [delta_uc, delta_qc, delta_rc] (thrust speed/deflections, normalized)
         """
 
         # States
@@ -953,14 +956,17 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         w = x[6]
         q = x[7]
         r = x[8]
+        delta_u = x[9]
+        delta_q = x[10]
+        delta_r = x[11]
 
         # Control
-        delta_u = u[0]
-        delta_q = u[1]
-        delta_r = u[2]
+        delta_uc = u[0]
+        delta_qc = u[1]
+        delta_rc = u[2]
 
         # Kinematics:
-        dx_dt = np.zeros(9)
+        dx_dt = np.zeros(12)
         dx_dt[0] = uu*np.cos(psi)*np.cos(theta) + w*np.cos(psi)*np.sin(theta)
         dx_dt[1] = uu*np.sin(psi)*np.cos(theta) + w*np.sin(psi)*np.sin(theta)
         dx_dt[2] = w*np.cos(theta) - uu*np.sin(theta)
@@ -972,6 +978,11 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         dx_dt[6] = 0*self.Zww*w**2*np.sign(w) + self.WB*np.cos(theta)
         dx_dt[7] = self.Muq*uu*q + self.Mq*q - self.Bz*np.sin(theta) + self.b*(uu**2)*delta_q
         dx_dt[8] = self.Nur*uu*r + self.c*(uu**2)*delta_r
+
+        # Actuator dynamics:
+        dx_dt[9] = self.K_delta_u*( delta_u - delta_uc )
+        dx_dt[10] = self.K_delta_q*( delta_q - delta_qc )
+        dx_dt[11] = self.K_delta_r*( delta_r - delta_rc )
 
         return dx_dt
 
