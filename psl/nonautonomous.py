@@ -902,4 +902,77 @@ class Iver_dyn_reduced(ODE_NonAutonomous):
 
         return dx_dt
 
+class Iver_dyn_simplified(ODE_NonAutonomous):
+    """
+    Dynamic model of Unmanned Underwater Vehicle (Stankiewicz et al) -- Excludes rolling, sway, currents, Includes: hydrostate/dynamic terms, control surface deflections/propeller thrust
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 9    # Number of states
+        self.nu = 3    # Number of control inputs
+        self.ts = 0.1
+
+        # Model parameters
+        self.Mq = -0.748        # Hydrodynamic coefficient (1/s)
+        self.Nur = -0.441       # Hydrodynamic coefficient (1/m)
+        self.Xuu = -0.179       # Hydrodynamic coefficient (1/m)
+        self.Zww = 0.098        # Hydrodynamic coefficient (1/m)
+        self.Muq = -3.519       # Hydrodynamic coefficient (1/m)
+        self.WB = -2.452        # Out-of-ballast term based on weight and buoyancy ratio (m/s^2)
+        self.Bz = 8.947         # Bouyancy term that accounts for the center of bouyancy vertical offset from the center of gravity (1/s^2)
+        self.k = 0.519          # Hydrodynamic coefficient (m/s^2)
+        self.b = 3.096          # Hydrodynamic coefficient (1/m^2)
+        self.c = 0.065          # Hydrodynamic coefficient (1/m^2)
+
+        # Initial Conditions for the States
+        self.x0 = np.array([0, 0, 0, 0, 0, 0.01, 0, 0, 0])
+
+        seed = 3
+        delta_u = SplineSignal(nsim=self.nsim, values=None, xmin= 0.0, xmax=0.05, rseed=seed)
+        delta_q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.05, xmax=0.05, rseed=seed)
+        delta_r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.05, xmax=0.05, rseed=seed)
+
+        self.U = np.vstack( [delta_u, delta_q, delta_r] ).T
+
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        + States (9): [px, py, pz, theta, psi, uu, w, q, r]
+        + Inputs (3): [delta_u, delta_q, delta_r] (deflection rates, normalized)
+        """
+
+        # States
+        px = x[0]
+        py = x[1]
+        pz = x[2]
+        theta = x[3]
+        psi = x[4]
+        uu = x[5]
+        w = x[6]
+        q = x[7]
+        r = x[8]
+
+        # Control
+        delta_u = u[0]
+        delta_q = u[1]
+        delta_r = u[2]
+
+        # Kinematics:
+        dx_dt = np.zeros(9)
+        dx_dt[0] = uu*np.cos(psi)*np.cos(theta) + w*np.cos(psi)*np.sin(theta)
+        dx_dt[1] = uu*np.sin(psi)*np.cos(theta) + w*np.sin(psi)*np.sin(theta)
+        dx_dt[2] = w*np.cos(theta) - uu*np.sin(theta)
+        dx_dt[3] = q
+        dx_dt[4] = r / (np.cos(theta))
+
+        # Dynamics
+        dx_dt[5] = self.Xuu*(uu**2) + self.k*delta_u
+        dx_dt[6] = 0*self.Zww*w**2*np.sign(w) + self.WB*np.cos(theta)
+        dx_dt[7] = self.Muq*uu*q + self.Mq*q - self.Bz*np.sin(theta) + self.b*(uu**2)*delta_q
+        dx_dt[8] = self.Nur*uu*r + self.c*(uu**2)*delta_r
+
+        return dx_dt
+
 
