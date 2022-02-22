@@ -651,11 +651,17 @@ class Iver_kin_reduced(ODE_NonAutonomous):
         self.x0 = np.array([0, 0, 0, 0, 0])
 
         seed = 3
-        u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
-        v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=2*seed)
-        w = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=3*seed)
-        q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=4*seed)
-        r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=5*seed)
+        #u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        #v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=2*seed)
+        #w = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=3*seed)
+        #q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=4*seed)
+        #r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=5*seed)
+
+        u = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=1.0, xmax=3.0, rseed=seed).T
+        v = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=2 * seed).T
+        w = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=3 * seed).T
+        q = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=4 * seed).T
+        r = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=5 * seed).T
 
         self.U = np.vstack( [u, v, w, q, r] ).T
 
@@ -942,17 +948,21 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         self.k = 0.519          # Hydrodynamic coefficient (m/s^2)
         self.b = 3.096          # Hydrodynamic coefficient (1/m^2)
         self.c = 0.065          # Hydrodynamic coefficient (1/m^2)
-        self.K_delta_u = -1.0   # Thruster dynamic coefficient
-        self.K_delta_q = -1.0   # Elevator deflection dynamic coefficient
-        self.K_delta_r = -1.0   # Rudder deflection dynamic coefficient
+        self.K_delta_u = -10.0   # Thruster dynamic coefficient
+        self.K_delta_q = -10.0   # Elevator deflection dynamic coefficient
+        self.K_delta_r = -10.0   # Rudder deflection dynamic coefficient
 
         # Initial Conditions for the States
         self.x0 = np.array([0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0])
 
         seed = 3
-        delta_u = SplineSignal(nsim=self.nsim, values=None, xmin= 0.0, xmax=1.0, rseed=seed)
-        delta_q = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=seed)
-        delta_r = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=seed)
+        #delta_u = SplineSignal(nsim=self.nsim, values=None, xmin= 0.0, xmax=1.0, rseed=seed)
+        #delta_q = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=2*seed)
+        #delta_r = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=3*seed)
+
+        delta_u = Steps(nsim=self.nsim, values=None, randsteps=100, xmin=0.0, xmax=1.0, rseed=seed).T
+        delta_q = Steps(nsim=self.nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=2 * seed).T
+        delta_r = Steps(nsim=self.nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=3 * seed).T
 
         self.U = np.vstack( [delta_u, delta_q, delta_r] ).T
 
