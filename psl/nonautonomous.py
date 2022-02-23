@@ -10,10 +10,8 @@ import os
 
 # local imports
 from psl.emulator import ODE_NonAutonomous
-from psl.perturb import Steps
-from psl.perturb import SplineSignal
+from psl.perturb import Steps, Step, SplineSignal, Periodic, RandomWalk
 from psl.emulator import SSM
-from psl.perturb import Periodic, RandomWalk
 
 
 class SEIR_population(ODE_NonAutonomous):
@@ -1012,6 +1010,89 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         dx_dt[10] = self.K_delta_q*( delta_q - delta_qc )
         dx_dt[11] = self.K_delta_r*( delta_r - delta_rc )
 
+        return dx_dt
+
+
+class SwingEquation(ODE_NonAutonomous):
+    """
+    Power Grid Swing Equation.
+
+    + https://en.wikipedia.org/wiki/Swing_equation
+    + The second-order swing equation is converted to
+    + two first-order ODEs
+    """
+
+    def parameters(self):
+        super().parameters()
+        self.Pm = 0.8  # Mechanical power
+        self.Pmax = 5.0  # Maximum electrical output
+        self.H = 500.0  # Inertia constant
+        self.D = 5.0  # Damping coefficient
+        self.freq = 60.0  # Base frequency
+        self.ws = 2 * np.pi * self.freq  # Base angular speed
+        self.M = 2 * self.H / self.ws  # scaled inertia constant
+        self.nx = 2  # number of variables
+        self.mode = 1  # 0 (Constant mechanical power and Pmax)
+        # 1 (Noisy mechanical power with constant Pmax)
+        # 2 (Constant mechanical power with fault on-off Pmax (square wave))
+
+        if (self.mode == 0):
+            self.delta0 = 0.0
+        else:
+            self.delta0 = np.arcsin(self.Pm / self.Pmax)  # initial condition for machine angle \delta
+
+        self.dw0 = 0.0  # initial condition for machine speed deviation d\omega
+        self.x0 = [self.delta0, self.dw0]  # initial condition for the model
+
+        self.ts = 0.01  # Time-step
+        self.ninit = 0.0  # Simulation start at t=0
+        self.nsim = 1000  # 1000 steps = 10 sec. horizon
+        self.tfaulton = 0.05
+        self.tfaultoff = 0.15
+
+        if (self.mode == 0):
+            # 0 (Constant mechanical power and Pmax)
+            Pmech = Step(nx=1, nsim=self.nsim, tstep=100, xmax=self.Pm, xmin=self.Pm, rseed=1)
+            Pmax = Step(nx=1, nsim=self.nsim, tstep=100, xmax=self.Pmax, xmin=self.Pmax, rseed=1)
+            self.U = np.vstack([Pmech.T, Pmax.T]).T
+            self.nu = 2
+        elif (self.mode == 1):
+            # 1 (Noisy mechanical power with constant Pmax)
+            Pmech = RandomWalk(nx=1, nsim=self.nsim, xmax=self.Pm * 1.02, xmin=self.Pm * 0.98, sigma=0.1, rseed=1)
+            self.U = Pmech
+            self.nu = 1
+        else:
+            # 2 (Constant mechanical power with fault on-off Pmax (square wave))
+            Signal = []
+            signal = []
+            for tstep in range(0, self.nsim):
+                t = tstep * self.ts
+                if (t < self.tfaulton):  # Pre-fault
+                    signal.append(self.Pmax)
+                elif (t >= self.tfaulton and t <= self.tfaultoff):  # Fault-on
+                    signal.append(0)
+                else:  # Post-fault
+                    signal.append(self.Pmax)
+            Signal.append(signal)
+            Pmax = np.asarray(Signal).T
+            self.U = Pmax
+            self.nu = 1
+
+    def equations(self, x, t, u):
+        delta = x[0]
+        domega = x[1]
+
+        if (self.mode == 0):
+            Pm = u[0]
+            Pmax = u[1]
+        elif (self.mode == 1):
+            Pm = u[0]
+            Pmax = self.Pmax
+        else:
+            Pm = self.Pm
+            Pmax = u[0]
+
+        dx_dt = [self.ws * domega, (Pm - Pmax * np.sin(delta) - self.D * domega) / self.M]
         return dx_dt
 
 

@@ -58,6 +58,9 @@ emulators = {
     "HollandschHuys_ROM100": BuildingEnvelope,
     "Infrax_full": BuildingEnvelope,
     "Infrax_ROM100": BuildingEnvelope,
+
+    # Power grid
+    "SwingEquation": SwingEquation,
 }
 
 systems = emulators
