@@ -635,3 +635,383 @@ class BuildingEnvelope(SSM):
         y = np.matmul(self.C, x) + self.F.ravel()
         return x, y
 
+class Iver_kin_reduced(ODE_NonAutonomous):
+    """
+    Kinetic model of Unmanned Underwater Vehicle (Yan et al 2020) -- UAV kinematic model with **no roll**
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 5    # Number of states
+        self.nu = 5    # Number of control inputs
+        self.ts = 0.1
+        self.K_alpha = 100.0 # Barrier function parameter
+
+        # Initial Conditions for the States
+        self.x0 = np.array([0, 0, 0, 0, 0])
+
+        seed = 3
+        #u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        #v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=2*seed)
+        #w = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=3*seed)
+        #q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=4*seed)
+        #r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=5*seed)
+
+        u = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=1.0, xmax=3.0, rseed=seed).T
+        v = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=2 * seed).T
+        w = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=3 * seed).T
+        q = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=4 * seed).T
+        r = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=5 * seed).T
+
+        self.U = np.vstack( [u, v, w, q, r] ).T
+
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        + States (5): [xi, eta, zeta, theta, psi]
+        + Inputs (5): [u, v, w, q, r]
+        """
+
+        # States
+        xi = x[0]
+        eta = x[1]
+        zeta = x[2]
+        theta = x[3]
+        psi = x[4]
+
+        # Control
+        uu = u[0]
+        v = u[1]
+        w = u[2]
+        q = u[3]
+        r = u[4]
+
+        # Barrier function to avoid singularities
+        h = (np.pi/2.0 - 0.01)**2 - theta**2
+        z = -2.0*theta*q + self.K_alpha*h
+
+        dx_dt = np.zeros(5)
+        dx_dt[0] = np.cos( psi )*np.cos( theta )*uu - np.sin( psi )*v + np.sin( theta )*np.cos( psi )*w
+        dx_dt[1] =  np.sin( psi )*np.cos( theta )*uu + np.cos( psi )*v + ( np.sin( theta )*np.sin( psi ) )*w
+        dx_dt[2] = -np.sin( theta )*uu + np.cos( theta )*w
+        dx_dt[3] = q - z
+        dx_dt[4] = r/(np.cos( theta ))
+
+        return dx_dt
+
+class Iver_kin(ODE_NonAutonomous):
+    """
+    Kinetic model of Unmanned Underwater Vehicle (Fossen) -- Full UAV kinematic model
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 6    # Number of states
+        self.nu = 6    # Number of control inputs
+        self.ts = 0.1
+
+        # Initial Conditions for the States
+        self.x0 = np.array([1.0, 0, 0, 0, 0, 0])
+
+        seed = 3
+        u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        w = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        p = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+
+        self.U = np.vstack( [u, v, w, p, q, r] ).T
+
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        + States (5): [n, e, d, phi, theta, psi]
+        + Inputs (5): [u, v, w, p, q, r]
+        """
+
+        # States
+        n = x[0]
+        e = x[1]
+        d = x[2]
+        phi = x[3]
+        theta = x[4]
+        psi = x[5]
+
+        # Control
+        uu = u[0]
+        v = u[1]
+        w = u[2]
+        p = u[3]
+        q = u[4]
+        r = u[5]
+
+        dx_dt = np.zeros(6)
+        dx_dt[0] = uu*np.cos( psi )*np.cos( theta ) + v*( np.cos( psi )*np.sin( theta )*np.sin( phi ) - np.sin( psi )*np.cos( phi ) ) + w*( np.sin( psi )*np.sin( phi ) + np.cos( psi )*np.cos( phi )*np.sin( theta ) )
+        dx_dt[1] = uu*( np.sin( psi )*np.cos( theta ) ) + v*( np.cos( psi )*np.cos( phi ) + np.sin( phi )*np.sin( theta )*np.sin( psi ) ) + w*( np.sin( theta )*np.sin( psi )*np.cos( phi ) - np.cos( psi )*np.sin( phi ) )
+        dx_dt[2] = -uu*np.sin( theta ) + v*np.cos( theta )*np.sin( phi ) + w*np.cos( theta )*np.cos( phi )
+        dx_dt[3] = p + q*np.sin ( phi )*np.tan( theta ) + r*np.cos( phi )*np.tan( theta )
+        dx_dt[4] = q*np.cos( phi ) - r*np.sin( phi )
+        dx_dt[5] = q*( np.sin( phi )/np.cos( theta ) ) + r*( np.cos( phi )/np.cos( theta ) )
+
+        return dx_dt
+
+class Iver_dyn(ODE_NonAutonomous):
+    """
+    Dynamic model of Unmanned Underwater Vehicle (Fossen) -- Excludes hydrostatic/dynamic terms and ocean current
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 6    # Number of states
+        self.nu = 6    # Number of control inputs
+        self.ts = 0.1
+
+        # Model parameters
+        self.m = 1.0        # Mass of of the vehicle (kg)
+        self.Ixx = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Iyy = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Izz = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Ixy = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Ixz = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Iyz = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.xg = 0.0       # Center of mass w.r.t x axis, written in body frame (m)
+        self.yg = 0.0       # Center of mass w.r.t y axis, written in body frame (m)
+        self.zg = 0.0       # Center of mass w.r.t z axis, written in body frame (m)
+
+
+        # Initial Conditions for the States
+        self.x0 = np.array([1.0, 0, 0, 0, 0, 0])
+
+        seed = 3
+        tau_X = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        tau_Y = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_Z = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_K = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_M = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_N = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+
+        self.U = np.vstack( [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N] ).T
+
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        + States (6): [u, v, w, p, q, r]
+        + Inputs (6): [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N]
+        """
+
+        # States
+        uu = x[0]
+        v = x[1]
+        w = x[2]
+        p = x[3]
+        q = x[4]
+        r = x[5]
+        nu = np.array(x)
+        nu1 = np.array([uu, v, w])
+        nu2 = np.array([p, q, r])
+
+        # Construct equations of motion in matrix form
+        rbg = np.array([self.xg, self.yg, self.zg ])
+        Io = np.array([ [self.Ixx, -self.Ixy, -self.Ixz], [-self.Ixy, self.Iyy, -self.Iyz], [-self.Ixz, -self.Iyz, self.Izz] ])
+        M_rb = np.block([ [self.m*np.eye(3), -self.m*self.Cross(rbg) ], [self.m*self.Cross(rbg), Io ] ])
+        C_rb = np.block([ [np.zeros((3,3)), -self.m*self.Cross(nu1) - self.m*np.multiply( self.Cross(nu2), self.Cross(rbg)) ], [-self.m*self.Cross(nu1) + self.m*np.multiply( self.Cross(rbg), self.Cross(nu2) ), -self.Cross( Io.dot(nu2) )  ] ])
+
+        # State derivatives
+        dx_dt = np.linalg.inv(M_rb).dot( -C_rb.dot(nu) + u  )
+
+
+        return dx_dt
+
+    def Cross(self,x):
+        """
+        + Input: 3d array x
+        + Output: cross product matrix (skew symmetric)
+        """
+
+        return np.array( [ [0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0] ])
+
+class Iver_dyn_reduced(ODE_NonAutonomous):
+    """
+    Dynamic model of Unmanned Underwater Vehicle (Yan et al) -- Excludes rolling, includes hydrostate/dynamic terms, no currents
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 10    # Number of states
+        self.nu = 5    # Number of control inputs
+        self.ts = 0.1
+
+        # Model parameters
+        self.m = 100.0        # Mass of of the vehicle (kg)
+        self.Iyy = 0.1    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Izz = 0.1    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
+        self.Xu_dot = 0.0001  # Hydrodynamic coefficient
+        self.Yv_dot = 0.0001  # Hydrodynamic coefficient
+        self.Zw_dot = 0.0001  # Hydrodynamic coefficient
+        self.Mq_dot = 0.0001  # Hydrodynamic coefficient
+        self.Nr_dot = 0.0001  # Hydrodynamic coefficient
+        self.Xu = 0.0001      # Hydrodynamic coefficient
+        self.Yv = 0.0001      # Hydrodynamic coefficient
+        self.Zw = 0.0001      # Hydrodynamic coefficient
+        self.Mq = 0.0001      # Hydrodynamic coefficient
+        self.Nr = 0.0001      # Hydrodynamic coefficient
+        self.Xuu = 0.0001     # Hydrodynamic coefficient
+        self.Yvv = 0.0001     # Hydrodynamic coefficient
+        self.Zww = 0.0001     # Hydrodynamic coefficient
+        self.Mqq = 0.0001     # Hydrodynamic coefficient
+        self.Nrr = 0.0001     # Hydrodynamic coefficient
+        self.V = 0.01       # Volume of water displaced by the vehicle
+        self.rho = 1000    # Density of the water (kg/m^3)
+        self.g = 9.81       # Acceleration due to gravity (m/s^2)
+        self.GML = 0.01     # Vertical metacentric height (m)
+
+        # Initial Conditions for the States
+        self.x0 = np.array([0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0])
+
+        seed = 3
+        tau_X = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        tau_Y = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_Z = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_M = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_N = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+
+        self.U = np.vstack( [tau_X, tau_Y, tau_Z, tau_M, tau_N] ).T
+
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        + States (10): [n, e, d, theta, psi, u, v, w, p, q, r]
+        + Inputs (5): [tau_X, tau_Y, tau_Z, tau_M, tau_N]
+        """
+
+        # States
+        n = x[0]
+        e = x[1]
+        d = x[2]
+        theta = x[3]
+        psi = x[4]
+        uu = x[5]
+        v = x[6]
+        w = x[7]
+        q = x[8]
+        r = x[9]
+        eta = np.array([ n, e, d, theta, psi])
+        nu = np.array([ uu, v, w, q, r])
+
+        # Kinematics: dot(eta) = J nu
+        dx_dt = np.zeros(10)
+        dx_dt[0] = np.cos(x[4]) * np.cos(x[3]) * nu[0] - np.sin(x[4]) * nu[1] + np.sin(x[3]) * np.cos(x[4]) * nu[2]
+        dx_dt[1] = (np.sin(x[4]) * np.cos(x[3]) * np.cos(x[4]) * np.sin(x[3]) * np.sin(x[4]) - np.sin(x[3])) * nu[0]
+        dx_dt[2] = np.cos(x[3]) * nu[2]
+        dx_dt[3] = nu[3]
+        dx_dt[4] = nu[4] / (np.cos(x[3]))
+
+        # Construct dynamics in matrix form: dot(nu) = inv(M) ( -C nu - D nu - g + tau)
+        M_rb = np.diag([ self.m, self.m, self.m, self.Iyy, self.Izz ])
+        M_a = np.diag([ -self.Xu_dot, -self.Yv_dot, -self.Zw_dot, -self.Mq_dot, -self.Nr_dot ])
+        M = M_rb + M_a
+        C_rb = np.array([ [0, 0, 0, self.m*w, -self.m*v], [0, 0, 0, 0, self.m*uu], [0, 0, 0, -self.m*uu, 0], [-self.m*w, 0, self.m*uu, 0, 0], [self.m*v, -self.m*uu, 0, 0, 0] ])
+        C_a = np.array([ [0, 0, 0, -self.Zw_dot*w, self.Yv_dot*v], [0, 0, 0, 0, -self.Xu_dot*uu], [0, 0, 0, self.Xu_dot*uu, 0],[self.Zw_dot*w, 0, -self.Xu_dot*uu, 0, 0], [-self.Yv_dot*v, self.Xu_dot*uu, 0, 0, 0] ])
+        C = C_rb + C_a
+        D = np.diag([ self.Xu, self.Yv, self.Zw, self.Mq, self.Nr ]) + np.diag([ self.Xuu, self.Yvv, self.Zww, self.Mqq, self.Nrr ])
+        g = np.array([ 0, 0, 0, self.rho*self.V*self.GML*np.sin(theta), 0])
+
+        # State derivatives
+        dx_dt[5:] = np.linalg.inv(M).dot( -C.dot(nu) -D.dot(nu) - g + u  )
+
+        return dx_dt
+
+class Iver_dyn_simplified(ODE_NonAutonomous):
+    """
+    Dynamic model of Unmanned Underwater Vehicle (modified from Stankiewicz et al) -- Excludes rolling, sway, currents, Includes: hydrostate/dynamic terms, control surface deflections/propeller thrust, and actuator dynamics
+    """
+
+    # parameters of the dynamical system
+    def parameters(self):
+        self.nx = 12    # Number of states (including actuator dynamics)
+        self.nu = 3    # Number of control inputs
+        self.ts = 0.1
+
+        # Model parameters
+        self.Mq = -0.748        # Hydrodynamic coefficient (1/s)
+        self.Nur = -0.441       # Hydrodynamic coefficient (1/m)
+        self.Xuu = -0.179       # Hydrodynamic coefficient (1/m)
+        self.Zww = 0.098        # Hydrodynamic coefficient (1/m)
+        self.Muq = -3.519       # Hydrodynamic coefficient (1/m)
+        self.WB = -2.452        # Out-of-ballast term based on weight and buoyancy ratio (m/s^2)
+        self.Bz = 8.947         # Bouyancy term that accounts for the center of bouyancy vertical offset from the center of gravity (1/s^2)
+        self.k = 0.519          # Hydrodynamic coefficient (m/s^2)
+        self.b = 3.096          # Hydrodynamic coefficient (1/m^2)
+        self.c = 0.065          # Hydrodynamic coefficient (1/m^2)
+        self.K_delta_u = -10.0   # Thruster dynamic coefficient
+        self.K_delta_q = -10.0   # Elevator deflection dynamic coefficient
+        self.K_delta_r = -10.0   # Rudder deflection dynamic coefficient
+
+        # Initial Conditions for the States
+        self.x0 = np.array([0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0])
+
+        seed = 3
+        #delta_u = SplineSignal(nsim=self.nsim, values=None, xmin= 0.0, xmax=1.0, rseed=seed)
+        #delta_q = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=2*seed)
+        #delta_r = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=3*seed)
+
+        delta_u = Steps(nsim=self.nsim, values=None, randsteps=100, xmin=0.0, xmax=1.0, rseed=seed).T
+        delta_q = Steps(nsim=self.nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=2 * seed).T
+        delta_r = Steps(nsim=self.nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=3 * seed).T
+
+        self.U = np.vstack( [delta_u, delta_q, delta_r] ).T
+
+
+    # equations defining the dynamical system
+    def equations(self, x, t, u):
+        """
+        + States (12): [px, py, pz, theta, psi, uu, w, q, r, delta_u, delta_q, delta_r]
+        + Inputs (3): [delta_uc, delta_qc, delta_rc] (thrust speed/deflections, normalized)
+        """
+
+        # States
+        px = x[0]
+        py = x[1]
+        pz = x[2]
+        theta = x[3]
+        psi = x[4]
+        uu = x[5]
+        w = x[6]
+        q = x[7]
+        r = x[8]
+        delta_u = x[9]
+        delta_q = x[10]
+        delta_r = x[11]
+
+        # Control
+        delta_uc = u[0]
+        delta_qc = u[1]
+        delta_rc = u[2]
+
+        # Kinematics:
+        dx_dt = np.zeros(12)
+        dx_dt[0] = uu*np.cos(psi)*np.cos(theta) + w*np.cos(psi)*np.sin(theta)
+        dx_dt[1] = uu*np.sin(psi)*np.cos(theta) + w*np.sin(psi)*np.sin(theta)
+        dx_dt[2] = w*np.cos(theta) - uu*np.sin(theta)
+        dx_dt[3] = q
+        dx_dt[4] = r / (np.cos(theta))
+
+        # Dynamics
+        dx_dt[5] = self.Xuu*(uu**2) + self.k*delta_u
+        dx_dt[6] = 0*self.Zww*w**2*np.sign(w) + self.WB*np.cos(theta)
+        dx_dt[7] = self.Muq*uu*q + self.Mq*q - self.Bz*np.sin(theta) + self.b*(uu**2)*delta_q
+        dx_dt[8] = self.Nur*uu*r + self.c*(uu**2)*delta_r
+
+        # Actuator dynamics:
+        dx_dt[9] = self.K_delta_u*( delta_u - delta_uc )
+        dx_dt[10] = self.K_delta_q*( delta_q - delta_qc )
+        dx_dt[11] = self.K_delta_r*( delta_r - delta_rc )
+
+        return dx_dt
+
+

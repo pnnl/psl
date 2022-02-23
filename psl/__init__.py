@@ -15,6 +15,11 @@ emulators = {
     "UAV2D_kin": UAV2D_kin,
     "UAV3D_reduced": UAV3D_reduced,
     "SEIR_population": SEIR_population,
+    "Iver_kin_reduced": Iver_kin_reduced,
+    "Iver_kin": Iver_kin,
+    "Iver_dyn": Iver_dyn,
+    "Iver_dyn_reduced": Iver_dyn_reduced,
+    "Iver_dyn_simplified": Iver_dyn_simplified,
 
     # autonomous chaotic ODEs
     "UniversalOscillator": UniversalOscillator,
