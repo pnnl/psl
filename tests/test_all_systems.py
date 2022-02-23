@@ -2,13 +2,14 @@ import psl
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os
+import shutil
 
 
 if __name__ == '__main__':
     """
     Tests
     """
-
+    shutil.rmtree("./figs")
     os.mkdir("./figs")
 
     for name, system in psl.systems.items():
@@ -22,7 +23,7 @@ if __name__ == '__main__':
             psl.plot.pltPhase(X=out['Y'], figname="./figs/"+name+"_phase")
             plt.close('all')
         elif isinstance(system(), psl.ODE_NonAutonomous):
-            model = system(nsim=12000)
+            model = system(nsim=1000)
             out = model.simulate()  # simulate open loop
             psl.plot.pltOL(Y=out['Y'], U=out['U'], figname="./figs/"+name+"_ol")  # plot trajectories
             psl.plot.pltPhase(X=out['Y'], figname="./figs/"+name+"_phase")

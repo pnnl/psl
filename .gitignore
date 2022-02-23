@@ -3,4 +3,11 @@
 **/psl.egg-info
 **/__pycache__
 **/.vscode
+**/psl/__pycache__
 /.idea
+*.png
+*.eps
+*.pdf
+*.jpg
+*.jpeg
+*.gif

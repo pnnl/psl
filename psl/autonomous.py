@@ -58,6 +58,37 @@ class Pendulum(ODE_Autonomous):
         return [omega, -self.f*omega - self.g*np.sin(theta)]
 
 
+class DoublePendulum(ODE_Autonomous):
+    """
+    Double Pendulum
+    https://scipython.com/blog/the-double-pendulum/
+    """
+    def parameters(self):
+        super().parameters()
+        self.L1 = 1
+        self.L2 = 1
+        self.m1 = 1
+        self.m2 = 1
+        self.g = 9.81
+        self.x0 = np.array([3 * np.pi / 7, 0, 3 * np.pi / 4, 0])
+        self.nx = 4
+
+    def equations(self, x, t):
+        theta1 = x[0]
+        z1 = x[1]
+        theta2 = x[2]
+        z2 = x[3]
+        c, s = np.cos(theta1 - theta2), np.sin(theta1 - theta2)
+        dx1 = z1
+        dx2 = (self.m2 * self.g * np.sin(theta2) * c - self.m2 * s * (self.L1 * z1 ** 2 * c + self.L2 * z2 ** 2) -
+                 (self.m1 + self.m2) * self.g * np.sin(theta1)) / self.L1 / (self.m1 + self.m2 * s ** 2)
+        dx3 = z2
+        dx4 = ((self.m1 + self.m2) * (self.L1 * z1 ** 2 * s - self.g * np.sin(theta2) + self.g * np.sin(theta1) * c) +
+                 self.m2 * self.L2 * z2 ** 2 * s * c) / self.L2 / (self.m1 + self.m2 * s ** 2)
+        dx = [dx1, dx2, dx3, dx4]
+        return dx
+
+
 class Lorenz96(ODE_Autonomous):
     """
     Lorenz 96 model

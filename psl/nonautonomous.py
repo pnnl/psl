@@ -250,10 +250,10 @@ class InvPendulum(ODE_NonAutonomous):
         self.x0 = [0.5, 0.0]
         self.U = np.zeros(self.nsim)
 
-    def equations(self, x, u):
+    def equations(self, x, t, u):
         y = [x[1],
             (self.m * self.g * self.L * np.sin(x[0]) - self.b * x[1]) / (self.m * self.L ** 2)]
-        y[1] = y[1] + (u / (m * L ** 2))
+        y[1] = y[1] + (u / (self.m * self.L ** 2))
         return y
 
 

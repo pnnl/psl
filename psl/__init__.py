@@ -33,6 +33,7 @@ emulators = {
     "Brusselator1D": Brusselator1D,
     "ChuaCircuit": ChuaCircuit,
     "Duffing": Duffing,
+    "DoublePendulum": DoublePendulum,
 
     # non-autonomous chaotic ODEs
     "HindmarshRose": HindmarshRose,
