@@ -34,6 +34,7 @@ emulators = {
     "ChuaCircuit": ChuaCircuit,
     "Duffing": Duffing,
     "DoublePendulum": DoublePendulum,
+    "Autoignition": Autoignition,
 
     # non-autonomous chaotic ODEs
     "HindmarshRose": HindmarshRose,

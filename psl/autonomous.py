@@ -312,4 +312,34 @@ class Duffing(ODE_Autonomous):
         return dx
 
 
+class Autoignition(ODE_Autonomous):
+    """
+    ODE describing pulsating instability in open-ended combustor.
+
+    + Koch, J., Kurosaka, M., Knowlen, C., Kutz, J.N.,
+      "Multiscale physics of rotating detonation waves: Autosolitons and modulational instabilities,"
+      Physical Review E, 2021
+    """
+
+    def parameters(self):
+        super().parameters()
+        self.alpha = 0.3
+        self.uc = 1.1
+        self.s = 1.0
+        self.k = 1.0
+        self.r = 5.0
+        self.q = 6.5
+        self.up = 0.55
+        self.e = 1.0
+        self.x0 = [1.0, 0.7]
+
+    def equations(self, x, t):
+        reactionRate = self.k * (1.0 - x[1]) * np.exp((x[0] - self.uc) / self.alpha)
+        regenRate = self.s * self.up * x[1] / (1.0 + np.exp(self.r * (x[0] - self.up)))
+        # Derivatives
+        dx1 = self.q * reactionRate - self.e * x[0] ** 2
+        dx2 = reactionRate - regenRate
+        dx = [dx1, dx2]
+        return dx
+
 
