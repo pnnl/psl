@@ -941,7 +941,7 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         self.Xuu = -0.179       # Hydrodynamic coefficient (1/m)
         self.Zww = 0.098        # Hydrodynamic coefficient (1/m)
         self.Muq = -3.519       # Hydrodynamic coefficient (1/m)
-        self.WB = -2.452        # Out-of-ballast term based on weight and buoyancy ratio (m/s^2)
+        self.WB = 0.0           # Out-of-ballast term based on weight and buoyancy ratio (m/s^2) (Differs from Stankiewicz, here set to zero for neutral buoyancy)
         self.Bz = 8.947         # Bouyancy term that accounts for the center of bouyancy vertical offset from the center of gravity (1/s^2)
         self.k = 0.519          # Hydrodynamic coefficient (m/s^2)
         self.b = 3.096          # Hydrodynamic coefficient (1/m^2)
@@ -1001,7 +1001,7 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
 
         # Dynamics
         dx_dt[5] = self.Xuu*(uu**2) + self.k*delta_u
-        dx_dt[6] = 0*self.Zww*w**2*np.sign(w) + self.WB*np.cos(theta)
+        dx_dt[6] = self.Zww*w*np.absolute(w) + self.WB*np.cos(theta)
         dx_dt[7] = self.Muq*uu*q + self.Mq*q - self.Bz*np.sin(theta) + self.b*(uu**2)*delta_q
         dx_dt[8] = self.Nur*uu*r + self.c*(uu**2)*delta_r
 
