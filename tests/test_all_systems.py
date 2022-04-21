@@ -1,15 +1,13 @@
 import psl
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import os
-import shutil
 
 
 if __name__ == '__main__':
     """
     Tests
     """
-    shutil.rmtree("./figs")
+    os.system('rm -rf figs')
     os.mkdir("./figs")
 
     for name, system in psl.systems.items():

@@ -209,7 +209,7 @@ def SplineSignal(nsim=500, values=None, xmin=0, xmax=1, rseed=1):
         values = [rd.triangular(xmin, xmax) for _ in range(30)]
     dt = int(np.ceil(nsim / len(values)))
     dt_time = np.arange(0, nsim, dt)
-    cs = interpolate.CubicSpline(dt_time, values, extrapolate='periodic')
+    cs = interpolate.CubicSpline(dt_time, values[:len(dt_time)], extrapolate='periodic')
     time = np.arange(0, nsim)
     return cs(time)
 

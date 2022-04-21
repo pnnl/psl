@@ -122,8 +122,8 @@ class ODE_Autonomous(EmulatorBase):
             x = x0
         # time interval
         t = np.arange(0, nsim+1) * ts + ninit
-        X = []
-        for N in range(nsim):
+        X = [x]
+        for N in range(nsim-1):
             dT = [t[N], t[N + 1]]
             xdot = odeint(self.equations, x, dT)
             x = xdot[-1]
@@ -167,7 +167,7 @@ class ODE_NonAutonomous(EmulatorBase, ABC):
             x = x0
         # time interval
         t = np.arange(0, nsim+1) * ts + ninit
-        X = []
+        X = [x]
         N = 0
         for u in U:
             dT = [t[N], t[N + 1]]
@@ -175,7 +175,7 @@ class ODE_NonAutonomous(EmulatorBase, ABC):
             x = xdot[-1]
             X.append(x)  # updated states trajectories
             N += 1
-            if N == nsim:
+            if N == nsim-1:
                 break
         Yout = np.asarray(X).reshape(nsim, -1)
         Uout = np.asarray(U).reshape(nsim, -1)
@@ -206,8 +206,8 @@ class GymWrapper(EmulatorBase):
         self.action_sample = self.env.action_space.sample()
         self.nu = np.asarray([self.action_sample]).shape[0]
         #     default simulation setup
-        self.U = np.zeros([(self.nsim - 1), self.nu])
-        self.U[int(self.nsim/8)] = 0.1
+        # self.U = np.zeros([(self.nsim - 1), self.nu])
+        # self.U[int(self.nsim/8)] = 0.1
         self.U = Steps(nx=1, nsim=self.nsim, values=None,
                        randsteps=int(np.ceil(self.nsim/40)), xmax=0.5, xmin=-0.5)
         if type(self.action_sample) == int:
@@ -237,14 +237,14 @@ class GymWrapper(EmulatorBase):
             assert x0.shape[0] == self.nx, "Mismatch in x0 size"
             x = x0
 
-        X, Reward = [], []
+        X, Reward = [x], [0.]
         N = 0
         for u in U:
             x, reward = self.equations(x, u)
             X.append(x)  # updated states trajectories
             Reward.append(reward)  # updated states trajectories
             N += 1
-            if N == nsim:
+            if N == nsim-1:
                 break
         Xout = np.asarray(X)
         Yout = np.asarray(Reward).reshape(-1, 1)

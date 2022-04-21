@@ -6,12 +6,45 @@ Chaotic nonlinear ODEs
 """
 import numpy as np
 from scipy.io import loadmat
-import os
-
+import os, inspect, sys
+import warnings
+warnings.filterwarnings("ignore")
 # local imports
 from psl.emulator import ODE_NonAutonomous
 from psl.perturb import Steps, Step, SplineSignal, Periodic, RandomWalk
 from psl.emulator import SSM
+
+
+class LorenzControl(ODE_NonAutonomous):
+
+    def parameters(self):
+        self.sigma = 10.
+        self.beta = 2.66667
+        self.rho = 28
+        self.x0 = np.asarray([-8., 8., 27.])
+        self.nx = 3
+        self.nu = 2
+        self.ts = 0.01
+        self.ninit = 0.
+        self.nsim = 1000
+        self.U = self.get_U(self.nsim)
+
+    def get_U(self, nsim):
+        t = np.random.uniform(low=0, high=np.pi)
+        self.ninit = t
+        T = np.arange(t, t + self.ts * nsim, self.ts)
+        return self.u_fun(T).T[:nsim]
+
+    def equations(self, x, t, u):
+        return [
+            self.sigma * (x[1] - x[0]) + u[0],
+            x[0] * (self.rho - x[2]) - x[1],
+            x[0] * x[1] - self.beta * x[2] - u[1],
+        ]
+
+    # Control input
+    def u_fun(self, t):
+        return np.array([np.sin(2 * t), np.sin(8 * t)])
 
 
 class SEIR_population(ODE_NonAutonomous):
@@ -48,7 +81,10 @@ class SEIR_population(ODE_NonAutonomous):
         self.gamma = 1 / self.t_infective
         self.beta = self.R0 * self.gamma
         # default simulation setup
-        self.U = Steps(nx=self.nu, nsim=self.nsim, values=None,
+        self.U = self.get_U(self.nsim)
+
+    def get_U(self, nsim):
+        return Steps(nx=self.nu, nsim=nsim, values=None,
                      randsteps=int(np.ceil(self.nsim / 100)), xmax=1, xmin=0)
 
     def equations(self, x, t, u):
@@ -90,13 +126,16 @@ class Tank(ODE_NonAutonomous):
         # Initial Conditions for the States
         self.x0 = 0
         # default imputs
-        c = Steps(nx=1, nsim=self.nsim, values=None,
-                     randsteps=int(np.ceil(self.nsim/400)), xmax=55, xmin=45)
-        valve = Steps(nx=1, nsim=self.nsim, values=None,
-                      randsteps=int(np.ceil(self.nsim/400)), xmax=100, xmin=0)
-        self.U = np.vstack([c.T, valve.T]).T
+        self.U = self.get_U(self.nsim)
         self.nu = 2
         self.nx = 1
+
+    def get_U(self, nsim):
+        c = Steps(nx=1, nsim=self.nsim, values=None,
+                  randsteps=int(np.ceil(nsim / 400)), xmax=55, xmin=45)
+        valve = Steps(nx=1, nsim=nsim, values=None,
+                      randsteps=int(np.ceil(nsim / 400)), xmax=100, xmin=0)
+        return np.vstack([c.T, valve.T]).T
 
     def equations(self, x, t, u):
         """
@@ -131,13 +170,16 @@ class TwoTank(ODE_NonAutonomous):
         # Initial Conditions for the States
         self.x0 = np.asarray([0, 0])
         # default simulation setup
-        pump = Steps(nx=1, nsim=self.nsim, values=None,
-                     randsteps=int(np.ceil(self.nsim/200)), xmax=0.5, xmin=0)
-        valve = Steps(nx=1, nsim=self.nsim, values=None,
-                      randsteps=int(np.ceil(self.nsim/300)), xmax=0.4, xmin=0)
-        self.U = np.vstack([pump.T, valve.T]).T
+        self.U = self.get_U(self.nsim)
         self.nu = 2
         self.nx = 2
+
+    def get_U(self, nsim):
+        pump = Steps(nx=1, nsim=nsim, values=None,
+                     randsteps=int(np.ceil(nsim / 200)), xmax=0.5, xmin=0)
+        valve = Steps(nx=1, nsim=nsim, values=None,
+                      randsteps=int(np.ceil(nsim / 300)), xmax=0.4, xmin=0)
+        return np.vstack([pump.T, valve.T]).T
 
     def equations(self, x, t, u):
         # States (2): level in the tanks
@@ -199,8 +241,11 @@ class CSTR(ODE_NonAutonomous):
         self.nu = 1
         self.nd = 2
         # default simulation setup
-        self.U = self.u_ss + Steps(nx=1, nsim=self.nsim, values=None,
-                     randsteps=int(np.ceil(self.nsim / 100)), xmax=6, xmin=-6)
+        self.U = self.get_U(self.nsim)
+
+    def get_U(self, nsim):
+        return self.u_ss + Steps(nx=1, nsim=nsim, values=None,
+                                 randsteps=int(np.ceil(nsim / 100)), xmax=6, xmin=-6)
 
     def equations(self, x, t, u):
         # Inputs (1):
@@ -246,7 +291,11 @@ class InvPendulum(ODE_NonAutonomous):
         self.m = 0.15  # ball mass in kg
         self.b = 0.1  # friction
         self.x0 = [0.5, 0.0]
-        self.U = np.zeros(self.nsim)
+
+        self.U = self.get_U(self.nsim)
+
+    def get_U(self, nsim):
+        return np.zeros(nsim)
 
     def equations(self, x, t, u):
         y = [x[1],
@@ -271,26 +320,26 @@ class UAV3D_kin(ODE_NonAutonomous):
 
         # Initial Conditions for the States
         self.x0 = np.array([5, 10, 50, 0])
+        self.U = self.get_U(self.nsim)
 
-        # default simulation setup
-
+    def get_U(self, nsim):
         seed = 1
-        headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi/180.0)
-        gammVec = np.multiply([0.0, 5.0, 10.0, -5.0, 0.0, 9.0, -1.0, 0.0, 3.0, -1.0, 0.0, 3.0, -1.0], np.pi/180.0)
+        headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0],
+                              np.pi / 180.0)
+        gammVec = np.multiply([0.0, 5.0, 10.0, -5.0, 0.0, 9.0, -1.0, 0.0, 3.0, -1.0, 0.0, 3.0, -1.0], np.pi / 180.0)
         velVec = [9.5, 16.0, 10.0, 11.0, 10.0, 11.5, 9.5, 15.0, 16.0, 13.0, 12.0, 12.0, 9.0]
-        self.V = SplineSignal(nsim=self.nsim, values=velVec, xmin=9, xmax=15, rseed=seed)
-        heading = SplineSignal(nsim=self.nsim, values=headVec, xmin=-20 * np.pi / 180, xmax=20 * np.pi / 180, rseed=seed)
-        self.phi = np.append([0.0], np.diff(heading)/self.ts)
-        self.gamma = SplineSignal(nsim=self.nsim, values=gammVec, xmin=-10*np.pi/180, xmax=10*np.pi/180, rseed=seed)
+        self.V = SplineSignal(nsim=nsim, values=velVec, xmin=9, xmax=15, rseed=seed)
+        heading = SplineSignal(nsim=nsim, values=headVec, xmin=-20 * np.pi / 180, xmax=20 * np.pi / 180,
+                               rseed=seed)
+        self.phi = np.append([0.0], np.diff(heading) / self.ts)
+        self.gamma = SplineSignal(nsim=nsim, values=gammVec, xmin=-10 * np.pi / 180, xmax=10 * np.pi / 180,
+                                  rseed=seed)
 
         # Transformed inputs
         U1 = np.multiply(self.V, np.cos(self.gamma))
         U2 = np.multiply(self.V, np.sin(self.gamma))
         U3 = self.g * np.divide(np.tan(self.phi), self.V)
-        # U3 = SplineSignal(nsim=self.nsim, values=headVec * 3, xmin=-20 * np.pi / 180, xmax=20 * np.pi / 180, rseed=seed)
-
-        # self.U = np.vstack([self.V, self.phi, self.gamma]).T
-        self.U = np.vstack([U1, U2, U3]).T
+        return np.vstack([U1, U2, U3]).T
 
     # equations defining the dynamical system
     def equations(self, x, t, u):
@@ -334,10 +383,13 @@ class UAV2D_kin(ODE_NonAutonomous):
         # Initial Conditions for the States
         self.x0 = np.array([5, 10, 10, 0])
 
-        seed = 3
-        self.phi = SplineSignal(nsim=self.nsim, values=None, xmin=-45*np.pi/180, xmax=45*np.pi/180, rseed=seed)
+        self.U = self.get_U(self.nsim)
 
-        self.U = self.phi
+    def get_U(self, nsim):
+
+        seed = 3
+        self.phi = SplineSignal(nsim, values=None, xmin=-45*np.pi/180, xmax=45*np.pi/180, rseed=seed)
+        return self.phi
 
     # equations defining the dynamical system
     def equations(self, x, t, u):
@@ -377,22 +429,24 @@ class UAV3D_reduced(ODE_NonAutonomous):
         self.x0 = np.array([5, 10, 50])
 
         # default simulation setup
+        self.U = self.get_U(self.nsim)
 
+    def get_U(self, nsim):
         seed = 2
         headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi/180.0)
         gammVec = np.multiply([0.0, 5.0, 10.0, -5.0, 0.0, 9.0, -1.0, 0.0, 3.0, -1.0, 0.0], np.pi/180.0)
-        self.V = SplineSignal(nsim=self.nsim, values=None, xmin=9, xmax=15, rseed=seed)
-        self.phi = SplineSignal(nsim=self.nsim, values=None, xmin=-20*np.pi/180, xmax=20*np.pi/180, rseed=seed)
-        self.gamma = SplineSignal(nsim=self.nsim, values=gammVec, xmin=-10*np.pi/180, xmax=10*np.pi/180, rseed=seed)
+        self.V = SplineSignal(nsim=nsim, values=None, xmin=9, xmax=15, rseed=seed)
+        self.phi = SplineSignal(nsim=nsim, values=None, xmin=-20*np.pi/180, xmax=20*np.pi/180, rseed=seed)
+        self.gamma = SplineSignal(nsim=nsim, values=gammVec, xmin=-10*np.pi/180, xmax=10*np.pi/180, rseed=seed)
 
         # Transformed inputs
         U1 = np.multiply(self.V, np.cos(self.gamma))
         U2 = np.multiply(self.V, np.sin(self.gamma))
         # U3 = self.g * np.divide(np.tan(self.phi), self.V)
-        U3 = SplineSignal(nsim=self.nsim, values=headVec * 3, xmin=-20 * np.pi / 180, xmax=20 * np.pi / 180, rseed=seed)
+        U3 = SplineSignal(nsim=nsim, values=headVec * 3, xmin=-20 * np.pi / 180, xmax=20 * np.pi / 180, rseed=seed)
 
         # self.U = np.vstack([self.V, self.phi, self.gamma]).T
-        self.U = np.vstack([U1, U2, U3]).T
+        return np.vstack([U1, U2, U3]).T
 
     # equations defining the dynamical system
     def equations(self, x, t, u):
@@ -438,14 +492,16 @@ class UAV3D_dyn(ODE_NonAutonomous):
 
         # Initial Conditions for the States
         self.x0 = np.array([5, 10, 15, 0, np.pi/18, 9])
+        self.U = self.get_U(self.nsim)
 
+    def get_U(self, nsim):
         seed = 2
         headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi / 180.0)
         loadVec = [1.0, 1.5, 1.0, 0.5, 0.1, 1.5, 1.0, 1.25, 1.0, 0.9, 1.0]
-        T = SplineSignal(nsim=self.nsim, values=None, xmin=100, xmax=500, rseed=seed)
-        phi = SplineSignal(nsim=self.nsim, values=None, xmin=-10 * np.pi / 180, xmax=10 * np.pi / 180, rseed=seed)
-        load = SplineSignal(nsim=self.nsim, values=loadVec, xmin=0, xmax=3, rseed=seed)
-        self.U = np.vstack([T, phi, load]).T
+        T = SplineSignal(nsim=nsim, values=None, xmin=100, xmax=500, rseed=seed)
+        phi = SplineSignal(nsim=nsim, values=None, xmin=-10 * np.pi / 180, xmax=10 * np.pi / 180, rseed=seed)
+        load = SplineSignal(nsim=nsim, values=loadVec, xmin=0, xmax=3, rseed=seed)
+        return np.vstack([T, phi, load]).T
 
     # equations defining the dynamical system
     def equations(self, x, t, U):
@@ -507,10 +563,13 @@ class HindmarshRose(ODE_NonAutonomous):
         self.umin = -10
         self.umax = 10
         self.x0 = np.asarray([-5,-10,0])
-        # default simulation setup
-        self.U = 3 * np.asarray([np.ones((self.nsim))]).T
+        self.U = self.get_U(self.nsim)
         self.nu = 1
         self.nx = 3
+
+    def get_U(self, nsim):
+        return 3 * np.asarray([np.ones((nsim))]).T
+
 
     def equations(self, x, t, u):
         # Derivatives
@@ -577,7 +636,7 @@ class BuildingEnvelope(SSM):
         #  constraints bounds
         self.ts = file['Ts']  # sampling time
         self.umax = file['umax'].squeeze()  # max heat per zone
-        self.umin = file['umin'].squeeze() # min heat per zone
+        self.umin = file['umin'].squeeze()  # min heat per zone
         if not self.linear:
             self.dT_max = file['dT_max']  # maximal temperature difference deg C
             self.dT_min = file['dT_min']  # minimal temperature difference deg C
@@ -613,14 +672,17 @@ class BuildingEnvelope(SSM):
         # default simulation setup
         self.ninit = 0
         self.nsim = np.min([8640, self.D.shape[0]])
+        self.U = self.get_U(self.nsim)
+
+    def get_U(self, nsim):
         if self.linear:
-            self.U = Periodic(nx=self.nu, nsim=self.nsim, numPeriods=21, xmax=self.umax/2, xmin=self.umin, form='sin')
+            return Periodic(nx=self.nu, nsim=nsim, numPeriods=21, xmax=self.umax/2, xmin=self.umin, form='sin')
         else:
-            self.M_flow = self.mf_max/2+RandomWalk(nx=self.n_mf, nsim=self.nsim, xmax=self.mf_max/2, xmin=self.mf_min, sigma=0.05)
+            self.M_flow = self.mf_max/2+RandomWalk(nx=self.n_mf, nsim=nsim, xmax=self.mf_max/2, xmin=self.mf_min, sigma=0.05)
             # self.M_flow = Periodic(nx=self.n_mf, nsim=self.nsim, numPeriods=21, xmax=self.mf_max, xmin=self.mf_min, form='sin')
             # self.DT = Periodic(nx=self.n_dT, nsim=self.nsim, numPeriods=15, xmax=self.dT_max/2, xmin=self.dT_min, form='cos')
-            self.DT = RandomWalk(nx=self.n_dT, nsim=self.nsim, xmax=self.dT_max*0.6, xmin=self.dT_min, sigma=0.05)
-            self.U = np.hstack([self.M_flow, self.DT])
+            self.DT = RandomWalk(nx=self.n_dT, nsim=nsim, xmax=self.dT_max*0.6, xmin=self.dT_min, sigma=0.05)
+            return np.hstack([self.M_flow, self.DT])
 
     def equations(self, x, u, d):
         if self.linear:
@@ -632,6 +694,7 @@ class BuildingEnvelope(SSM):
         x = np.matmul(self.A, x) + np.matmul(self.B, q) + np.matmul(self.E, d) + self.G.ravel()
         y = np.matmul(self.C, x) + self.F.ravel()
         return x, y
+
 
 class Iver_kin_reduced(ODE_NonAutonomous):
     """
@@ -647,7 +710,9 @@ class Iver_kin_reduced(ODE_NonAutonomous):
 
         # Initial Conditions for the States
         self.x0 = np.array([0, 0, 0, 0, 0])
+        self.U = self.get_U(self.nsim)
 
+    def get_U(self, nsim):
         seed = 3
         #u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
         #v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=2*seed)
@@ -655,13 +720,13 @@ class Iver_kin_reduced(ODE_NonAutonomous):
         #q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=4*seed)
         #r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=5*seed)
 
-        u = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=1.0, xmax=3.0, rseed=seed).T
-        v = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=2 * seed).T
-        w = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=3 * seed).T
-        q = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=4 * seed).T
-        r = Steps(nsim=self.nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=5 * seed).T
+        u = Steps(nsim=nsim, values=None, randsteps=20, xmin=1.0, xmax=3.0, rseed=seed).T
+        v = Steps(nsim=nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=2 * seed).T
+        w = Steps(nsim=nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=3 * seed).T
+        q = Steps(nsim=nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=4 * seed).T
+        r = Steps(nsim=nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=5 * seed).T
 
-        self.U = np.vstack( [u, v, w, q, r] ).T
+        return np.vstack( [u, v, w, q, r] ).T
 
 
     # equations defining the dynamical system
@@ -703,27 +768,25 @@ class Iver_kin(ODE_NonAutonomous):
     Kinetic model of Unmanned Underwater Vehicle (Fossen) -- Full UAV kinematic model
     """
 
-    # parameters of the dynamical system
     def parameters(self):
         self.nx = 6    # Number of states
         self.nu = 6    # Number of control inputs
         self.ts = 0.1
 
-        # Initial Conditions for the States
         self.x0 = np.array([1.0, 0, 0, 0, 0, 0])
+        self.U = self.get_U(self.nsim)
 
+    def get_U(self, nsim):
         seed = 3
-        u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
-        v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
-        w = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
-        p = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
-        q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
-        r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        u = SplineSignal(nsim=nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        v = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        w = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        p = SplineSignal(nsim=nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        q = SplineSignal(nsim=nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        r = SplineSignal(nsim=nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
 
-        self.U = np.vstack( [u, v, w, p, q, r] ).T
+        return np.vstack( [u, v, w, p, q, r] ).T
 
-
-    # equations defining the dynamical system
     def equations(self, x, t, u):
         """
         + States (5): [n, e, d, phi, theta, psi]
@@ -782,16 +845,18 @@ class Iver_dyn(ODE_NonAutonomous):
 
         # Initial Conditions for the States
         self.x0 = np.array([1.0, 0, 0, 0, 0, 0])
+        self.U = self.get_U(self.nsim)
 
+    def get_U(self, nsim):
         seed = 3
-        tau_X = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
-        tau_Y = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
-        tau_Z = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
-        tau_K = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
-        tau_M = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
-        tau_N = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_X = SplineSignal(nsim=nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        tau_Y = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_Z = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_K = SplineSignal(nsim=nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_M = SplineSignal(nsim=nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_N = SplineSignal(nsim=nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
 
-        self.U = np.vstack( [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N] ).T
+        return np.vstack( [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N] ).T
 
 
     # equations defining the dynamical system
@@ -830,7 +895,7 @@ class Iver_dyn(ODE_NonAutonomous):
         + Output: cross product matrix (skew symmetric)
         """
 
-        return np.array( [ [0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0] ])
+        return np.array([[0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0] ])
 
 class Iver_dyn_reduced(ODE_NonAutonomous):
     """
@@ -870,14 +935,17 @@ class Iver_dyn_reduced(ODE_NonAutonomous):
         # Initial Conditions for the States
         self.x0 = np.array([0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0])
 
-        seed = 3
-        tau_X = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
-        tau_Y = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
-        tau_Z = SplineSignal(nsim=self.nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
-        tau_M = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
-        tau_N = SplineSignal(nsim=self.nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        self.U = self.get_U(self.nsim)
 
-        self.U = np.vstack( [tau_X, tau_Y, tau_Z, tau_M, tau_N] ).T
+    def get_U(self, nsim):
+        seed = 3
+        tau_X = SplineSignal(nsim=nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
+        tau_Y = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_Z = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
+        tau_M = SplineSignal(nsim=nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+        tau_N = SplineSignal(nsim=nsim, values=None, xmin=-0.01, xmax=0.01, rseed=seed)
+
+        return np.vstack( [tau_X, tau_Y, tau_Z, tau_M, tau_N] ).T
 
 
     # equations defining the dynamical system
@@ -953,16 +1021,19 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         # Initial Conditions for the States
         self.x0 = np.array([0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0])
 
+        self.U = self.get_U(self.nsim)
+
+    def get_U(self, nsim):
         seed = 3
         #delta_u = SplineSignal(nsim=self.nsim, values=None, xmin= 0.0, xmax=1.0, rseed=seed)
         #delta_q = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=2*seed)
         #delta_r = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=3*seed)
 
-        delta_u = Steps(nsim=self.nsim, values=None, randsteps=100, xmin=0.0, xmax=1.0, rseed=seed).T
-        delta_q = Steps(nsim=self.nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=2 * seed).T
-        delta_r = Steps(nsim=self.nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=3 * seed).T
+        delta_u = Steps(nsim=nsim, values=None, randsteps=100, xmin=0.0, xmax=1.0, rseed=seed).T
+        delta_q = Steps(nsim=nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=2 * seed).T
+        delta_r = Steps(nsim=nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=3 * seed).T
 
-        self.U = np.vstack( [delta_u, delta_q, delta_r] ).T
+        return np.vstack( [delta_u, delta_q, delta_r] ).T
 
 
     # equations defining the dynamical system
@@ -1049,23 +1120,25 @@ class SwingEquation(ODE_NonAutonomous):
         self.nsim = 1000  # 1000 steps = 10 sec. horizon
         self.tfaulton = 0.05
         self.tfaultoff = 0.15
+        self.U = self.get_U(self.nsim)
 
+    def get_U(self, nsim):
         if (self.mode == 0):
             # 0 (Constant mechanical power and Pmax)
-            Pmech = Step(nx=1, nsim=self.nsim, tstep=100, xmax=self.Pm, xmin=self.Pm, rseed=1)
-            Pmax = Step(nx=1, nsim=self.nsim, tstep=100, xmax=self.Pmax, xmin=self.Pmax, rseed=1)
+            Pmech = Step(nx=1, nsim=nsim, tstep=100, xmax=self.Pm, xmin=self.Pm, rseed=1)
+            Pmax = Step(nx=1, nsim=nsim, tstep=100, xmax=self.Pmax, xmin=self.Pmax, rseed=1)
             self.U = np.vstack([Pmech.T, Pmax.T]).T
             self.nu = 2
         elif (self.mode == 1):
             # 1 (Noisy mechanical power with constant Pmax)
-            Pmech = RandomWalk(nx=1, nsim=self.nsim, xmax=self.Pm * 1.02, xmin=self.Pm * 0.98, sigma=0.1, rseed=1)
+            Pmech = RandomWalk(nx=1, nsim=nsim, xmax=self.Pm * 1.02, xmin=self.Pm * 0.98, sigma=0.1, rseed=1)
             self.U = Pmech
             self.nu = 1
         else:
             # 2 (Constant mechanical power with fault on-off Pmax (square wave))
             Signal = []
             signal = []
-            for tstep in range(0, self.nsim):
+            for tstep in range(0, nsim):
                 t = tstep * self.ts
                 if (t < self.tfaulton):  # Pre-fault
                     signal.append(self.Pmax)
@@ -1077,6 +1150,7 @@ class SwingEquation(ODE_NonAutonomous):
             Pmax = np.asarray(Signal).T
             self.U = Pmax
             self.nu = 1
+        return self.U
 
     def equations(self, x, t, u):
         delta = x[0]
@@ -1095,4 +1169,7 @@ class SwingEquation(ODE_NonAutonomous):
         dx_dt = [self.ws * domega, (Pm - Pmax * np.sin(delta) - self.D * domega) / self.M]
         return dx_dt
 
+systems = dict(inspect.getmembers(sys.modules[__name__], lambda x: inspect.isclass(x) and not inspect.isabstract(x)))
+odes = {k: v for k, v in systems.items() if issubclass(v, ODE_NonAutonomous)}
+ssms = {k: v for k, v in systems.items() if issubclass(v, SSM)}
 

@@ -11,7 +11,7 @@ References:
 
 """
 import numpy as np
-
+import inspect, sys
 
 from psl.emulator import ODE_Autonomous
 
@@ -341,5 +341,8 @@ class Autoignition(ODE_Autonomous):
         dx2 = reactionRate - regenRate
         dx = [dx1, dx2]
         return dx
+
+systems = dict(inspect.getmembers(sys.modules[__name__], lambda x: inspect.isclass(x) and not inspect.isabstract(x)))
+odes = {k: v for k, v in systems.items() if issubclass(v, ODE_Autonomous)}
 
 
