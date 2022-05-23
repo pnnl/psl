@@ -212,20 +212,3 @@ def SplineSignal(nsim=500, values=None, xmin=0, xmax=1, rseed=1):
     cs = interpolate.CubicSpline(dt_time, values[:len(dt_time)], extrapolate='periodic')
     time = np.arange(0, nsim)
     return cs(time)
-
-
-def SignalComposite():
-    """
-    composite of signal excitations
-    allows generating heterogenous signals
-    """
-    pass
-
-
-def SignalSeries():
-    """
-    series of signal excitations
-    allows combining sequence of different signals
-    """
-    pass
-
