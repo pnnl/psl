@@ -5,19 +5,62 @@ Chaotic nonlinear ODEs
     + https://en.wikipedia.org/wiki/List_of_chaotic_maps
 """
 import numpy as np
-from scipy.io import loadmat
-import os, inspect, sys
+import inspect, sys
 import warnings
 warnings.filterwarnings("ignore")
-# local imports
-from psl.emulator import ODE_NonAutonomous
+from scipy.integrate import odeint
+
+from psl.emulator import EmulatorBase
 from psl.perturb import Steps, Step, SplineSignal, Periodic, RandomWalk
-from psl.emulator import SSM
+
+
+class ODE_NonAutonomous(EmulatorBase):
+    """
+    base class autonomous ODE
+    """
+
+    def simulate(self, U=None, ninit=None, nsim=None, ts=None, x0=None):
+        """
+        :param nsim: (int) Number of steps for open loop response
+        :param ninit: (float) initial simulation time
+        :param ts: (float) step size, sampling time
+        :param x0: (float) state initial conditions
+        :return: X, Y, U, D
+        """
+        if ninit is None:
+            ninit = self.ninit
+        if nsim is None:
+            nsim = self.nsim
+        if ts is None:
+            ts = self.ts
+        if U is None:
+            U = self.U
+
+        if x0 is None:
+            x = self.x0
+        else:
+            assert x0.shape[0] == self.nx, "Mismatch in x0 size"
+            x = x0
+        t = np.arange(0, nsim+1) * ts + ninit
+        X = [x]
+        N = 0
+        for u in U:
+            dT = [t[N], t[N + 1]]
+            xdot = odeint(self.equations, x, dT, args=(u,))
+            x = xdot[-1]
+            X.append(x)
+            N += 1
+            if N == nsim-1:
+                break
+        Yout = np.asarray(X).reshape(nsim, -1)
+        Uout = np.asarray(U).reshape(nsim, -1)
+        return {'Y': Yout, 'U': Uout, 'X': np.asarray(X)}
 
 
 class LorenzControl(ODE_NonAutonomous):
 
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.sigma = 10.
         self.beta = 2.66667
         self.rho = 28
@@ -42,7 +85,6 @@ class LorenzControl(ODE_NonAutonomous):
             x[0] * x[1] - self.beta * x[2] - u[1],
         ]
 
-    # Control input
     def u_fun(self, t):
         return np.array([np.sin(2 * t), np.sin(8 * t)])
 
@@ -62,7 +104,8 @@ class SEIR_population(ODE_NonAutonomous):
     + Recovered (r): population fraction recovered from infection and is immune from further infection
     """
 
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.N = 10000 # population
         # initial number of infected and recovered individuals
         self.e_0 = 1 / self.N
@@ -80,7 +123,6 @@ class SEIR_population(ODE_NonAutonomous):
         self.alpha = 1 / self.t_incubation
         self.gamma = 1 / self.t_infective
         self.beta = self.R0 * self.gamma
-        # default simulation setup
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):
@@ -101,9 +143,8 @@ class SEIR_population(ODE_NonAutonomous):
         s = x[0]
         e = x[1]
         i = x[2]
-        r = x[3]
         u = u[0]
-        # SEIR equations
+
         sdt = -(1 - u) * self.beta * s * i
         edt = (1 - u) * self.beta * s * i - self.alpha * e
         idt = self.alpha * e - self.gamma * i
@@ -120,12 +161,11 @@ class Tank(ODE_NonAutonomous):
     + https://apmonitor.com/pdc/index.php/Main/TankLevel
     """
 
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.rho = 1000.0  # water density (kg/m^3)
         self.A = 1.0  # tank area (m^2)
-        # Initial Conditions for the States
         self.x0 = 0
-        # default imputs
         self.U = self.get_U(self.nsim)
         self.nu = 2
         self.nx = 1
@@ -147,7 +187,6 @@ class Tank(ODE_NonAutonomous):
 
         c = u[0]
         valve = u[1]
-        # equations
         dx_dt = (c / (self.rho*self.A)) * valve
         if x >= 1.0 and dx_dt > 0.0:
             dx_dt = 0
@@ -162,14 +201,13 @@ class TwoTank(ODE_NonAutonomous):
     + https://apmonitor.com/do/index.php/Main/LevelControl
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.ts = 1
         self.c1 = 0.08  # inlet valve coefficient
         self.c2 = 0.04  # tank outlet coefficient
-        # Initial Conditions for the States
+
         self.x0 = np.asarray([0, 0])
-        # default simulation setup
         self.U = self.get_U(self.nsim)
         self.nu = 2
         self.nx = 2
@@ -188,7 +226,6 @@ class TwoTank(ODE_NonAutonomous):
         # Inputs (2): pump and valve
         pump = u[0]
         valve = u[1]
-        # equations
         dhdt1 = self.c1 * (1.0 - valve) * pump - self.c2 * np.sqrt(h1)
         dhdt2 = self.c1 * valve * pump + self.c2 * np.sqrt(h1) - self.c2 * np.sqrt(h2)
         if h1 >= 1.0 and dhdt1 > 0.0:
@@ -207,7 +244,8 @@ class CSTR(ODE_NonAutonomous):
     + http://apmonitor.com/do/index.php/Main/NonlinearControl
     """
 
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         # Volumetric Flowrate (m^3/sec)
         self.q = 100
         # Volume of CSTR (m^3)
@@ -236,11 +274,9 @@ class CSTR(ODE_NonAutonomous):
         self.u_ss = 300.0  # cooling jacket Temperature (K)
         self.Tf = 350  # Feed Temperature (K)
         self.Caf = 1  # Feed Concentration (mol/m^3)
-        # dimensions
         self.nx = 2
         self.nu = 1
         self.nd = 2
-        # default simulation setup
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):
@@ -282,8 +318,8 @@ class InvPendulum(ODE_NonAutonomous):
 
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 2  # Number of states
         self.nu = 1  # Number of control inputs
         self.g = 9.81  # Acceleration due to gravity (m/s^2)
@@ -309,8 +345,8 @@ class UAV3D_kin(ODE_NonAutonomous):
     Dubins 3D model -- UAV kinematic model with no wind
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 4    # Number of states
         self.nu = 3    # Number of control inputs
         self.g = 9.81  # Acceleration due to gravity (m/s^2)
@@ -335,13 +371,11 @@ class UAV3D_kin(ODE_NonAutonomous):
         self.gamma = SplineSignal(nsim=nsim, values=gammVec, xmin=-10 * np.pi / 180, xmax=10 * np.pi / 180,
                                   rseed=seed)
 
-        # Transformed inputs
         U1 = np.multiply(self.V, np.cos(self.gamma))
         U2 = np.multiply(self.V, np.sin(self.gamma))
         U3 = self.g * np.divide(np.tan(self.phi), self.V)
         return np.vstack([U1, U2, U3]).T
 
-    # equations defining the dynamical system
     def equations(self, x, t, u):
         """
         + States (4): [x, y, z]
@@ -369,8 +403,8 @@ class UAV2D_kin(ODE_NonAutonomous):
     Dubins 2D model -- UAV kinematic model with no wind
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 4    # Number of states
         self.nu = 1    # Number of control inputs
         self.g = 9.81  # Acceleration due to gravity (m/s^2)
@@ -380,7 +414,6 @@ class UAV2D_kin(ODE_NonAutonomous):
 
         self.V = 10   # Constant velocity  (m/s^2)
 
-        # Initial Conditions for the States
         self.x0 = np.array([5, 10, 10, 0])
 
         self.U = self.get_U(self.nsim)
@@ -391,14 +424,12 @@ class UAV2D_kin(ODE_NonAutonomous):
         self.phi = SplineSignal(nsim, values=None, xmin=-45*np.pi/180, xmax=45*np.pi/180, rseed=seed)
         return self.phi
 
-    # equations defining the dynamical system
     def equations(self, x, t, u):
         """
         + States (3): [x, y, z, psi]
         + Inputs (1): [phi]
         """
 
-        # Inputs
         V = self.V
         phi = u
 
@@ -416,8 +447,8 @@ class UAV3D_reduced(ODE_NonAutonomous):
     Reduced Dubins 3D model -- UAV kinematic model with transformed inputs
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 3    # Number of states
         self.nu = 3    # Number of control inputs
         self.g = 9.81  # Acceleration due to gravity (m/s^2)
@@ -425,10 +456,8 @@ class UAV3D_reduced(ODE_NonAutonomous):
         self.h = 10    # Minimum altitude to avoid crash (m)
         self.ts = 0.1
 
-        # Initial Conditions for the States
         self.x0 = np.array([5, 10, 50])
 
-        # default simulation setup
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):
@@ -439,16 +468,12 @@ class UAV3D_reduced(ODE_NonAutonomous):
         self.phi = SplineSignal(nsim=nsim, values=None, xmin=-20*np.pi/180, xmax=20*np.pi/180, rseed=seed)
         self.gamma = SplineSignal(nsim=nsim, values=gammVec, xmin=-10*np.pi/180, xmax=10*np.pi/180, rseed=seed)
 
-        # Transformed inputs
         U1 = np.multiply(self.V, np.cos(self.gamma))
         U2 = np.multiply(self.V, np.sin(self.gamma))
-        # U3 = self.g * np.divide(np.tan(self.phi), self.V)
         U3 = SplineSignal(nsim=nsim, values=headVec * 3, xmin=-20 * np.pi / 180, xmax=20 * np.pi / 180, rseed=seed)
 
-        # self.U = np.vstack([self.V, self.phi, self.gamma]).T
         return np.vstack([U1, U2, U3]).T
 
-    # equations defining the dynamical system
     def equations(self, x, t, u):
         """
         + States (4): [x, y, z]
@@ -475,8 +500,8 @@ class UAV3D_dyn(ODE_NonAutonomous):
     UAV dynamic guidance model with no wind
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 6    # Number of states
         self.nu = 3    # Number of control inputs
         self.g = 9.81  # Acceleration due to gravity (m/s^2)
@@ -490,20 +515,17 @@ class UAV3D_dyn(ODE_NonAutonomous):
         self.K = 1 / (self.eps * np.pi * self.AR)  # aerodynamic coefficient
         self.ts = 0.1
 
-        # Initial Conditions for the States
         self.x0 = np.array([5, 10, 15, 0, np.pi/18, 9])
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):
         seed = 2
-        headVec = np.multiply([0.0, -120.0, 0.0, 45.0, -90.0, 90.0, -175.0, 25.0, -90.0, 40.0, -20.0], np.pi / 180.0)
         loadVec = [1.0, 1.5, 1.0, 0.5, 0.1, 1.5, 1.0, 1.25, 1.0, 0.9, 1.0]
         T = SplineSignal(nsim=nsim, values=None, xmin=100, xmax=500, rseed=seed)
         phi = SplineSignal(nsim=nsim, values=None, xmin=-10 * np.pi / 180, xmax=10 * np.pi / 180, rseed=seed)
         load = SplineSignal(nsim=nsim, values=loadVec, xmin=0, xmax=3, rseed=seed)
         return np.vstack([T, phi, load]).T
 
-    # equations defining the dynamical system
     def equations(self, x, t, U):
         """
         + States (6): [x, y, z, psi, gamma, V]
@@ -512,18 +534,14 @@ class UAV3D_dyn(ODE_NonAutonomous):
 
         """
 
-        # equations
         V = x[5]
         T = U[0]
         phi = U[1]
-        load = U[2]
         load = 1.0
-        Re = 1.225 * V * self.lenF / 1.725e-5  # Reynolds number at V m / s
         CD0 = 0.015  # 0.074 * Re ** (-0.2)  # parasitic drag
         CL = 2 * load * self.W / self.rho * V ** 2 * self.S  # Lift coefficient
         CD = CD0 + self.K * CL**2     # Drag coefficient
         drag = self.rho * V ** 2 * self.S * CD   # Total drag
-        # T = drag         # For level flight
 
         dx_dt = np.zeros(6)
 
@@ -552,7 +570,8 @@ class HindmarshRose(ODE_NonAutonomous):
     + https://demonstrations.wolfram.com/HindmarshRoseNeuronModel/
     """
 
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.a = 1
         self.b = 2.6
         self.c = 1
@@ -572,7 +591,6 @@ class HindmarshRose(ODE_NonAutonomous):
 
 
     def equations(self, x, t, u):
-        # Derivatives
         theta = -self.a*x[0]**3 + self.b*x[0]**2
         phi = self.c -self.d*x[0]**2
         dx1 = x[1] + theta - x[2] + u
@@ -582,144 +600,23 @@ class HindmarshRose(ODE_NonAutonomous):
         return dx
 
 
-"""
-Building thermal dynamics ODEs 
-"""
-
-
-class BuildingEnvelope(SSM):
-    """
-    building envelope heat transfer model
-    linear building envelope dynamics and bilinear heat flow input dynamics
-    different building types are stored in ./emulators/buildings/*.mat
-    models obtained from:
-
-    + https://github.com/drgona/BeSim
-    """
-    def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=True, seed=59):
-        self.system = system
-        self.linear = linear
-        self.resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'parameters/buildings')
-        super().__init__(nsim=nsim, ninit=ninit)
-
-    # parameters of the dynamical system
-    def parameters(self, system=None, linear=True):
-        if system is None:
-            system = self.system
-        if linear is None:
-            linear = self.linear
-        # file paths for different building models
-        systems = {'SimpleSingleZone': os.path.join(self.resource_path, 'SimpleSingleZone.mat'),
-                   'Reno_full': os.path.join(self.resource_path, 'Reno_full.mat'),
-                   'Reno_ROM40': os.path.join(self.resource_path, 'Reno_ROM40.mat'),
-                   'RenoLight_full': os.path.join(self.resource_path, 'RenoLight_full.mat'),
-                   'RenoLight_ROM40': os.path.join(self.resource_path, 'RenoLight_ROM40.mat'),
-                   'Old_full': os.path.join(self.resource_path, 'Old_full.mat'),
-                   'Old_ROM40': os.path.join(self.resource_path, 'Old_ROM40.mat'),
-                   'HollandschHuys_full': os.path.join(self.resource_path, 'HollandschHuys_full.mat'),
-                   'HollandschHuys_ROM100': os.path.join(self.resource_path, 'HollandschHuys_ROM100.mat'),
-                   'Infrax_full': os.path.join(self.resource_path, 'Infrax_full.mat'),
-                   'Infrax_ROM100': os.path.join(self.resource_path, 'Infrax_ROM100.mat')
-                   }
-        self.system = system
-        self.linear = linear  # if True use only linear building envelope model with Q as U
-        file_path = systems[self.system]
-        file = loadmat(file_path)
-
-        #  LTI SSM model
-        self.A = file['Ad']
-        self.B = file['Bd']
-        self.C = file['Cd']
-        self.E = file['Ed']
-        self.G = file['Gd']
-        self.F = file['Fd']
-        #  constraints bounds
-        self.ts = file['Ts']  # sampling time
-        self.umax = file['umax'].squeeze()  # max heat per zone
-        self.umin = file['umin'].squeeze()  # min heat per zone
-        if not self.linear:
-            self.dT_max = file['dT_max']  # maximal temperature difference deg C
-            self.dT_min = file['dT_min']  # minimal temperature difference deg C
-            self.mf_max = file['mf_max'].squeeze()  # maximal nominal mass flow l/h
-            self.mf_min = file['mf_min'].squeeze()  # minimal nominal mass flow l/h
-            #   heat flow equation constants
-            self.rho = 0.997  # density  of water kg/1l
-            self.cp = 4185.5  # specific heat capacity of water J/(kg/K)
-            self.time_reg = 1 / 3600  # time regularization of the mass flow 1 hour = 3600 seconds
-            # building type
-        self.type = file['type']
-        self.HC_system = file['HC_system']
-        # problem dimensions
-        self.nx = self.A.shape[0]
-        self.ny = self.C.shape[0]
-        self.nq = self.B.shape[1]
-        self.nd = self.E.shape[1]
-        if self.linear:
-            self.nu = self.nq
-        else:
-            self.n_mf = self.B.shape[1]
-            self.n_dT = self.dT_max.shape[0]
-            self.nu = self.n_mf + self.n_dT
-        # initial conditions and disturbance profiles
-        if self.system == 'SimpleSingleZone':
-            self.x0 = file['x0'].reshape(self.nx)
-        else:
-            self.x0 = 0*np.ones(self.nx, dtype=np.float32)  # initial conditions
-        self.D = file['disturb'] # pre-defined disturbance profiles
-        #  steady states - linearization offsets
-        self.x_ss = file['x_ss']
-        self.y_ss = file['y_ss']
-        # default simulation setup
-        self.ninit = 0
-        self.nsim = np.min([8640, self.D.shape[0]])
-        self.U = self.get_U(self.nsim)
-
-    def get_U(self, nsim):
-        if self.linear:
-            return Periodic(nx=self.nu, nsim=nsim, numPeriods=21, xmax=self.umax/2, xmin=self.umin, form='sin')
-        else:
-            self.M_flow = self.mf_max/2+RandomWalk(nx=self.n_mf, nsim=nsim, xmax=self.mf_max/2, xmin=self.mf_min, sigma=0.05)
-            # self.M_flow = Periodic(nx=self.n_mf, nsim=self.nsim, numPeriods=21, xmax=self.mf_max, xmin=self.mf_min, form='sin')
-            # self.DT = Periodic(nx=self.n_dT, nsim=self.nsim, numPeriods=15, xmax=self.dT_max/2, xmin=self.dT_min, form='cos')
-            self.DT = RandomWalk(nx=self.n_dT, nsim=nsim, xmax=self.dT_max*0.6, xmin=self.dT_min, sigma=0.05)
-            return np.hstack([self.M_flow, self.DT])
-
-    def equations(self, x, u, d):
-        if self.linear:
-            q = u
-        else:
-            m_flow = u[0:self.n_mf]
-            dT = u[self.n_mf:self.n_mf+self.n_dT]
-            q = m_flow * self.rho * self.cp * self.time_reg * dT
-        x = np.matmul(self.A, x) + np.matmul(self.B, q) + np.matmul(self.E, d) + self.G.ravel()
-        y = np.matmul(self.C, x) + self.F.ravel()
-        return x, y
-
-
 class Iver_kin_reduced(ODE_NonAutonomous):
     """
     Kinetic model of Unmanned Underwater Vehicle (Yan et al 2020) -- UAV kinematic model with **no roll**
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
-        self.nx = 5    # Number of states
-        self.nu = 5    # Number of control inputs
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=3):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
+        self.nx = 5
+        self.nu = 5
         self.ts = 0.1
         self.K_alpha = 100.0 # Barrier function parameter
 
-        # Initial Conditions for the States
         self.x0 = np.array([0, 0, 0, 0, 0])
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):
-        seed = 3
-        #u = SplineSignal(nsim=self.nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
-        #v = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=2*seed)
-        #w = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=3*seed)
-        #q = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=4*seed)
-        #r = SplineSignal(nsim=self.nsim, values=None, xmin=-0.5, xmax=0.5, rseed=5*seed)
-
+        seed = self.seed
         u = Steps(nsim=nsim, values=None, randsteps=20, xmin=1.0, xmax=3.0, rseed=seed).T
         v = Steps(nsim=nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=2 * seed).T
         w = Steps(nsim=nsim, values=None, randsteps=20, xmin=-0.5, xmax=0.5, rseed=3 * seed).T
@@ -729,17 +626,11 @@ class Iver_kin_reduced(ODE_NonAutonomous):
         return np.vstack( [u, v, w, q, r] ).T
 
 
-    # equations defining the dynamical system
     def equations(self, x, t, u):
         """
         + States (5): [xi, eta, zeta, theta, psi]
         + Inputs (5): [u, v, w, q, r]
         """
-
-        # States
-        xi = x[0]
-        eta = x[1]
-        zeta = x[2]
         theta = x[3]
         psi = x[4]
 
@@ -763,21 +654,23 @@ class Iver_kin_reduced(ODE_NonAutonomous):
 
         return dx_dt
 
+
 class Iver_kin(ODE_NonAutonomous):
     """
     Kinetic model of Unmanned Underwater Vehicle (Fossen) -- Full UAV kinematic model
     """
 
-    def parameters(self):
-        self.nx = 6    # Number of states
-        self.nu = 6    # Number of control inputs
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=3):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
+        self.nx = 6
+        self.nu = 6
         self.ts = 0.1
 
         self.x0 = np.array([1.0, 0, 0, 0, 0, 0])
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):
-        seed = 3
+        seed = self.seed
         u = SplineSignal(nsim=nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
         v = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
         w = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
@@ -792,11 +685,6 @@ class Iver_kin(ODE_NonAutonomous):
         + States (5): [n, e, d, phi, theta, psi]
         + Inputs (5): [u, v, w, p, q, r]
         """
-
-        # States
-        n = x[0]
-        e = x[1]
-        d = x[2]
         phi = x[3]
         theta = x[4]
         psi = x[5]
@@ -824,13 +712,12 @@ class Iver_dyn(ODE_NonAutonomous):
     Dynamic model of Unmanned Underwater Vehicle (Fossen) -- Excludes hydrostatic/dynamic terms and ocean current
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=3):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 6    # Number of states
         self.nu = 6    # Number of control inputs
         self.ts = 0.1
 
-        # Model parameters
         self.m = 1.0        # Mass of of the vehicle (kg)
         self.Ixx = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
         self.Iyy = 0.001    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
@@ -842,13 +729,11 @@ class Iver_dyn(ODE_NonAutonomous):
         self.yg = 0.0       # Center of mass w.r.t y axis, written in body frame (m)
         self.zg = 0.0       # Center of mass w.r.t z axis, written in body frame (m)
 
-
-        # Initial Conditions for the States
         self.x0 = np.array([1.0, 0, 0, 0, 0, 0])
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):
-        seed = 3
+        seed = self.seed
         tau_X = SplineSignal(nsim=nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
         tau_Y = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
         tau_Z = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
@@ -858,8 +743,6 @@ class Iver_dyn(ODE_NonAutonomous):
 
         return np.vstack( [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N] ).T
 
-
-    # equations defining the dynamical system
     def equations(self, x, t, u):
         """
         + States (6): [u, v, w, p, q, r]
@@ -877,16 +760,12 @@ class Iver_dyn(ODE_NonAutonomous):
         nu1 = np.array([uu, v, w])
         nu2 = np.array([p, q, r])
 
-        # Construct equations of motion in matrix form
         rbg = np.array([self.xg, self.yg, self.zg ])
         Io = np.array([ [self.Ixx, -self.Ixy, -self.Ixz], [-self.Ixy, self.Iyy, -self.Iyz], [-self.Ixz, -self.Iyz, self.Izz] ])
         M_rb = np.block([ [self.m*np.eye(3), -self.m*self.Cross(rbg) ], [self.m*self.Cross(rbg), Io ] ])
         C_rb = np.block([ [np.zeros((3,3)), -self.m*self.Cross(nu1) - self.m*np.multiply( self.Cross(nu2), self.Cross(rbg)) ], [-self.m*self.Cross(nu1) + self.m*np.multiply( self.Cross(rbg), self.Cross(nu2) ), -self.Cross( Io.dot(nu2) )  ] ])
 
-        # State derivatives
         dx_dt = np.linalg.inv(M_rb).dot( -C_rb.dot(nu) + u  )
-
-
         return dx_dt
 
     def Cross(self,x):
@@ -894,21 +773,20 @@ class Iver_dyn(ODE_NonAutonomous):
         + Input: 3d array x
         + Output: cross product matrix (skew symmetric)
         """
-
         return np.array([[0, -x[2], x[1]], [x[2], 0, -x[0]], [-x[1], x[0], 0] ])
+
 
 class Iver_dyn_reduced(ODE_NonAutonomous):
     """
     Dynamic model of Unmanned Underwater Vehicle (Yan et al) -- Excludes rolling, includes hydrostate/dynamic terms, no currents
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=3):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 10    # Number of states
         self.nu = 5    # Number of control inputs
         self.ts = 0.1
 
-        # Model parameters
         self.m = 100.0        # Mass of of the vehicle (kg)
         self.Iyy = 0.1    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
         self.Izz = 0.1    # Moment of inertia about resp. axes, written w.r.t body frame (kg m^2)
@@ -932,13 +810,11 @@ class Iver_dyn_reduced(ODE_NonAutonomous):
         self.g = 9.81       # Acceleration due to gravity (m/s^2)
         self.GML = 0.01     # Vertical metacentric height (m)
 
-        # Initial Conditions for the States
         self.x0 = np.array([0, 0, 0, 0, 0, 1.0, 0, 0, 0, 0])
-
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):
-        seed = 3
+        seed = self.seed
         tau_X = SplineSignal(nsim=nsim, values=None, xmin=1.0, xmax=3.0, rseed=seed)
         tau_Y = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
         tau_Z = SplineSignal(nsim=nsim, values=None, xmin=-0.1, xmax=0.1, rseed=seed)
@@ -947,15 +823,12 @@ class Iver_dyn_reduced(ODE_NonAutonomous):
 
         return np.vstack( [tau_X, tau_Y, tau_Z, tau_M, tau_N] ).T
 
-
-    # equations defining the dynamical system
     def equations(self, x, t, u):
         """
         + States (10): [n, e, d, theta, psi, u, v, w, p, q, r]
         + Inputs (5): [tau_X, tau_Y, tau_Z, tau_M, tau_N]
         """
 
-        # States
         n = x[0]
         e = x[1]
         d = x[2]
@@ -966,7 +839,6 @@ class Iver_dyn_reduced(ODE_NonAutonomous):
         w = x[7]
         q = x[8]
         r = x[9]
-        eta = np.array([ n, e, d, theta, psi])
         nu = np.array([ uu, v, w, q, r])
 
         # Kinematics: dot(eta) = J nu
@@ -987,23 +859,22 @@ class Iver_dyn_reduced(ODE_NonAutonomous):
         D = np.diag([ self.Xu, self.Yv, self.Zw, self.Mq, self.Nr ]) + np.diag([ self.Xuu, self.Yvv, self.Zww, self.Mqq, self.Nrr ])
         g = np.array([ 0, 0, 0, self.rho*self.V*self.GML*np.sin(theta), 0])
 
-        # State derivatives
         dx_dt[5:] = np.linalg.inv(M).dot( -C.dot(nu) -D.dot(nu) - g + u  )
 
         return dx_dt
+
 
 class Iver_dyn_simplified(ODE_NonAutonomous):
     """
     Dynamic model of Unmanned Underwater Vehicle (modified from Stankiewicz et al) -- Excludes rolling, sway, currents, Includes: hydrostate/dynamic terms, control surface deflections/propeller thrust, and actuator dynamics
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=3):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 12    # Number of states (including actuator dynamics)
         self.nu = 3    # Number of control inputs
         self.ts = 0.1
 
-        # Model parameters
         self.Mq = -0.748        # Hydrodynamic coefficient (1/s)
         self.Nur = -0.441       # Hydrodynamic coefficient (1/m)
         self.Xuu = -0.179       # Hydrodynamic coefficient (1/m)
@@ -1018,35 +889,22 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         self.K_delta_q = -10.0   # Elevator deflection dynamic coefficient
         self.K_delta_r = -10.0   # Rudder deflection dynamic coefficient
 
-        # Initial Conditions for the States
         self.x0 = np.array([0, 0, 0, 0, 0, 0.01, 0, 0, 0, 0, 0, 0])
 
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):
-        seed = 3
-        #delta_u = SplineSignal(nsim=self.nsim, values=None, xmin= 0.0, xmax=1.0, rseed=seed)
-        #delta_q = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=2*seed)
-        #delta_r = SplineSignal(nsim=self.nsim, values=None, xmin=-1.0, xmax=1.0, rseed=3*seed)
-
+        seed = self.seed
         delta_u = Steps(nsim=nsim, values=None, randsteps=100, xmin=0.0, xmax=1.0, rseed=seed).T
         delta_q = Steps(nsim=nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=2 * seed).T
         delta_r = Steps(nsim=nsim, values=None, randsteps=100, xmin=-1.0, xmax=1.0, rseed=3 * seed).T
-
         return np.vstack( [delta_u, delta_q, delta_r] ).T
 
-
-    # equations defining the dynamical system
     def equations(self, x, t, u):
         """
         + States (12): [px, py, pz, theta, psi, uu, w, q, r, delta_u, delta_q, delta_r]
         + Inputs (3): [delta_uc, delta_qc, delta_rc] (thrust speed/deflections, normalized)
         """
-
-        # States
-        px = x[0]
-        py = x[1]
-        pz = x[2]
         theta = x[3]
         psi = x[4]
         uu = x[5]
@@ -1057,7 +915,6 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         delta_q = x[10]
         delta_r = x[11]
 
-        # Control
         delta_uc = u[0]
         delta_qc = u[1]
         delta_rc = u[2]
@@ -1179,8 +1036,8 @@ class SwingEquation(ODE_NonAutonomous):
     + two first-order ODEs
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=3):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.Pm = 0.8  # Mechanical power
         self.Pmax = 5.0  # Maximum electrical output
         self.H = 500.0  # Inertia constant
@@ -1255,7 +1112,7 @@ class SwingEquation(ODE_NonAutonomous):
         dx_dt = [self.ws * domega, (Pm - Pmax * np.sin(delta) - self.D * domega) / self.M]
         return dx_dt
 
-systems = dict(inspect.getmembers(sys.modules[__name__], lambda x: inspect.isclass(x) and not inspect.isabstract(x)))
-odes = {k: v for k, v in systems.items() if issubclass(v, ODE_NonAutonomous)}
-ssms = {k: v for k, v in systems.items() if issubclass(v, SSM)}
+systems = dict(inspect.getmembers(sys.modules[__name__], lambda x: inspect.isclass(x)))
+systems = {k: v for k, v in systems.items() if issubclass(v, ODE_NonAutonomous) and v is not ODE_NonAutonomous}
+
 

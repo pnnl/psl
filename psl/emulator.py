@@ -5,7 +5,6 @@ Base Classes for dynamic systems emulators
 from abc import ABC, abstractmethod
 import random
 import numpy as np
-from scipy.integrate import odeint
 import gym
 
 from psl.perturb import Steps
@@ -19,15 +18,9 @@ class EmulatorBase(ABC):
         super().__init__()
         random.seed(seed)
         np.random.seed(seed)
+        self.seed = seed
         self.nsim, self.ninit, self.ts = nsim, ninit, ts
-        self.parameters()
-
-    @abstractmethod
-    def parameters(self):
-        """
-        Initialize parameters of the dynamical system
-        """
-        pass
+        self.x0 = 0.
 
     @abstractmethod
     def equations(self, **kwargs):
@@ -44,144 +37,6 @@ class EmulatorBase(ABC):
         pass
 
 
-class SSM(EmulatorBase):
-    """
-    base class state space model
-    """
-
-    def parameters(self):
-        # steady state values
-        self.x_ss = 0
-        self.y_ss = 0
-
-    def simulate(self, ninit=None, nsim=None, U=None, D=None, x0=None, **kwargs):
-        """
-        :param nsim: (int) Number of steps for open loop response
-        :param U: (ndarray, shape=(nsim, self.nu)) control signals
-        :param D: (ndarray, shape=(nsim, self.nd)) measured disturbance signals
-        :param x0: (ndarray, shape=(self.nx)) Initial state.
-        :return: The response matrices, i.e. X, Y, U, D
-        """
-        if ninit is None:
-            ninit = self.ninit
-        if nsim is None:
-            nsim = self.nsim
-        if x0 is None:
-            x = self.x0
-        else:
-            assert x0.shape[0] == self.nx, "Mismatch in x0 size"
-            x = x0
-        if D is None:
-            D = self.D[ninit: ninit + nsim, :] if self.D is not None else None
-        if U is None:
-            U = self.U[ninit: ninit + nsim, :] if self.U is not None else None
-        X, Y = [], []
-        for k in range(nsim):
-            u = U[k, :] if U is not None else None
-            d = D[k, :] if D is not None else None
-            x, y = self.equations(x, u, d)
-            X.append(x + self.x_ss)
-            Y.append(y - self.y_ss)
-        Xout = np.asarray(X).reshape(nsim, self.nx)
-        Yout = np.asarray(Y).reshape(nsim, self.ny)
-        Uout = np.asarray(U).reshape(nsim, self.nu) if U is not None else None
-        Dout = np.asarray(D).reshape(nsim, self.nd) if D is not None else None
-        return {'X': Xout, 'Y': Yout, 'U': Uout, 'D': Dout}
-
-
-class ODE_Autonomous(EmulatorBase):
-    """
-    base class autonomous ODE
-    """
-
-    def parameters(self):
-        pass
-
-    def simulate(self, ninit=None, nsim=None, ts=None, x0=None, **kwargs):
-        """
-        :param nsim: (int) Number of steps for open loop response
-        :param ninit: (float) initial simulation time
-        :param ts: (float) step size, sampling time
-        :param x0: (float) state initial conditions
-        :return: The response matrices, i.e. X
-        """
-
-        # default simulation setup parameters
-        if ninit is None:
-            ninit = self.ninit
-        if nsim is None:
-            nsim = self.nsim
-        if ts is None:
-            ts = self.ts
-
-        # initial conditions states + uncontrolled inputs
-        if x0 is None:
-            x = self.x0
-        else:
-            assert x0.shape[0] == self.nx, "Mismatch in x0 size"
-            x = x0
-        # time interval
-        t = np.arange(0, nsim+1) * ts + ninit
-        X = [x]
-        for N in range(nsim-1):
-            dT = [t[N], t[N + 1]]
-            xdot = odeint(self.equations, x, dT)
-            x = xdot[-1]
-            X.append(x)  # updated states trajectories
-        Yout = np.asarray(X).reshape(nsim, -1)
-        return {'Y': Yout, 'X': np.asarray(X)}
-
-
-class ODE_NonAutonomous(EmulatorBase, ABC):
-    """
-    base class autonomous ODE
-    """
-
-    def parameters(self):
-        pass
-
-    def simulate(self, U=None, ninit=None, nsim=None, ts=None, x0=None, **kwargs):
-        """
-        :param nsim: (int) Number of steps for open loop response
-        :param ninit: (float) initial simulation time
-        :param ts: (float) step size, sampling time
-        :param x0: (float) state initial conditions
-        :return: X, Y, U, D
-        """
-
-        # default simulation setup parameters
-        if ninit is None:
-            ninit = self.ninit
-        if nsim is None:
-            nsim = self.nsim
-        if ts is None:
-            ts = self.ts
-        if U is None:
-            U = self.U
-
-        # initial conditions states + uncontrolled inputs
-        if x0 is None:
-            x = self.x0
-        else:
-            assert x0.shape[0] == self.nx, "Mismatch in x0 size"
-            x = x0
-        # time interval
-        t = np.arange(0, nsim+1) * ts + ninit
-        X = [x]
-        N = 0
-        for u in U:
-            dT = [t[N], t[N + 1]]
-            xdot = odeint(self.equations, x, dT, args=(u,))
-            x = xdot[-1]
-            X.append(x)  # updated states trajectories
-            N += 1
-            if N == nsim-1:
-                break
-        Yout = np.asarray(X).reshape(nsim, -1)
-        Uout = np.asarray(U).reshape(nsim, -1)
-        return {'Y': Yout, 'U': Uout, 'X': np.asarray(X)}
-
-
 class GymWrapper(EmulatorBase):
     """
     Wrapper for OpenAI gym environments
@@ -189,25 +44,18 @@ class GymWrapper(EmulatorBase):
         + https://gym.openai.com/read-only.html
         + https://github.com/openai/gym
 
-    .. todo::
-        Include visualization option for the trajectories or render of OpenAI gym.
-
     """
-    def __init__(self, nsim=1000, ninit=0, system='Pendulum-v0', seed=59):
-        super().__init__(nsim=nsim, ninit=ninit)
-        self.system = system
-
-    def parameters(self, system='Pendulum-v0'):
+    envs = ["Pendulum-v1", "CartPole-v1", "Acrobot-v1", "MountainCar-v0", "MountainCarContinuous-v0"]
+    
+    def __init__(self, nsim=1000, ninit=0, system='Pendulum-v1', seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, seed=seed)
         self.system = system
         self.env = gym.make(self.system)
-        self.env.reset()  # to reset the environment state
+        self.env.reset()
         self.x0 = self.env.state
         self.nx = self.x0.shape[0]
         self.action_sample = self.env.action_space.sample()
         self.nu = np.asarray([self.action_sample]).shape[0]
-        #     default simulation setup
-        # self.U = np.zeros([(self.nsim - 1), self.nu])
-        # self.U[int(self.nsim/8)] = 0.1
         self.U = Steps(nx=1, nsim=self.nsim, values=None,
                        randsteps=int(np.ceil(self.nsim/40)), xmax=0.5, xmin=-0.5)
         if type(self.action_sample) == int:
@@ -218,9 +66,9 @@ class GymWrapper(EmulatorBase):
             u = u.item()
         self.env.state = x
         x, reward, done, info = self.env.step(u)
-        return x, reward
+        return x, reward, done, info
 
-    def simulate(self, nsim=None, U=None, x0=None, **kwargs):
+    def simulate(self, nsim=None, U=None, x0=None):
         """
         :param nsim: (int) Number of steps for open loop response
         :param U: (ndarray, shape=(self.nu)) control actions
@@ -240,9 +88,9 @@ class GymWrapper(EmulatorBase):
         X, Reward = [x], [0.]
         N = 0
         for u in U:
-            x, reward = self.equations(x, u)
-            X.append(x)  # updated states trajectories
-            Reward.append(reward)  # updated states trajectories
+            x, reward, done, info = self.equations(x, u)
+            X.append(x)
+            Reward.append(reward)
             N += 1
             if N == nsim-1:
                 break
@@ -250,3 +98,5 @@ class GymWrapper(EmulatorBase):
         Yout = np.asarray(Reward).reshape(-1, 1)
         Uout = np.asarray(U)
         return {'X': Xout, 'Y': Yout, 'U': Uout}
+
+systems = {k: GymWrapper for k in GymWrapper.envs}

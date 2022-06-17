@@ -1,6 +1,12 @@
-import psl
+from psl import plot
 import matplotlib.pyplot as plt
 import os
+
+import psl.autonomous as auto
+import psl.nonautonomous as nauto
+import psl.ssm as ssm
+import warnings
+warnings.filterwarnings("ignore")
 
 
 if __name__ == '__main__':
@@ -9,27 +15,29 @@ if __name__ == '__main__':
     """
     os.system('rm -rf figs')
     os.mkdir("./figs")
+    ninit = 0
 
-    for name, system in psl.systems.items():
+    for name, system in ssm.systems.items():
         print(name)
-        if system is psl.BuildingEnvelope:
-            ninit = 0
-            building = psl.BuildingEnvelope()  # instantiate building class
-            building.parameters(system='HollandschHuys_full', linear=False)  # load model parameters
-            out = building.simulate(ninit=ninit)  # simulate open loop
-            psl.plot.pltOL(Y=out['Y'], U=out['U'], D=out['D'], X=out['X'], figname="./figs/"+name+"_ol")
-            psl.plot.pltPhase(X=out['Y'], figname="./figs/"+name+"_phase")
-            plt.close('all')
-        elif isinstance(system(), psl.ODE_NonAutonomous):
-            model = system(nsim=1000)
-            out = model.simulate()  # simulate open loop
-            psl.plot.pltOL(Y=out['Y'], U=out['U'], figname="./figs/"+name+"_ol")  # plot trajectories
-            psl.plot.pltPhase(X=out['Y'], figname="./figs/"+name+"_phase")
-            plt.close('all')
-        elif isinstance(system(), psl.ODE_Autonomous):
-            model = system()
-            out = model.simulate()  # simulate open loop
-            psl.plot.pltOL(Y=out['Y'], figname="./figs/"+name+"_ol")  # plot trajectories
-            psl.plot.pltPhase(X=out['Y'], figname="./figs/"+name+"_phase")
-            plt.close('all')
+        ssm = system(system=name)
+        out = ssm.simulate(ninit=ninit)
+        plot.pltOL(Y=out['Y'], U=out['U'], D=out['D'], X=out['X'], figname="./figs/" + name + "_ol")
+        plot.pltPhase(X=out['Y'], figname="./figs/" + name + "_phase")
+        plt.close('all')
+
+    for name, system in nauto.systems.items():
+        print(name)
+        model = system(nsim=1000)
+        out = model.simulate()
+        plot.pltOL(Y=out['Y'], U=out['U'], figname="./figs/"+name+"_ol")  # plot trajectories
+        plot.pltPhase(X=out['Y'], figname="./figs/"+name+"_phase")
+        plt.close('all')
+
+    for name, system in auto.systems.items():
+        print(name)
+        model = system()
+        out = model.simulate()
+        plot.pltOL(Y=out['Y'], figname="./figs/"+name+"_ol")  # plot trajectories
+        plot.pltPhase(X=out['Y'], figname="./figs/"+name+"_phase")
+        plt.close('all')
 
