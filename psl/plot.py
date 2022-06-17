@@ -109,7 +109,7 @@ def pltRecurrence(X, figname=None):
         col = (i-1)%size
         C = X_rp[i-1]
         im = axes[row, col].imshow(C)
-        axes[row, col].set_title('Recurrence plot')
+        axes[row, col].set_title(f'Recurrence plot x_{i}')
         axes[row, col].set_xlabel('time')
         axes[row, col].set_ylabel('time')
     plt.tight_layout()
@@ -136,7 +136,7 @@ def pltRecurrence(X, figname=None):
         col = (i - 1) % size
         C = X_mtf[i - 1]
         axes[row, col].imshow(C)
-        axes[row, col].set_title('Markov Transition Field')
+        axes[row, col].set_title(f'Markov Transition Field x_{i}')
         axes[row, col].set_xlabel('X norm discretized')
         axes[row, col].set_ylabel('X norm discretized')
     plt.tight_layout()
@@ -151,7 +151,7 @@ def pltRecurrence(X, figname=None):
         col = (i - 1) % size
         C = X_gasf[i - 1]
         im = axes[row, col].imshow(C)
-        axes[row, col].set_title('Gramian Angular Fields')
+        axes[row, col].set_title(f'Gramian Angular Fields x_{i}')
         axes[row, col].set_xlabel('X norm discretized')
         axes[row, col].set_ylabel('X norm discretized')
     plt.tight_layout()
