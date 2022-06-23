@@ -1,9 +1,5 @@
 from setuptools import setup
 
-requirements = [
-    # package requirements go here
-]
-
 setup(
     name="psl",
     description="dynamic Systems Library in Python",
@@ -14,12 +10,6 @@ setup(
     packages=["psl"],
     package_data={"psl": ["psl/parameters/buildings/*"]},
     entry_points={"console_scripts": ["psl=psl.cli:cli"]},
-    install_requires=requirements,
-    keywords="psl",
-    classifiers=[
-        "Programming Language :: Python :: 3.10",
-    ],
-    include_package_data=True,
     python_requires=">=3.10",
     install_requires=[
         "gym",
@@ -30,4 +20,10 @@ setup(
         "pyts",
         "scipy",
     ],
+    keywords="psl",
+    classifiers=[
+        "Programming Language :: Python :: 3.10",
+    ],
+    include_package_data=True,
+    
 )
