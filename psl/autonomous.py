@@ -11,9 +11,47 @@ References:
 
 """
 import numpy as np
+import inspect, sys
+
+from psl.emulator import EmulatorBase
+from scipy.integrate import odeint
 
 
-from psl.emulator import ODE_Autonomous
+class ODE_Autonomous(EmulatorBase):
+    """
+    base class autonomous ODE
+    """
+
+    def simulate(self, ninit=None, nsim=None, ts=None, x0=None):
+        """
+        :param nsim: (int) Number of steps for open loop response
+        :param ninit: (float) initial simulation time
+        :param ts: (float) step size, sampling time
+        :param x0: (float) state initial conditions
+        :return: The response matrices, i.e. X
+        """
+
+        if ninit is None:
+            ninit = self.ninit
+        if nsim is None:
+            nsim = self.nsim
+        if ts is None:
+            ts = self.ts
+
+        if x0 is None:
+            x = self.x0
+        else:
+            assert x0.shape[0] == self.nx, "Mismatch in x0 size"
+            x = x0
+        t = np.arange(0, nsim+1) * ts + ninit
+        X = [x]
+        for N in range(nsim-1):
+            dT = [t[N], t[N + 1]]
+            xdot = odeint(self.equations, x, dT)
+            x = xdot[-1]
+            X.append(x)
+        Yout = np.asarray(X).reshape(nsim, -1)
+        return {'Y': Yout, 'X': np.asarray(X)}
 
 
 class UniversalOscillator(ODE_Autonomous):
@@ -24,15 +62,14 @@ class UniversalOscillator(ODE_Autonomous):
     + https://sam-dolan.staff.shef.ac.uk/mas212/notebooks/ODE_Example.html
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.mu = 2
         self.omega = 1
         self.x0 = [1.0, 0.0]
         self.nx = 2
 
     def equations(self, x, t):
-        # Derivatives
         dx1 = x[1]
         dx2 = -2*self.mu*x[1] - x[0] + np.cos(self.omega*t)
         dx = [dx1, dx2]
@@ -45,8 +82,9 @@ class Pendulum(ODE_Autonomous):
 
     + https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html
     """
-    def parameters(self):
-        super().parameters()
+
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.g = 9.81
         self.f = 3.
         self.nx = 2
@@ -63,8 +101,9 @@ class DoublePendulum(ODE_Autonomous):
     Double Pendulum
     https://scipython.com/blog/the-double-pendulum/
     """
-    def parameters(self):
-        super().parameters()
+
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.L1 = 1
         self.L2 = 1
         self.m1 = 1
@@ -96,8 +135,8 @@ class Lorenz96(ODE_Autonomous):
     + https://en.wikipedia.org/wiki/Lorenz_96_model
     """
 
-    def parameters(self):
-        super().parameters() # inherit parameters of the mothership
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.N = 36  # Number of variables
         self.F = 8  # Forcing
         self.x0 = self.F*np.ones(self.N)
@@ -105,7 +144,6 @@ class Lorenz96(ODE_Autonomous):
         self.nx = self.N
 
     def equations(self, x, t):
-        # Compute state derivatives
         dx = np.zeros(self.N)
         # First the 3 edge cases: i=1,2,N
         dx[0] = (x[1] - x[self.N - 2]) * x[self.N - 1] - x[0]
@@ -129,8 +167,8 @@ class LorenzSystem(ODE_Autonomous):
     + https://matplotlib.org/3.1.0/gallery/mplot3d/lorenz_attractor.html
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.rho = 28.0
         self.sigma = 10.0
         self.beta = 8.0 / 3.0
@@ -138,7 +176,6 @@ class LorenzSystem(ODE_Autonomous):
         self.nx = 3
 
     def equations(self, x, t):
-        # Derivatives
         dx1 = self.sigma*(x[1] - x[0])
         dx2 = x[0]*(self.rho - x[2]) - x[1]
         dx3 = x[0]*x[1] - self.beta*x[2]
@@ -154,14 +191,13 @@ class VanDerPol(ODE_Autonomous):
     + http://kitchingroup.cheme.cmu.edu/blog/2013/02/02/Solving-a-second-order-ode/
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.mu = 1.0
         self.x0 = [1, 2]
         self.nx = 2
 
     def equations(self, x, t):
-        # Derivatives
         dx1 = self.mu*(x[0] - 1./3.*x[0]**3 - x[1])
         dx2= x[0]/self.mu
         dx = [dx1, dx2]
@@ -175,14 +211,13 @@ class ThomasAttractor(ODE_Autonomous):
     + https://en.wikipedia.org/wiki/Thomas%27_cyclically_symmetric_attractor
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.b = 0.208186
         self.x0 = [1, -1, 1]
         self.nx = 3
 
     def equations(self, x, t):
-        # Derivatives
         dx1 = np.sin(x[1]) - self.b*x[0]
         dx2 = np.sin(x[2]) - self.b*x[1]
         dx3 = np.sin(x[0]) - self.b*x[2]
@@ -197,8 +232,8 @@ class RosslerAttractor(ODE_Autonomous):
     + https://en.wikipedia.org/wiki/R%C3%B6ssler_attractor
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.a = 0.2
         self.b = 0.2
         self.c = 5.7
@@ -206,7 +241,6 @@ class RosslerAttractor(ODE_Autonomous):
         self.nx = 3
 
     def equations(self, x, t):
-        # Derivatives
         dx1 = - x[1] - x[2]
         dx2 = x[0] + self.a*x[1]
         dx3 = self.b + x[2]*(x[0]-self.c)
@@ -221,7 +255,8 @@ class LotkaVolterra(ODE_Autonomous):
     + https://en.wikipedia.org/wiki/Lotka%E2%80%93Volterra_equations
     """
 
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.a = 1.
         self.b = 0.1
         self.c = 1.5
@@ -230,7 +265,6 @@ class LotkaVolterra(ODE_Autonomous):
         self.nx = 2
 
     def equations(self, x, t):
-        # Derivatives
         dx1 = self.a*x[0] - self.b*x[0]*x[1]
         dx2 = -self.c*x[1] + self.d*self.b*x[0]*x[1]
         dx = [dx1, dx2]
@@ -244,14 +278,14 @@ class Brusselator1D(ODE_Autonomous):
     + https://en.wikipedia.org/wiki/Brusselator
     """
 
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.a = 1.0
         self.b = 3.0
         self.x0 = [1.0, 1.0]
         self.nx = 2
 
     def equations(self, x, t):
-        # Derivatives
         dx1 = self.a + x[1]*x[0]**2 -self.b*x[0] - x[0]
         dx2 = self.b*x[0] - x[1]*x[0]**2
         dx = [dx1, dx2]
@@ -266,12 +300,10 @@ class ChuaCircuit(ODE_Autonomous):
     + https://www.chuacircuits.com/matlabsim.php
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.a = 15.6
         self.b = 28.0
-        # self.R = 1.0
-        # self.C = 1.0
         self.m0 = -1.143
         self.m1 = -0.714
         self.x0 = [0.7, 0.0, 0.0]
@@ -279,7 +311,6 @@ class ChuaCircuit(ODE_Autonomous):
 
     def equations(self, x, t):
         fx = self.m1*x[0] + 0.5*(self.m0 - self.m1)*(np.abs(x[0] + 1) - np.abs(x[0] - 1))
-        # Derivatives
         dx1 = self.a*(x[1] - x[0] - fx)
         dx2 = x[0] - x[1] + x[2]
         dx3 = -self.b*x[1]
@@ -294,8 +325,8 @@ class Duffing(ODE_Autonomous):
     + https://en.wikipedia.org/wiki/Duffing_equation
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.delta = 0.02
         self.alpha = 1
         self.beta = 5
@@ -305,7 +336,6 @@ class Duffing(ODE_Autonomous):
         self.nx = 2
 
     def equations(self, x, t):
-        # Derivatives
         dx1 = x[1]
         dx2 = - self.delta*x[1] - self.alpha*x[0] - self.beta*x[0]**3 + self.gamma*np.cos(self.omega*t)
         dx = [dx1, dx2]
@@ -321,8 +351,8 @@ class Autoignition(ODE_Autonomous):
       Physical Review E, 2021
     """
 
-    def parameters(self):
-        super().parameters()
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.alpha = 0.3
         self.uc = 1.1
         self.s = 1.0
@@ -336,10 +366,11 @@ class Autoignition(ODE_Autonomous):
     def equations(self, x, t):
         reactionRate = self.k * (1.0 - x[1]) * np.exp((x[0] - self.uc) / self.alpha)
         regenRate = self.s * self.up * x[1] / (1.0 + np.exp(self.r * (x[0] - self.up)))
-        # Derivatives
         dx1 = self.q * reactionRate - self.e * x[0] ** 2
         dx2 = reactionRate - regenRate
         dx = [dx1, dx2]
         return dx
 
+systems = dict(inspect.getmembers(sys.modules[__name__], lambda x: inspect.isclass(x)))
+systems = {k: v for k, v in systems.items() if issubclass(v, ODE_Autonomous) and v is not ODE_Autonomous}
 
