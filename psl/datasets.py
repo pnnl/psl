@@ -1,6 +1,6 @@
 import os
 
-resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "datasets")
+resource_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 datasets = {
     k: os.path.join(resource_path, v) for k, v in {
