@@ -10,7 +10,7 @@ setup(
     packages=["psl"],
     package_data={"psl": ["psl/parameters/buildings/*"]},
     entry_points={"console_scripts": ["psl=psl.cli:cli"]},
-    python_requires=">=3.10",
+    python_requires=">=3.9",
     install_requires=[
         "gym",
         "matplotlib",
