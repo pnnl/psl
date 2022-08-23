@@ -58,6 +58,7 @@ class BuildingEnvelope(SSM):
     building envelope heat transfer model
     linear building envelope dynamics and bilinear heat flow input dynamics
     different building types are stored in ./emulators/buildings/*.mat
+    documentation about the building systems is stored in ./emulators/buildings/building_type/*
     models obtained from:
 
     + https://github.com/drgona/BeSim
@@ -115,7 +116,7 @@ class BuildingEnvelope(SSM):
             self.x0 = file['x0'].reshape(self.nx)
         else:
             self.x0 = 0*np.ones(self.nx, dtype=np.float32)  # initial conditions
-        self.D = file['disturb'] # pre-defined disturbance profiles
+        self.D = file['disturb']    # pre-defined disturbance profiles
         #  steady states - linearization offsets
         self.x_ss = file['x_ss']
         self.y_ss = file['y_ss']
