@@ -42,4 +42,5 @@ class GymWrapper(Env):
     def render(self, mode='human'):
         print('render')
 
+systems = {k: GymWrapper for k in GymWrapper.envs}
 
