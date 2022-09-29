@@ -16,6 +16,7 @@ datasets = {
         "aero": "NLIN_MIMO_Aerodynamic/NLIN_MIMO_Aerodynamic.mat",
         "flexy_air": "Flexy_air/flexy_air_data.csv",
         "EED_building": "EED_building/EED_building.csv",
+        "Eplus": "Eplus/Eplus.csv",
         "Residential_building": "Residential_building/Residential_building.csv",
         "fsw_phase_1": "FSW/by_step/fsw_data_phase_1.csv",
         "fsw_phase_2": "FSW/by_step/fsw_data_phase_2.csv",
