@@ -1,0 +1,517 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Autonomous &mdash; PSL 0.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/lorenz.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Emulator" href="emulator.html" />
+    <link rel="prev" title="PSL: Python Systems Library" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PSL
+          
+
+          
+            
+            <img src="_static/lorenz.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Docs:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Autonomous</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.Autoignition"><code class="docutils literal notranslate"><span class="pre">Autoignition</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.Autoignition.equations"><code class="docutils literal notranslate"><span class="pre">Autoignition.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.Brusselator1D"><code class="docutils literal notranslate"><span class="pre">Brusselator1D</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.Brusselator1D.equations"><code class="docutils literal notranslate"><span class="pre">Brusselator1D.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.ChuaCircuit"><code class="docutils literal notranslate"><span class="pre">ChuaCircuit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.ChuaCircuit.equations"><code class="docutils literal notranslate"><span class="pre">ChuaCircuit.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.DoublePendulum"><code class="docutils literal notranslate"><span class="pre">DoublePendulum</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.DoublePendulum.equations"><code class="docutils literal notranslate"><span class="pre">DoublePendulum.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.Duffing"><code class="docutils literal notranslate"><span class="pre">Duffing</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.Duffing.equations"><code class="docutils literal notranslate"><span class="pre">Duffing.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.Lorenz96"><code class="docutils literal notranslate"><span class="pre">Lorenz96</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.Lorenz96.equations"><code class="docutils literal notranslate"><span class="pre">Lorenz96.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.LorenzSystem"><code class="docutils literal notranslate"><span class="pre">LorenzSystem</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.LorenzSystem.equations"><code class="docutils literal notranslate"><span class="pre">LorenzSystem.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.LotkaVolterra"><code class="docutils literal notranslate"><span class="pre">LotkaVolterra</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.LotkaVolterra.equations"><code class="docutils literal notranslate"><span class="pre">LotkaVolterra.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.ODE_Autonomous"><code class="docutils literal notranslate"><span class="pre">ODE_Autonomous</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.ODE_Autonomous.simulate"><code class="docutils literal notranslate"><span class="pre">ODE_Autonomous.simulate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.Pendulum"><code class="docutils literal notranslate"><span class="pre">Pendulum</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.Pendulum.equations"><code class="docutils literal notranslate"><span class="pre">Pendulum.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.RosslerAttractor"><code class="docutils literal notranslate"><span class="pre">RosslerAttractor</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.RosslerAttractor.equations"><code class="docutils literal notranslate"><span class="pre">RosslerAttractor.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.ThomasAttractor"><code class="docutils literal notranslate"><span class="pre">ThomasAttractor</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.ThomasAttractor.equations"><code class="docutils literal notranslate"><span class="pre">ThomasAttractor.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.UniversalOscillator"><code class="docutils literal notranslate"><span class="pre">UniversalOscillator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.UniversalOscillator.equations"><code class="docutils literal notranslate"><span class="pre">UniversalOscillator.equations()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#autonomous.VanDerPol"><code class="docutils literal notranslate"><span class="pre">VanDerPol</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autonomous.VanDerPol.equations"><code class="docutils literal notranslate"><span class="pre">VanDerPol.equations()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="emulator.html">Emulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nonautonomous.html">Nonautonomous</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perturb.html">Perturb</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PSL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Autonomous</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/autonomous.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-autonomous">
+<span id="autonomous"></span><h1>Autonomous<a class="headerlink" href="#module-autonomous" title="Permalink to this heading">¶</a></h1>
+<p>Nonlinear ODEs. Wrapper for emulator dynamical models</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Internal Emulators - in house ground truth equations</p></li>
+<li><p>External Emulators - third party models</p></li>
+</ul>
+</div></blockquote>
+<p>References:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/List_of_nonlinear_ordinary_differential_equations">https://en.wikipedia.org/wiki/List_of_nonlinear_ordinary_differential_equations</a></p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/List_of_dynamical_systems_and_differential_equations_topics">https://en.wikipedia.org/wiki/List_of_dynamical_systems_and_differential_equations_topics</a></p></li>
+</ul>
+</div></blockquote>
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.Autoignition">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">Autoignition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Autoignition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Autoignition" title="Permalink to this definition">¶</a></dt>
+<dd><p>ODE describing pulsating instability in open-ended combustor.</p>
+<ul class="simple">
+<li><p>Koch, J., Kurosaka, M., Knowlen, C., Kutz, J.N.,
+“Multiscale physics of rotating detonation waves: Autosolitons and modulational instabilities,”
+Physical Review E, 2021</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.Autoignition.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Autoignition.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Autoignition.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.Brusselator1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">Brusselator1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Brusselator1D"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Brusselator1D" title="Permalink to this definition">¶</a></dt>
+<dd><p>Brusselator</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Brusselator">https://en.wikipedia.org/wiki/Brusselator</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.Brusselator1D.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Brusselator1D.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Brusselator1D.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.ChuaCircuit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">ChuaCircuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#ChuaCircuit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.ChuaCircuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Chua’s circuit</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Chua%27s_circuit">https://en.wikipedia.org/wiki/Chua%27s_circuit</a></p></li>
+<li><p><a class="reference external" href="https://www.chuacircuits.com/matlabsim.php">https://www.chuacircuits.com/matlabsim.php</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.ChuaCircuit.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#ChuaCircuit.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.ChuaCircuit.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.DoublePendulum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">DoublePendulum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#DoublePendulum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.DoublePendulum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Double Pendulum
+<a class="reference external" href="https://scipython.com/blog/the-double-pendulum/">https://scipython.com/blog/the-double-pendulum/</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.DoublePendulum.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#DoublePendulum.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.DoublePendulum.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.Duffing">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">Duffing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Duffing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Duffing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Duffing equation</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Duffing_equation">https://en.wikipedia.org/wiki/Duffing_equation</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.Duffing.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Duffing.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Duffing.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.Lorenz96">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">Lorenz96</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Lorenz96"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Lorenz96" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lorenz 96 model</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Lorenz_96_model">https://en.wikipedia.org/wiki/Lorenz_96_model</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.Lorenz96.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Lorenz96.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Lorenz96.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.LorenzSystem">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">LorenzSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#LorenzSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.LorenzSystem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lorenz System</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Lorenz_system#Analysis">https://en.wikipedia.org/wiki/Lorenz_system#Analysis</a></p></li>
+<li><p><a class="reference external" href="https://ipywidgets.readthedocs.io/en/stable/examples/Lorenz%20Differential%20Equations.html">https://ipywidgets.readthedocs.io/en/stable/examples/Lorenz%20Differential%20Equations.html</a></p></li>
+<li><p><a class="reference external" href="https://scipython.com/blog/the-lorenz-attractor/">https://scipython.com/blog/the-lorenz-attractor/</a></p></li>
+<li><p><a class="reference external" href="https://matplotlib.org/3.1.0/gallery/mplot3d/lorenz_attractor.html">https://matplotlib.org/3.1.0/gallery/mplot3d/lorenz_attractor.html</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.LorenzSystem.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#LorenzSystem.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.LorenzSystem.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.LotkaVolterra">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">LotkaVolterra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#LotkaVolterra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.LotkaVolterra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lotka–Volterra equations, also known as the predator–prey equations</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Lotka%E2%80%93Volterra_equations">https://en.wikipedia.org/wiki/Lotka%E2%80%93Volterra_equations</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.LotkaVolterra.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#LotkaVolterra.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.LotkaVolterra.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.ODE_Autonomous">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">ODE_Autonomous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#ODE_Autonomous"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.ODE_Autonomous" title="Permalink to this definition">¶</a></dt>
+<dd><p>base class autonomous ODE</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.ODE_Autonomous.simulate">
+<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#ODE_Autonomous.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.ODE_Autonomous.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsim</strong> – (int) Number of steps for open loop response</p></li>
+<li><p><strong>ninit</strong> – (float) initial simulation time</p></li>
+<li><p><strong>ts</strong> – (float) step size, sampling time</p></li>
+<li><p><strong>x0</strong> – (float) state initial conditions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The response matrices, i.e. X</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.Pendulum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">Pendulum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Pendulum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Pendulum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple pendulum.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html">https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.odeint.html</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.Pendulum.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#Pendulum.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.Pendulum.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.RosslerAttractor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">RosslerAttractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#RosslerAttractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.RosslerAttractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rössler attractor</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/R%C3%B6ssler_attractor">https://en.wikipedia.org/wiki/R%C3%B6ssler_attractor</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.RosslerAttractor.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#RosslerAttractor.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.RosslerAttractor.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.ThomasAttractor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">ThomasAttractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#ThomasAttractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.ThomasAttractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Thomas’ cyclically symmetric attractor</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Thomas%27_cyclically_symmetric_attractor">https://en.wikipedia.org/wiki/Thomas%27_cyclically_symmetric_attractor</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.ThomasAttractor.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#ThomasAttractor.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.ThomasAttractor.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.UniversalOscillator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">UniversalOscillator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#UniversalOscillator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.UniversalOscillator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Harmonic oscillator</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Harmonic_oscillator">https://en.wikipedia.org/wiki/Harmonic_oscillator</a></p></li>
+<li><p><a class="reference external" href="https://sam-dolan.staff.shef.ac.uk/mas212/notebooks/ODE_Example.html">https://sam-dolan.staff.shef.ac.uk/mas212/notebooks/ODE_Example.html</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.UniversalOscillator.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#UniversalOscillator.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.UniversalOscillator.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="autonomous.VanDerPol">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">autonomous.</span></span><span class="sig-name descname"><span class="pre">VanDerPol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#VanDerPol"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.VanDerPol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Van der Pol oscillator</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Van_der_Pol_oscillator">https://en.wikipedia.org/wiki/Van_der_Pol_oscillator</a></p></li>
+<li><p><a class="reference external" href="http://kitchingroup.cheme.cmu.edu/blog/2013/02/02/Solving-a-second-order-ode/">http://kitchingroup.cheme.cmu.edu/blog/2013/02/02/Solving-a-second-order-ode/</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="autonomous.VanDerPol.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/autonomous.html#VanDerPol.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#autonomous.VanDerPol.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="emulator.html" class="btn btn-neutral float-right" title="Emulator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="PSL: Python Systems Library" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Aaron Tuor, Mia Skomski, Jan Drgona, Soumya Vasisht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

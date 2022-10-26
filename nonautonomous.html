@@ -1,0 +1,753 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Nonautonomous &mdash; PSL 0.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/lorenz.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Perturb" href="perturb.html" />
+    <link rel="prev" title="Emulator" href="emulator.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PSL
+          
+
+          
+            
+            <img src="_static/lorenz.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Docs:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="autonomous.html">Autonomous</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emulator.html">Emulator</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Nonautonomous</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.CSTR"><code class="docutils literal notranslate"><span class="pre">CSTR</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.CSTR.equations"><code class="docutils literal notranslate"><span class="pre">CSTR.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.CSTR.get_U"><code class="docutils literal notranslate"><span class="pre">CSTR.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.HindmarshRose"><code class="docutils literal notranslate"><span class="pre">HindmarshRose</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.HindmarshRose.equations"><code class="docutils literal notranslate"><span class="pre">HindmarshRose.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.HindmarshRose.get_U"><code class="docutils literal notranslate"><span class="pre">HindmarshRose.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.InvPendulum"><code class="docutils literal notranslate"><span class="pre">InvPendulum</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.InvPendulum.equations"><code class="docutils literal notranslate"><span class="pre">InvPendulum.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.InvPendulum.get_U"><code class="docutils literal notranslate"><span class="pre">InvPendulum.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.Iver_dyn"><code class="docutils literal notranslate"><span class="pre">Iver_dyn</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn.Cross"><code class="docutils literal notranslate"><span class="pre">Iver_dyn.Cross()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn.equations"><code class="docutils literal notranslate"><span class="pre">Iver_dyn.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn.get_U"><code class="docutils literal notranslate"><span class="pre">Iver_dyn.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.Iver_dyn_reduced"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_reduced</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn_reduced.equations"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_reduced.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn_reduced.get_U"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_reduced.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.Iver_dyn_simplified"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_simplified</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn_simplified.equations"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_simplified.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn_simplified.get_U"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_simplified.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.Iver_dyn_simplified_output"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_simplified_output</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn_simplified_output.equations"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_simplified_output.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn_simplified_output.get_U"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_simplified_output.get_U()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_dyn_simplified_output.parameters"><code class="docutils literal notranslate"><span class="pre">Iver_dyn_simplified_output.parameters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.Iver_kin"><code class="docutils literal notranslate"><span class="pre">Iver_kin</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_kin.equations"><code class="docutils literal notranslate"><span class="pre">Iver_kin.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_kin.get_U"><code class="docutils literal notranslate"><span class="pre">Iver_kin.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.Iver_kin_reduced"><code class="docutils literal notranslate"><span class="pre">Iver_kin_reduced</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_kin_reduced.equations"><code class="docutils literal notranslate"><span class="pre">Iver_kin_reduced.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Iver_kin_reduced.get_U"><code class="docutils literal notranslate"><span class="pre">Iver_kin_reduced.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.LorenzControl"><code class="docutils literal notranslate"><span class="pre">LorenzControl</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.LorenzControl.equations"><code class="docutils literal notranslate"><span class="pre">LorenzControl.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.LorenzControl.get_U"><code class="docutils literal notranslate"><span class="pre">LorenzControl.get_U()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.LorenzControl.u_fun"><code class="docutils literal notranslate"><span class="pre">LorenzControl.u_fun()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.ODE_NonAutonomous"><code class="docutils literal notranslate"><span class="pre">ODE_NonAutonomous</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.ODE_NonAutonomous.simulate"><code class="docutils literal notranslate"><span class="pre">ODE_NonAutonomous.simulate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.SEIR_population"><code class="docutils literal notranslate"><span class="pre">SEIR_population</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.SEIR_population.equations"><code class="docutils literal notranslate"><span class="pre">SEIR_population.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.SEIR_population.get_U"><code class="docutils literal notranslate"><span class="pre">SEIR_population.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.SwingEquation"><code class="docutils literal notranslate"><span class="pre">SwingEquation</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.SwingEquation.equations"><code class="docutils literal notranslate"><span class="pre">SwingEquation.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.SwingEquation.get_U"><code class="docutils literal notranslate"><span class="pre">SwingEquation.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.Tank"><code class="docutils literal notranslate"><span class="pre">Tank</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Tank.equations"><code class="docutils literal notranslate"><span class="pre">Tank.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.Tank.get_U"><code class="docutils literal notranslate"><span class="pre">Tank.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.TwoTank"><code class="docutils literal notranslate"><span class="pre">TwoTank</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.TwoTank.equations"><code class="docutils literal notranslate"><span class="pre">TwoTank.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.TwoTank.get_U"><code class="docutils literal notranslate"><span class="pre">TwoTank.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.UAV2D_kin"><code class="docutils literal notranslate"><span class="pre">UAV2D_kin</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.UAV2D_kin.equations"><code class="docutils literal notranslate"><span class="pre">UAV2D_kin.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.UAV2D_kin.get_U"><code class="docutils literal notranslate"><span class="pre">UAV2D_kin.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.UAV3D_dyn"><code class="docutils literal notranslate"><span class="pre">UAV3D_dyn</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.UAV3D_dyn.equations"><code class="docutils literal notranslate"><span class="pre">UAV3D_dyn.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.UAV3D_dyn.get_U"><code class="docutils literal notranslate"><span class="pre">UAV3D_dyn.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.UAV3D_kin"><code class="docutils literal notranslate"><span class="pre">UAV3D_kin</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.UAV3D_kin.equations"><code class="docutils literal notranslate"><span class="pre">UAV3D_kin.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.UAV3D_kin.get_U"><code class="docutils literal notranslate"><span class="pre">UAV3D_kin.get_U()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#nonautonomous.UAV3D_reduced"><code class="docutils literal notranslate"><span class="pre">UAV3D_reduced</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.UAV3D_reduced.equations"><code class="docutils literal notranslate"><span class="pre">UAV3D_reduced.equations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nonautonomous.UAV3D_reduced.get_U"><code class="docutils literal notranslate"><span class="pre">UAV3D_reduced.get_U()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="perturb.html">Perturb</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PSL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Nonautonomous</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/nonautonomous.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-nonautonomous">
+<span id="nonautonomous"></span><h1>Nonautonomous<a class="headerlink" href="#module-nonautonomous" title="Permalink to this heading">¶</a></h1>
+<p>Non-autonomous dynamic systems.</p>
+<dl class="simple">
+<dt>Chaotic nonlinear ODEs</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/List_of_chaotic_maps">https://en.wikipedia.org/wiki/List_of_chaotic_maps</a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.CSTR">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">CSTR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#CSTR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.CSTR" title="Permalink to this definition">¶</a></dt>
+<dd><p>CSTR model
+Original code obtained from APMonitor:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://apmonitor.com/do/index.php/Main/NonlinearControl">http://apmonitor.com/do/index.php/Main/NonlinearControl</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.CSTR.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#CSTR.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.CSTR.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.CSTR.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#CSTR.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.CSTR.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.HindmarshRose">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">HindmarshRose</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#HindmarshRose"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.HindmarshRose" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hindmarsh–Rose model of neuronal activity</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Hindmarsh%E2%80%93Rose_model">https://en.wikipedia.org/wiki/Hindmarsh%E2%80%93Rose_model</a></p></li>
+<li><p><a class="reference external" href="https://demonstrations.wolfram.com/HindmarshRoseNeuronModel/">https://demonstrations.wolfram.com/HindmarshRoseNeuronModel/</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.HindmarshRose.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#HindmarshRose.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.HindmarshRose.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.HindmarshRose.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#HindmarshRose.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.HindmarshRose.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.InvPendulum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">InvPendulum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#InvPendulum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.InvPendulum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inverted Pendulum dynamics
+states: x = [       heta dot{      heta}];         heta is angle from upright equilibrium
+input: u = input torque</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.InvPendulum.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#InvPendulum.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.InvPendulum.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.InvPendulum.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#InvPendulum.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.InvPendulum.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">Iver_dyn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamic model of Unmanned Underwater Vehicle (Fossen) – Excludes hydrostatic/dynamic terms and ocean current</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn.Cross">
+<span class="sig-name descname"><span class="pre">Cross</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn.Cross"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn.Cross" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>Input: 3d array x</p></li>
+<li><p>Output: cross product matrix (skew symmetric)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (6): [u, v, w, p, q, r]</p></li>
+<li><p>Inputs (6): [tau_X, tau_Y, tau_Z, tau_K, tau_M, tau_N]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_reduced">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">Iver_dyn_reduced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_reduced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_reduced" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamic model of Unmanned Underwater Vehicle (Yan et al) – Excludes rolling, includes hydrostate/dynamic terms, no currents</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_reduced.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_reduced.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_reduced.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (10): [n, e, d, theta, psi, u, v, w, p, q, r]</p></li>
+<li><p>Inputs (5): [tau_X, tau_Y, tau_Z, tau_M, tau_N]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_reduced.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_reduced.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_reduced.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_simplified">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">Iver_dyn_simplified</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_simplified"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_simplified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamic model of Unmanned Underwater Vehicle (modified from Stankiewicz et al) – Excludes rolling, sway, currents, Includes: hydrostate/dynamic terms, control surface deflections/propeller thrust, and actuator dynamics</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_simplified.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_simplified.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_simplified.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (12): [px, py, pz, theta, psi, uu, w, q, r, delta_u, delta_q, delta_r]</p></li>
+<li><p>Inputs (3): [delta_uc, delta_qc, delta_rc] (thrust speed/deflections, normalized)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_simplified.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_simplified.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_simplified.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_simplified_output">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">Iver_dyn_simplified_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_simplified_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_simplified_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dynamic model of Unmanned Underwater Vehicle (modified from Stankiewicz et al) – Excludes rolling, sway, currents, Includes: hydrostate/dynamic terms, control surface deflections/propeller thrust, and actuator dynamics
+with non-kinematic output</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_simplified_output.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_simplified_output.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_simplified_output.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (9): [theta, psi, uu, w, q, r, delta_u, delta_q, delta_r]</p></li>
+<li><p>Inputs (3): [delta_uc, delta_qc, delta_rc] (thrust speed/deflections, normalized)</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_simplified_output.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_simplified_output.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_simplified_output.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_dyn_simplified_output.parameters">
+<span class="sig-name descname"><span class="pre">parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_dyn_simplified_output.parameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_dyn_simplified_output.parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.Iver_kin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">Iver_kin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_kin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_kin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kinetic model of Unmanned Underwater Vehicle (Fossen) – Full UAV kinematic model</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_kin.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_kin.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_kin.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (5): [n, e, d, phi, theta, psi]</p></li>
+<li><p>Inputs (5): [u, v, w, p, q, r]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_kin.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_kin.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_kin.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.Iver_kin_reduced">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">Iver_kin_reduced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_kin_reduced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_kin_reduced" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kinetic model of Unmanned Underwater Vehicle (Yan et al 2020) – UAV kinematic model with <strong>no roll</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_kin_reduced.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_kin_reduced.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_kin_reduced.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (5): [xi, eta, zeta, theta, psi]</p></li>
+<li><p>Inputs (5): [u, v, w, q, r]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Iver_kin_reduced.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Iver_kin_reduced.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Iver_kin_reduced.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.LorenzControl">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">LorenzControl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#LorenzControl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.LorenzControl" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.LorenzControl.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#LorenzControl.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.LorenzControl.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.LorenzControl.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#LorenzControl.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.LorenzControl.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.LorenzControl.u_fun">
+<span class="sig-name descname"><span class="pre">u_fun</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#LorenzControl.u_fun"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.LorenzControl.u_fun" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.ODE_NonAutonomous">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">ODE_NonAutonomous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#ODE_NonAutonomous"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.ODE_NonAutonomous" title="Permalink to this definition">¶</a></dt>
+<dd><p>base class autonomous ODE</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.ODE_NonAutonomous.simulate">
+<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#ODE_NonAutonomous.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.ODE_NonAutonomous.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsim</strong> – (int) Number of steps for open loop response</p></li>
+<li><p><strong>ninit</strong> – (float) initial simulation time</p></li>
+<li><p><strong>ts</strong> – (float) step size, sampling time</p></li>
+<li><p><strong>x0</strong> – (float) state initial conditions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>X, Y, U, D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.SEIR_population">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">SEIR_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#SEIR_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.SEIR_population" title="Permalink to this definition">¶</a></dt>
+<dd><p>Susceptible, Exposed, Infected, and Recovered (SEIR) population population model. Used to model COVID-19 spread.
+Source of the model:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://apmonitor.com/do/index.php/Main/COVID-19Response">https://apmonitor.com/do/index.php/Main/COVID-19Response</a></p></li>
+</ul>
+<p>states:</p>
+<ul class="simple">
+<li><p>Susceptible (s): population fraction that is susceptible to the virus</p></li>
+<li><p>Exposed (e): population fraction is infected with the virus but does not transmit to others</p></li>
+<li><p>Infectious (i): population fraction that is infected and can infect others</p></li>
+<li><p>Recovered (r): population fraction recovered from infection and is immune from further infection</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.SEIR_population.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#SEIR_population.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.SEIR_population.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>Inputs (1): social distancing (u=0 (none), u=1 (total isolation))</p></li>
+<li><p>States (4):</p></li>
+<li><p>Susceptible (s): population fraction that is susceptible to the virus</p></li>
+<li><p>Exposed (e): population fraction is infected with the virus but does not transmit to others</p></li>
+<li><p>Infectious (i): population fraction that is infected and can infect others</p></li>
+<li><p>Recovered (r): population fraction recovered from infection and is immune from further infection</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.SEIR_population.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#SEIR_population.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.SEIR_population.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.SwingEquation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">SwingEquation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#SwingEquation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.SwingEquation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Power Grid Swing Equation.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/Swing_equation">https://en.wikipedia.org/wiki/Swing_equation</a></p></li>
+<li><p>The second-order swing equation is converted to</p></li>
+<li><p>two first-order ODEs</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.SwingEquation.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#SwingEquation.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.SwingEquation.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.SwingEquation.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#SwingEquation.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.SwingEquation.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.Tank">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">Tank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Tank"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Tank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Single Tank model
+Original code obtained from APMonitor:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://apmonitor.com/pdc/index.php/Main/TankLevel">https://apmonitor.com/pdc/index.php/Main/TankLevel</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Tank.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Tank.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Tank.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (1): level in the tanks</p></li>
+<li><p>Inputs u(1): c - valve coefficient (kg/s / %open)</p></li>
+<li><p>Inputs u(2): valve in % [0-100]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.Tank.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#Tank.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.Tank.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.TwoTank">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">TwoTank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#TwoTank"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.TwoTank" title="Permalink to this definition">¶</a></dt>
+<dd><p>Two Tank model
+Original code obtained from APMonitor:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://apmonitor.com/do/index.php/Main/LevelControl">https://apmonitor.com/do/index.php/Main/LevelControl</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.TwoTank.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#TwoTank.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.TwoTank.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.TwoTank.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#TwoTank.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.TwoTank.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.UAV2D_kin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">UAV2D_kin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV2D_kin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV2D_kin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dubins 2D model – UAV kinematic model with no wind</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.UAV2D_kin.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV2D_kin.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV2D_kin.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (3): [x, y, z, psi]</p></li>
+<li><p>Inputs (1): [phi]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.UAV2D_kin.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV2D_kin.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV2D_kin.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.UAV3D_dyn">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">UAV3D_dyn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_dyn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV3D_dyn" title="Permalink to this definition">¶</a></dt>
+<dd><p>UAV dynamic guidance model with no wind</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.UAV3D_dyn.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_dyn.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV3D_dyn.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (6): [x, y, z, psi, gamma, V]</p></li>
+<li><p>Inputs (3): [T, phi, load]</p></li>
+<li><p>load = Lift force / Weight</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.UAV3D_dyn.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_dyn.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV3D_dyn.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.UAV3D_kin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">UAV3D_kin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_kin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV3D_kin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dubins 3D model – UAV kinematic model with no wind</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.UAV3D_kin.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_kin.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV3D_kin.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (4): [x, y, z]</p></li>
+<li><p>Inputs (3): [V, phi, gamma]</p></li>
+<li><p>Transformed Inputs (3): [U1, U2, U3]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.UAV3D_kin.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_kin.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV3D_kin.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="nonautonomous.UAV3D_reduced">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nonautonomous.</span></span><span class="sig-name descname"><span class="pre">UAV3D_reduced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_reduced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV3D_reduced" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reduced Dubins 3D model – UAV kinematic model with transformed inputs</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.UAV3D_reduced.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_reduced.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV3D_reduced.equations" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>States (4): [x, y, z]</p></li>
+<li><p>Inputs (3): [V, phi, gamma]</p></li>
+<li><p>Transformed Inputs (3): [U1, U2, U3]</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nonautonomous.UAV3D_reduced.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/nonautonomous.html#UAV3D_reduced.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nonautonomous.UAV3D_reduced.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="perturb.html" class="btn btn-neutral float-right" title="Perturb" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="emulator.html" class="btn btn-neutral float-left" title="Emulator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Aaron Tuor, Mia Skomski, Jan Drgona, Soumya Vasisht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
