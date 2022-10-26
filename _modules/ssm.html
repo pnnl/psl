@@ -1,0 +1,350 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ssm &mdash; PSL 0.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/lorenz.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> PSL
+          
+
+          
+            
+            <img src="../_static/lorenz.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Docs:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../autonomous.html">Autonomous</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../emulator.html">Emulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../nonautonomous.html">Nonautonomous</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../perturb.html">Perturb</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PSL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>ssm</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ssm</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">loadmat</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">psl.emulator</span> <span class="kn">import</span> <span class="n">EmulatorBase</span>
+<span class="kn">from</span> <span class="nn">psl.perturb</span> <span class="kn">import</span> <span class="n">Periodic</span><span class="p">,</span> <span class="n">RandomWalk</span>
+
+
+<div class="viewcode-block" id="SSM"><a class="viewcode-back" href="../ssm.html#ssm.SSM">[docs]</a><span class="k">class</span> <span class="nc">SSM</span><span class="p">(</span><span class="n">EmulatorBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    base class state space model</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsim</span><span class="o">=</span><span class="mi">1001</span><span class="p">,</span> <span class="n">ninit</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">59</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nsim</span><span class="o">=</span><span class="n">nsim</span><span class="p">,</span> <span class="n">ninit</span><span class="o">=</span><span class="n">ninit</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_ss</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_ss</span> <span class="o">=</span> <span class="mf">0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x0</span> <span class="o">=</span> <span class="mf">0.</span>
+
+<div class="viewcode-block" id="SSM.simulate"><a class="viewcode-back" href="../ssm.html#ssm.SSM.simulate">[docs]</a>    <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ninit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nsim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">U</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x0</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param nsim: (int) Number of steps for open loop response</span>
+<span class="sd">        :param U: (ndarray, shape=(nsim, self.nu)) control signals</span>
+<span class="sd">        :param D: (ndarray, shape=(nsim, self.nd)) measured disturbance signals</span>
+<span class="sd">        :param x0: (ndarray, shape=(self.nx)) Initial state.</span>
+<span class="sd">        :return: The response matrices, i.e. X, Y, U, D</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ninit</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ninit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ninit</span>
+        <span class="k">if</span> <span class="n">nsim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nsim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nsim</span>
+        <span class="k">if</span> <span class="n">x0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">x0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="s2">&quot;Mismatch in x0 size&quot;</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x0</span>
+        <span class="k">if</span> <span class="n">D</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="p">[</span><span class="n">ninit</span><span class="p">:</span> <span class="n">ninit</span> <span class="o">+</span> <span class="n">nsim</span><span class="p">,</span> <span class="p">:]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">U</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">ninit</span><span class="p">:</span> <span class="n">ninit</span> <span class="o">+</span> <span class="n">nsim</span><span class="p">,</span> <span class="p">:]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsim</span><span class="p">):</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:]</span> <span class="k">if</span> <span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="p">:]</span> <span class="k">if</span> <span class="n">D</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equations</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+            <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_ss</span><span class="p">)</span>
+            <span class="n">Y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_ss</span><span class="p">)</span>
+        <span class="n">Xout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nsim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">)</span>
+        <span class="n">Yout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nsim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
+        <span class="n">Uout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nsim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">)</span> <span class="k">if</span> <span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">Dout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">D</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nsim</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nd</span><span class="p">)</span> <span class="k">if</span> <span class="n">D</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="n">Xout</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">:</span> <span class="n">Yout</span><span class="p">,</span> <span class="s1">&#39;U&#39;</span><span class="p">:</span> <span class="n">Uout</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="n">Dout</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="BuildingEnvelope"><a class="viewcode-back" href="../ssm.html#ssm.BuildingEnvelope">[docs]</a><span class="k">class</span> <span class="nc">BuildingEnvelope</span><span class="p">(</span><span class="n">SSM</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    building envelope heat transfer model</span>
+<span class="sd">    linear building envelope dynamics and bilinear heat flow input dynamics</span>
+<span class="sd">    different building types are stored in ./emulators/buildings/*.mat</span>
+<span class="sd">    documentation about the building systems is stored in ./emulators/buildings/building_type/*</span>
+<span class="sd">    models obtained from:</span>
+
+<span class="sd">    + https://github.com/drgona/BeSim</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">systems</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;SimpleSingleZone&#39;</span><span class="p">,</span> <span class="s1">&#39;Reno_full&#39;</span><span class="p">,</span> <span class="s1">&#39;Reno_ROM40&#39;</span><span class="p">,</span> <span class="s1">&#39;RenoLight_full&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;RenoLight_ROM40&#39;</span><span class="p">,</span> <span class="s1">&#39;Old_full&#39;</span><span class="p">,</span> <span class="s1">&#39;Old_ROM40&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;HollandschHuys_full&#39;</span><span class="p">,</span> <span class="s1">&#39;HollandschHuys_ROM100&#39;</span><span class="p">,</span> <span class="s1">&#39;Infrax_full&#39;</span><span class="p">,</span> <span class="s1">&#39;Infrax_ROM100&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="BuildingEnvelope.path"><a class="viewcode-back" href="../ssm.html#ssm.BuildingEnvelope.path">[docs]</a>    <span class="k">def</span> <span class="nf">path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span> <span class="s1">&#39;parameters/buildings&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">system</span><span class="si">}</span><span class="s1">.mat&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsim</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">ninit</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="s1">&#39;Reno_full&#39;</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">59</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nsim</span><span class="o">=</span><span class="n">nsim</span><span class="p">,</span> <span class="n">ninit</span><span class="o">=</span><span class="n">ninit</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">linear</span> <span class="o">=</span> <span class="n">linear</span>  <span class="c1"># if True use only linear building envelope model with Q as U</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="n">loadmat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">(</span><span class="n">system</span><span class="p">))</span>
+
+        <span class="c1">#  LTI SSM model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;Ad&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">B</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;Bd&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">C</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;Cd&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;Ed&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;Gd&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">F</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;Fd&#39;</span><span class="p">]</span>
+        <span class="c1">#  constraints bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ts</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;Ts&#39;</span><span class="p">]</span>  <span class="c1"># sampling time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">umax</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;umax&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>  <span class="c1"># max heat per zone</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">umin</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;umin&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>  <span class="c1"># min heat per zone</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dT_max</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;dT_max&#39;</span><span class="p">]</span>  <span class="c1"># maximal temperature difference deg C</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dT_min</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;dT_min&#39;</span><span class="p">]</span>  <span class="c1"># minimal temperature difference deg C</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mf_max</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;mf_max&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>  <span class="c1"># maximal nominal mass flow l/h</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mf_min</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;mf_min&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>  <span class="c1"># minimal nominal mass flow l/h</span>
+            <span class="c1">#   heat flow equation constants</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rho</span> <span class="o">=</span> <span class="mf">0.997</span>  <span class="c1"># density  of water kg/1l</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cp</span> <span class="o">=</span> <span class="mf">4185.5</span>  <span class="c1"># specific heat capacity of water J/(kg/K)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time_reg</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3600</span>  <span class="c1"># time regularization of the mass flow 1 hour = 3600 seconds</span>
+            <span class="c1"># building type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">HC_system</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;HC_system&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ny</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nq</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_mf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_dT</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dT_max</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mf</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_dT</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">==</span> <span class="s1">&#39;SimpleSingleZone&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x0</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;x0&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x0</span> <span class="o">=</span> <span class="mi">0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>  <span class="c1"># initial conditions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;disturb&#39;</span><span class="p">]</span>    <span class="c1"># pre-defined disturbance profiles</span>
+        <span class="c1">#  steady states - linearization offsets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_ss</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;x_ss&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_ss</span> <span class="o">=</span> <span class="n">file</span><span class="p">[</span><span class="s1">&#39;y_ss&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ninit</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nsim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="mi">8640</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_U</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nsim</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BuildingEnvelope.get_U"><a class="viewcode-back" href="../ssm.html#ssm.BuildingEnvelope.get_U">[docs]</a>    <span class="k">def</span> <span class="nf">get_U</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nsim</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Periodic</span><span class="p">(</span><span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">nu</span><span class="p">,</span> <span class="n">nsim</span><span class="o">=</span><span class="n">nsim</span><span class="p">,</span> <span class="n">numPeriods</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">umax</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">umin</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="s1">&#39;sin&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">M_flow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mf_max</span><span class="o">/</span><span class="mi">2</span><span class="o">+</span><span class="n">RandomWalk</span><span class="p">(</span><span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mf</span><span class="p">,</span> <span class="n">nsim</span><span class="o">=</span><span class="n">nsim</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mf_max</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mf_min</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">DT</span> <span class="o">=</span> <span class="n">RandomWalk</span><span class="p">(</span><span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_dT</span><span class="p">,</span> <span class="n">nsim</span><span class="o">=</span><span class="n">nsim</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dT_max</span><span class="o">*</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">xmin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dT_min</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">M_flow</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">DT</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="BuildingEnvelope.equations"><a class="viewcode-back" href="../ssm.html#ssm.BuildingEnvelope.equations">[docs]</a>    <span class="k">def</span> <span class="nf">equations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">linear</span><span class="p">:</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">u</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">m_flow</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mf</span><span class="p">]</span>
+            <span class="n">dT</span> <span class="o">=</span> <span class="n">u</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mf</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mf</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">n_dT</span><span class="p">]</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">m_flow</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">rho</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">cp</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_reg</span> <span class="o">*</span> <span class="n">dT</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">B</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">E</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">C</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">F</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span></div></div>
+
+<span class="n">systems</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">BuildingEnvelope</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">BuildingEnvelope</span><span class="o">.</span><span class="n">systems</span><span class="p">}</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Aaron Tuor, Mia Skomski, Jan Drgona, Soumya Vasisht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

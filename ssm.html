@@ -1,0 +1,267 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SSM &mdash; PSL 0.1 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="_static/lorenz.ico"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> PSL
+          
+
+          
+            
+            <img src="_static/lorenz.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Docs:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="autonomous.html">Autonomous</a></li>
+<li class="toctree-l1"><a class="reference internal" href="emulator.html">Emulator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="nonautonomous.html">Nonautonomous</a></li>
+<li class="toctree-l1"><a class="reference internal" href="perturb.html">Perturb</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">PSL</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>SSM</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/ssm.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="module-ssm">
+<span id="ssm"></span><h1>SSM<a class="headerlink" href="#module-ssm" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="ssm.BuildingEnvelope">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ssm.</span></span><span class="sig-name descname"><span class="pre">BuildingEnvelope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Reno_full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssm.html#BuildingEnvelope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ssm.BuildingEnvelope" title="Permalink to this definition">¶</a></dt>
+<dd><p>building envelope heat transfer model
+linear building envelope dynamics and bilinear heat flow input dynamics
+different building types are stored in ./emulators/buildings/<em>.mat
+documentation about the building systems is stored in ./emulators/buildings/building_type/</em>
+models obtained from:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/drgona/BeSim">https://github.com/drgona/BeSim</a></p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="ssm.BuildingEnvelope.equations">
+<span class="sig-name descname"><span class="pre">equations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssm.html#BuildingEnvelope.equations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ssm.BuildingEnvelope.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define equations defining the dynamical system</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ssm.BuildingEnvelope.get_U">
+<span class="sig-name descname"><span class="pre">get_U</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssm.html#BuildingEnvelope.get_U"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ssm.BuildingEnvelope.get_U" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ssm.BuildingEnvelope.path">
+<span class="sig-name descname"><span class="pre">path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">system</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssm.html#BuildingEnvelope.path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ssm.BuildingEnvelope.path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ssm.BuildingEnvelope.systems">
+<span class="sig-name descname"><span class="pre">systems</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['SimpleSingleZone',</span> <span class="pre">'Reno_full',</span> <span class="pre">'Reno_ROM40',</span> <span class="pre">'RenoLight_full',</span> <span class="pre">'RenoLight_ROM40',</span> <span class="pre">'Old_full',</span> <span class="pre">'Old_ROM40',</span> <span class="pre">'HollandschHuys_full',</span> <span class="pre">'HollandschHuys_ROM100',</span> <span class="pre">'Infrax_full',</span> <span class="pre">'Infrax_ROM100']</span></em><a class="headerlink" href="#ssm.BuildingEnvelope.systems" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ssm.SSM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ssm.</span></span><span class="sig-name descname"><span class="pre">SSM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">59</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssm.html#SSM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ssm.SSM" title="Permalink to this definition">¶</a></dt>
+<dd><p>base class state space model</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ssm.SSM.simulate">
+<span class="sig-name descname"><span class="pre">simulate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ninit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ssm.html#SSM.simulate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ssm.SSM.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nsim</strong> – (int) Number of steps for open loop response</p></li>
+<li><p><strong>U</strong> – (ndarray, shape=(nsim, self.nu)) control signals</p></li>
+<li><p><strong>D</strong> – (ndarray, shape=(nsim, self.nd)) measured disturbance signals</p></li>
+<li><p><strong>x0</strong> – (ndarray, shape=(self.nx)) Initial state.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The response matrices, i.e. X, Y, U, D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Aaron Tuor, Mia Skomski, Jan Drgona, Soumya Vasisht
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

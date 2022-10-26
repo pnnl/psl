@@ -1,0 +1,7 @@
+SSM
+==================
+
+.. automodule:: ssm
+   :members:
+   :undoc-members:
+   :special-members: __call__
