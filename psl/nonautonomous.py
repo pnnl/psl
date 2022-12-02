@@ -9,9 +9,10 @@ import inspect, sys
 import warnings
 warnings.filterwarnings("ignore")
 from scipy.integrate import odeint
-
+from tqdm.auto import tqdm
 from psl.emulator import EmulatorBase
 from psl.perturb import Steps, Step, SplineSignal, Periodic, RandomWalk
+from tqdm.auto import tqdm
 
 
 class ODE_NonAutonomous(EmulatorBase):
@@ -19,7 +20,7 @@ class ODE_NonAutonomous(EmulatorBase):
     base class autonomous ODE
     """
 
-    def simulate(self, U=None, ninit=None, nsim=None, ts=None, x0=None):
+    def simulate(self, U=None, ninit=None, nsim=None, Time=None, ts=None, x0=None, show_progress=False):
         """
         :param nsim: (int) Number of steps for open loop response
         :param ninit: (float) initial simulation time
@@ -35,25 +36,29 @@ class ODE_NonAutonomous(EmulatorBase):
             ts = self.ts
         if U is None:
             U = self.U
-
+        if Time is None:
+            Time = np.arange(0, nsim+1) * ts + ninit
         if x0 is None:
             x = self.x0
         else:
-            assert x0.shape[0] == self.nx, "Mismatch in x0 size"
+            assert x0.shape[0] % self.nx == 0, "Mismatch in x0 size"
             x = x0
-        t = np.arange(0, nsim+1) * ts + ninit
         X = [x]
         N = 0
-        for u in U:
-            dT = [t[N], t[N + 1]]
+        simrange = tqdm(U) if show_progress else U
+        for u in simrange:
+            if len(Time) == 1:
+                dT = [Time[0], Time[0]+ts]
+            else:
+                dT = [Time[N], Time[N + 1]]
             xdot = odeint(self.equations, x, dT, args=(u,))
             x = xdot[-1]
             X.append(x)
             N += 1
-            if N == nsim-1:
+            if N == nsim:
                 break
-        Yout = np.asarray(X).reshape(nsim, -1)
-        Uout = np.asarray(U).reshape(nsim, -1)
+        Yout = np.asarray(X).reshape(nsim+1, -1)
+        Uout = U.reshape(nsim, -1)
         return {'Y': Yout, 'U': Uout, 'X': np.asarray(X)}
 
 
@@ -201,22 +206,22 @@ class TwoTank(ODE_NonAutonomous):
     + https://apmonitor.com/do/index.php/Main/LevelControl
     """
 
-    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+    def __init__(self, nsim=1001, ninit=0, ts=1., seed=59):
         super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
-        self.ts = 1
+        self.ts = ts
         self.c1 = 0.08  # inlet valve coefficient
         self.c2 = 0.04  # tank outlet coefficient
 
         self.x0 = np.asarray([0, 0])
-        self.U = self.get_U(self.nsim)
+        self.U = self.get_U(self.nsim, self.ts)
         self.nu = 2
         self.nx = 2
 
-    def get_U(self, nsim):
+    def get_U(self, nsim, ts):
         pump = Steps(nx=1, nsim=nsim, values=None,
-                     randsteps=int(np.ceil(nsim / 200)), xmax=0.5, xmin=0)
+                     randsteps=int(np.ceil(ts*nsim/300)), xmax=0.5, xmin=0)
         valve = Steps(nx=1, nsim=nsim, values=None,
-                      randsteps=int(np.ceil(nsim / 300)), xmax=0.4, xmin=0)
+                      randsteps=int(np.ceil(ts*nsim/420)), xmax=0.4, xmin=0)
         return np.vstack([pump.T, valve.T]).T
 
     def equations(self, x, t, u):
@@ -494,7 +499,7 @@ class UAV3D_reduced(ODE_NonAutonomous):
 
         return dx_dt
 
-      
+
 class UAV3D_dyn(ODE_NonAutonomous):
     """
     UAV dynamic guidance model with no wind
@@ -554,7 +559,7 @@ class UAV3D_dyn(ODE_NonAutonomous):
 
         return dx_dt
 
-      
+
 """
 Chaotic nonlinear ODEs 
 
@@ -946,8 +951,8 @@ class Iver_dyn_simplified_output(ODE_NonAutonomous):
     with non-kinematic output
     """
 
-    # parameters of the dynamical system
-    def parameters(self):
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=3):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 9    # Number of states (including actuator dynamics)
         self.nu = 3    # Number of control inputs
         self.ts = 0.1
@@ -1111,6 +1116,116 @@ class SwingEquation(ODE_NonAutonomous):
 
         dx_dt = [self.ws * domega, (Pm - Pmax * np.sin(delta) - self.D * domega) / self.M]
         return dx_dt
+
+
+class DuffingControl(ODE_NonAutonomous):
+    """
+    Duffing equation with driving force as a function of control inputs not time
+    + https://en.wikipedia.org/wiki/Duffing_equation
+    """
+
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
+        self.delta = 0.02
+        self.alpha = 1
+        self.beta = 5
+        self.gamma = 8
+        self.omega = 0.5
+        self.x0 = [1.0, 0.0]
+        self.nx = 2
+        self.nu = 1
+        self.U = np.cos([np.arange(0., nsim) * ts]).T
+
+    def equations(self, x, t, u):
+        dx1 = x[1]
+        dx2 = - self.delta*x[1] - self.alpha*x[0] - self.beta*x[0]**3 + \
+              self.gamma*np.cos(self.omega*u[0])
+        dx = [dx1, dx2]
+        return dx
+
+
+class VanDerPolControl(ODE_NonAutonomous):
+    """
+    Van der Pol oscillator
+
+    + https://en.wikipedia.org/wiki/Van_der_Pol_oscillator
+    + http://kitchingroup.cheme.cmu.edu/blog/2013/02/02/Solving-a-second-order-ode/
+    + section V.A in: https://arxiv.org/abs/2203.14114
+    """
+
+    def __init__(self, nsim=1001, ninit=0, ts=0.02, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
+        self.mu = 1.0
+        # self.x0 = [1, 2]
+        self.x0 = np.random.randn(2)
+        self.nx = 2
+        self.nu = 1
+        self.U = np.cos([np.arange(0., nsim) * ts]).T
+
+    def equations(self, x, t, u):
+        dx1 = x[1]
+        dx2 = self.mu*(1 - x[0]**2)*x[1] - x[0] + u[0]
+        dx = [dx1, dx2]
+        return dx
+
+
+class ThomasAttractorControl(ODE_NonAutonomous):
+    """
+    Thomas' cyclically symmetric attractor
+    control input: dissipativity parameter b
+
+    + https://en.wikipedia.org/wiki/Thomas%27_cyclically_symmetric_attractor
+    """
+
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
+        self.b = 0.208186    # chaos starts at this parameter point
+        self.x0 = [1, -1, 1]
+        self.nx = 3
+        self.nu = 1
+        self.U = self.get_U(nsim)
+
+    def get_U(self, nsim):
+        return Steps(nx=1, nsim=nsim, values=[0.208186, 0.3289, 0.5, 1.0],
+                    randsteps=int(np.ceil(nsim / 200)), xmax=1.0, xmin=0.)
+
+    def equations(self, x, t, u):
+        b = u[0]
+        dx1 = np.sin(x[1]) - b*x[0]
+        dx2 = np.sin(x[2]) - b*x[1]
+        dx3 = np.sin(x[0]) - b*x[2]
+        dx = [dx1, dx2, dx3]
+        return dx
+
+
+class ChuaCircuitControl(ODE_NonAutonomous):
+    """
+    Chua's circuit
+
+    + https://en.wikipedia.org/wiki/Chua%27s_circuit
+    + https://www.chuacircuits.com/matlabsim.php
+    """
+
+    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+        super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
+        self.a = 15.6
+        self.b = 28.0
+        self.m0 = -1.143
+        self.m1 = -0.714
+        self.x0 = [0.7, 0.0, 0.0]
+        self.nx = 3
+        self.nu = 3
+        # self.U = np.zeros([nsim, self.nu])
+        self.U = np.random.rand(nsim, self.nu)
+
+    def equations(self, x, t, u):
+        fx = self.m1*x[0] + 0.5*(self.m0 - self.m1)*(np.abs(x[0] + 1) - np.abs(x[0] - 1))
+        dx1 = self.a*(x[1] - x[0] - fx) - u[0]
+        dx2 = x[0] - x[1] + x[2] - u[1]
+        dx3 = -self.b*x[1] - u[2]
+        dx = [dx1, dx2, dx3]
+        return dx
+
 
 systems = dict(inspect.getmembers(sys.modules[__name__], lambda x: inspect.isclass(x)))
 systems = {k: v for k, v in systems.items() if issubclass(v, ODE_NonAutonomous) and v is not ODE_NonAutonomous}

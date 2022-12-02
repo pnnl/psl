@@ -18,7 +18,7 @@ class SSM(EmulatorBase):
         self.y_ss = 0.
         self.x0 = 0.
 
-    def simulate(self, ninit=None, nsim=None, U=None, D=None, x0=None):
+    def simulate(self, ninit=None, nsim=None, U=None, D=None, x0=None, Time=None):
         """
         :param nsim: (int) Number of steps for open loop response
         :param U: (ndarray, shape=(nsim, self.nu)) control signals
@@ -39,17 +39,23 @@ class SSM(EmulatorBase):
             D = self.D[ninit: ninit + nsim, :] if self.D is not None else None
         if U is None:
             U = self.U[ninit: ninit + nsim, :] if self.U is not None else None
-        X, Y = [], []
+        X, Y = [x+self.x_ss], []
         for k in range(nsim):
             u = U[k, :] if U is not None else None
             d = D[k, :] if D is not None else None
             x, y = self.equations(x, u, d)
             X.append(x + self.x_ss)
             Y.append(y - self.y_ss)
-        Xout = np.asarray(X).reshape(nsim, self.nx)
-        Yout = np.asarray(Y).reshape(nsim, self.ny)
+        Xout = np.asarray(X).reshape(nsim+1, -1)
+        Yout = np.asarray(Y).reshape(nsim, -1)
         Uout = np.asarray(U).reshape(nsim, self.nu) if U is not None else None
-        Dout = np.asarray(D).reshape(nsim, self.nd) if D is not None else None
+        if D is not None:
+            if self.d_idx is not None:
+                Dout = np.asarray(D[:, self.d_idx]).reshape(nsim, len(self.d_idx)) - self.d_ss
+            else:
+                Dout = np.asarray(D).reshape(nsim, self.nd)
+        else:
+            Dout = None
         return {'X': Xout, 'Y': Yout, 'U': Uout, 'D': Dout}
 
 
@@ -68,15 +74,21 @@ class BuildingEnvelope(SSM):
                'RenoLight_ROM40', 'Old_full', 'Old_ROM40',
                'HollandschHuys_full', 'HollandschHuys_ROM100', 'Infrax_full', 'Infrax_ROM100']
 
+    T_dist_idx = {'Reno_full': [40], 'Reno_ROM40': [40],
+                  'RenoLight_full': [40], 'RenoLight_ROM40': [40],
+                  'Old_full': [40], 'Old_ROM40': [40],
+                  'HollandschHuys_full': [221], 'HollandschHuys_ROM100':  [221],
+                  'Infrax_full': [160], 'Infrax_ROM100': [160],
+                  'SimpleSingleZone': None}
+
     def path(self, system):
         return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'parameters/buildings', f'{system}.mat')
 
-    def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=True, seed=59):
+    def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=False, seed=59):
         super().__init__(nsim=nsim, ninit=ninit, seed=seed)
         self.system = system
         self.linear = linear  # if True use only linear building envelope model with Q as U
         file = loadmat(self.path(system))
-
         #  LTI SSM model
         self.A = file['Ad']
         self.B = file['Bd']
@@ -84,15 +96,22 @@ class BuildingEnvelope(SSM):
         self.E = file['Ed']
         self.G = file['Gd']
         self.F = file['Fd']
+        # problem dimensions
+        self.nx = self.A.shape[0]
+        self.ny = self.C.shape[0]
+        self.nq = self.B.shape[1]
+        self.nd = self.E.shape[1]
+        # observable disturbance index
+        self.d_idx = self.T_dist_idx[system]
         #  constraints bounds
         self.ts = file['Ts']  # sampling time
-        self.umax = file['umax'].squeeze()  # max heat per zone
-        self.umin = file['umin'].squeeze()  # min heat per zone
+        self.umax = file['umax'].squeeze()   # max heat per zone
+        self.umin = file['umin'].squeeze()   # min heat per zone
         if not self.linear:
             self.dT_max = file['dT_max']  # maximal temperature difference deg C
             self.dT_min = file['dT_min']  # minimal temperature difference deg C
-            self.mf_max = file['mf_max'].squeeze()  # maximal nominal mass flow l/h
-            self.mf_min = file['mf_min'].squeeze()  # minimal nominal mass flow l/h
+            self.mf_max = file['mf_max'].reshape(self.nq,)  # maximal nominal mass flow l/h
+            self.mf_min = file['mf_min'].reshape(self.nq,)  # minimal nominal mass flow l/h
             #   heat flow equation constants
             self.rho = 0.997  # density  of water kg/1l
             self.cp = 4185.5  # specific heat capacity of water J/(kg/K)
@@ -101,10 +120,7 @@ class BuildingEnvelope(SSM):
         self.type = file['type']
         self.HC_system = file['HC_system']
 
-        self.nx = self.A.shape[0]
-        self.ny = self.C.shape[0]
-        self.nq = self.B.shape[1]
-        self.nd = self.E.shape[1]
+
         if self.linear:
             self.nu = self.nq
         else:
@@ -120,8 +136,9 @@ class BuildingEnvelope(SSM):
         #  steady states - linearization offsets
         self.x_ss = file['x_ss']
         self.y_ss = file['y_ss']
+        self.d_ss = np.asarray([273.15])
         self.ninit = 0
-        self.nsim = np.min([8640, self.D.shape[0]])
+        self.nsim = np.min([nsim, self.D.shape[0]])
         self.U = self.get_U(self.nsim)
 
     def get_U(self, nsim):

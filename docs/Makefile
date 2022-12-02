@@ -6,7 +6,7 @@ SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 SPHINXPROJ    = PSL
 SOURCEDIR     = .
-BUILDDIR      = ../../docs
+BUILDDIR      = ../../psl_docs
 PDFBUILDDIR   = /tmp
 PDF           = ../manual.pdf
 

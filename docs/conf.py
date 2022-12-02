@@ -53,8 +53,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'PSL'
-copyright = '2021, Aaron Tuor, Elliott Skomski, Jan Drgona, Soumya Vasisht'
-author = 'Aaron Tuor, Elliott Skomski, Jan Drgona, Soumya Vasisht'
+copyright = '2022, Aaron Tuor, Mia Skomski, Jan Drgona, Soumya Vasisht'
+author = 'Aaron Tuor, Mia Skomski, Jan Drgona, Soumya Vasisht'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

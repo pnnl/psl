@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import pyts.image as pytsimg
 import pyts.multivariate.image as pytsmvimg
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 
 
 def get_colors(k):
@@ -28,7 +29,7 @@ def get_colors(k):
     return rgb_cycle
 
 
-def pltPhase(X, figname=None):
+def pltPhase(X, Xtrain=None, figname=None):
     """
     plot phase space for 2D and 3D state spaces
 
@@ -40,14 +41,18 @@ def pltPhase(X, figname=None):
     """
     fig = plt.figure()
     if X.shape[1] >= 3:
-        ax = fig.gca(projection='3d')
+        ax = fig.add_subplot(projection='3d')
         ax.plot(X[:, 0], X[:, 1], X[:, 2])
+        if Xtrain is not None:
+            ax.plot(Xtrain[:, 0], Xtrain[:, 1], Xtrain[:, 2], '--')
         ax.set_xlabel('$x_1$')
         ax.set_ylabel('$x_2$')
         ax.set_zlabel('$x_3$')
     elif X.shape[1] == 2:
         plt.plot(X[:, 0], X[:, 1])
         plt.plot(X[0, 0], X[0, 1], 'ro')
+        if Xtrain is not None:
+            plt.plot(Xtrain[:, 0], Xtrain[:, 1], '--')
         plt.xlabel('$x_1$')
         plt.ylabel('$x_2$')
     plt.tight_layout()
@@ -174,19 +179,67 @@ def pltOL(Y, Ytrain=None, U=None, D=None, X=None, figname=None):
                     Line2D([0], [0], color='gray', lw=4, linestyle='--')]
     for j, (name, notation, array) in enumerate(plot_setup):
         if notation == 'Y' and Ytrain is not None:
-            colors = get_colors(array.shape[1])
+            colors = get_colors(array.shape[1]+1)
             for k in range(array.shape[1]):
-                ax[j, 0].plot(Ytrain[:, k], '--', linewidth=3, c=colors[k])
-                ax[j, 0].plot(array[:, k], '-', linewidth=3, c=colors[k])
+                ax[j, 0].plot(Ytrain[:, k], '--', linewidth=2, c=colors[k])
+                ax[j, 0].plot(array[:, k], '-', linewidth=2, c=colors[k])
                 ax[j, 0].legend(custom_lines, ['True', 'Pred'])
         else:
-            ax[j, 0].plot(array, linewidth=3)
+            ax[j, 0].plot(array, linewidth=2)
         ax[j, 0].grid(True)
-        ax[j, 0].set_title(name, fontsize=24)
-        ax[j, 0].set_xlabel('Time', fontsize=24)
-        ax[j, 0].set_ylabel(notation, fontsize=24)
-        ax[j, 0].tick_params(axis='x', labelsize=22)
-        ax[j, 0].tick_params(axis='y', labelsize=22)
+        ax[j, 0].set_title(name, fontsize=14)
+        ax[j, 0].set_xlabel('Time', fontsize=14)
+        ax[j, 0].set_ylabel(notation, fontsize=14)
+        ax[j, 0].tick_params(axis='x', labelsize=14)
+        ax[j, 0].tick_params(axis='y', labelsize=14)
+    plt.tight_layout()
+    if figname is not None:
+        plt.savefig(figname)
+
+
+def pltCL(Y, U=None, D=None, X=None, R=None,
+          Ymin=None, Ymax=None, Umin=None, Umax=None, figname=None):
+    """
+    plot trained open loop dataset
+    Ytrue: ground truth training signal
+    Ytrain: trained model response
+    """
+
+    plot_setup = [(name, notation, array) for
+                  name, notation, array in
+                  zip(['Outputs', 'States', 'Inputs', 'Disturbances'],
+                      ['Y', 'X', 'U', 'D'], [Y, X, U, D]) if
+                  array is not None]
+
+    fig, ax = plt.subplots(nrows=len(plot_setup), ncols=1, figsize=(20, 16), squeeze=False)
+    custom_lines = [Line2D([0], [0], color='gray', lw=4, linestyle='-'),
+                    Line2D([0], [0], color='gray', lw=4, linestyle='--')]
+    for j, (name, notation, array) in enumerate(plot_setup):
+        if notation == 'Y':
+            if R is not None:
+                colors = get_colors(array.shape[1]+1)
+                for k in range(array.shape[1]):
+                    ax[j, 0].plot(array[:, k], '-', linewidth=2, c=colors[k])
+                ax[j, 0].plot(R, '--', linewidth=2, c='black')
+                ax[j, 0].legend(custom_lines, ['Ref', 'Y'])
+            else:
+                ax[j, 0].plot(array, linewidth=2)
+            if Ymax is not None:
+                ax[j, 0].plot(Ymax, '--', linewidth=2, c='red')
+            if Ymin is not None:
+                ax[j, 0].plot(Ymin, '--', linewidth=2, c='red')
+        else:
+            ax[j, 0].plot(array, linewidth=2)
+            if notation == 'U' and Umax is not None:
+                ax[j, 0].plot(Umax, '--', linewidth=2, c='red')
+            if notation == 'U' and Umin is not None:
+                ax[j, 0].plot(Umin, '--', linewidth=2, c='red')
+        ax[j, 0].grid(True)
+        ax[j, 0].set_title(name, fontsize=14)
+        ax[j, 0].set_xlabel('Time', fontsize=14)
+        ax[j, 0].set_ylabel(notation, fontsize=14)
+        ax[j, 0].tick_params(axis='x', labelsize=14)
+        ax[j, 0].tick_params(axis='y', labelsize=14)
     plt.tight_layout()
     if figname is not None:
         plt.savefig(figname)

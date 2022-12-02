@@ -122,7 +122,7 @@ def Steps(nx=1, nsim=100, values=None, randsteps=5, xmax=1, xmin=0, rseed=1):
     return signal.T
 
 
-def sawtooth(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, rseed=1):
+def Sawtooth(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, rseed=1):
     """
     ramp change
     :param nx: (int) Number signals
@@ -187,6 +187,8 @@ def Periodic(nx=1, nsim=100, numPeriods=1, xmax=1, xmin=0, form='sin', rseed=1):
             base = xmin[k] + (xmax[k] - xmin[k])*(0.5 + 0.5 * np.sin(np.arange(0, 2 * np.pi, 2 * np.pi / samples_period)))
         elif form == 'cos':
             base = xmin[k] + (xmax[k] - xmin[k])*(0.5 + 0.5 * np.cos(np.arange(0, 2 * np.pi, 2 * np.pi / samples_period)))
+        elif form == 'square':
+            base = xmin[k] + (xmax[k] - xmin[k])*(0.5 + 0.5 * sig.square(np.arange(0, 2*np.pi, 2*np.pi / samples_period)))
         signal = np.tile(base, numPeriods+extraPeriods)
         signal = np.append(signal, base[0:leftover])
         Signal.append(signal)
