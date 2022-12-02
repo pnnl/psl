@@ -14,19 +14,19 @@ def multidim(is_autonomous):
         ode._simulate = ode.simulate
         
         if is_autonomous:
-            def sim_dec(self, ninit=None, nsim=None, ts=None, x0=None, show_progress=False):
+            def sim_dec(self, ninit=None, nsim=None, Time=None, ts=None, x0=None, show_progress=False):
                 x0 = x0 if x0 is not None else self.x0
                 shape = x0.shape
-                out = ode._simulate(self, ninit, nsim, ts, x0.ravel(), show_progress)
+                out = ode._simulate(self, ninit, nsim, Time, ts, x0.ravel(), show_progress)
                 out['Y'].shape = (-1,) + shape
                 out['X'].shape = (-1,) + shape
                 return out
-        else:#if issubclass(type(ode), Coupled_NonAutonomous):
-            def sim_dec(self, U=None, ninit=None, nsim=None, ts=None, x0=None, show_progress=False):
+        else:
+            def sim_dec(self, U=None, ninit=None, nsim=None, Time=None, ts=None, x0=None, show_progress=False):
                 print(type(self))
                 x0 = x0 if x0 is not None else self.x0
                 shape = x0.shape
-                out = ode._simulate(self, U, ninit, nsim, ts, x0.ravel(), show_progress)
+                out = ode._simulate(self, U, ninit, nsim, Time, ts, x0.ravel(), show_progress)
                 out['Y'].shape = (-1,) + shape
                 out['X'].shape = (-1,) + shape
                 return out
@@ -74,9 +74,6 @@ class Coupled_ODE(ODE_Autonomous):
         dx = np.zeros_like(x)
         np.add.at(dx, self.adj_list[0], messages)
         return dx
-
-    def simulate(self, ninit=None, nsim=None, ts=None, x0=None, show_progress=False):
-        return super().simulate(ninit, nsim, ts, x0, show_progress)
     
 class Coupled_NonAutonomous(ODE_NonAutonomous):
     def __init__(self, nsim=1001, ninit=0, ts=0.1, adj=None, nx=1, seed=59):
@@ -111,6 +108,7 @@ class Coupled_NonAutonomous(ODE_NonAutonomous):
         :param u: Control Variables
         """
         pass
+
  
 
 class RC_Network(Coupled_NonAutonomous):
