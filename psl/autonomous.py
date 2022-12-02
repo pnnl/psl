@@ -15,6 +15,7 @@ import inspect, sys
 
 from psl.emulator import EmulatorBase
 from scipy.integrate import odeint
+from tqdm.auto import tqdm
 
 
 class ODE_Autonomous(EmulatorBase):
@@ -22,7 +23,8 @@ class ODE_Autonomous(EmulatorBase):
     base class autonomous ODE
     """
 
-    def simulate(self, ninit=None, nsim=None, ts=None, x0=None):
+    def simulate(self, ninit=None, nsim=None, Time=None, ts=None, x0=None, show_progress=False):
+
         """
         :param nsim: (int) Number of steps for open loop response
         :param ninit: (float) initial simulation time
@@ -37,20 +39,24 @@ class ODE_Autonomous(EmulatorBase):
             nsim = self.nsim
         if ts is None:
             ts = self.ts
-
+        if Time is None:
+            Time = np.arange(0, nsim+1) * ts + ninit
         if x0 is None:
             x = self.x0
         else:
-            assert x0.shape[0] == self.nx, "Mismatch in x0 size"
+            assert x0.shape[0] % self.nx == 0, "Mismatch in x0 size"
             x = x0
-        t = np.arange(0, nsim+1) * ts + ninit
         X = [x]
-        for N in range(nsim-1):
-            dT = [t[N], t[N + 1]]
+        simrange = tqdm(range(nsim)) if show_progress else range(nsim)
+        for N in simrange:
+            if len(Time) == 1:
+                dT = [Time[0], Time[0]+ts]
+            else:
+                dT = [Time[N], Time[N + 1]]
             xdot = odeint(self.equations, x, dT)
             x = xdot[-1]
             X.append(x)
-        Yout = np.asarray(X).reshape(nsim, -1)
+        Yout = np.asarray(X).reshape(nsim+1, -1)
         return {'Y': Yout, 'X': np.asarray(X)}
 
 
@@ -325,7 +331,7 @@ class Duffing(ODE_Autonomous):
     + https://en.wikipedia.org/wiki/Duffing_equation
     """
 
-    def __init__(self, nsim=1001, ninit=0, ts=0.1, seed=59):
+    def __init__(self, nsim=3001, ninit=0, ts=0.01, seed=59):
         super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.delta = 0.02
         self.alpha = 1

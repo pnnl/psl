@@ -1,10 +1,15 @@
-# PSL: Python Systems Library
+# PSL: Python Systems Library v1.2
 
-## [Complete documentation](https://pnnl.github.io/psl/)
+PSL is a minimalistic library for simulating dynamical systems in Python
+using [SciPy](https://scipy.org/) library.
 
-### TODO
-    [ ] include Nonlinear PDEs - https://en.wikipedia.org/wiki/List_of_nonlinear_partial_differential_equations
-    [ ] Fractals, Cellular automata
+Authors: Jan Drgona, Aaron Tuor, Stefan Dernbach, 
+James Koch, Soumya Vasisht, Wenceslao Shaw Cortez, Draguna Vrabie
+
+
+## Documentation
+
+See online [Documentation](https://pnnl.github.io/psl/).
 
 ## Setup
 
@@ -15,4 +20,25 @@ $ conda activate psl
 (psl) $ conda install scipy
 (psl) $ conda install matplotlib
 (psl) $ pip install pyts
+(psl) $ pip install tqdm
 ```
+
+## Syntax and Use
+```python
+import psl
+# instantiate selected dynamical system model
+model = psl.systems['Duffing'](ts=0.01)
+# simulate the dynamical system over nsim steps
+out = model.simulate(nsim=2000)
+# plot time series and phase portrait 
+psl.plot.pltOL(Y=out['Y'], X=out['X'])
+psl.plot.pltPhase(X=out['Y'])
+```
+
+![Duffing_time_series](figs/Duffing_time_series.png)
+![Duffing_phase](figs/Duffing_phase.png)
+
+## Examples
+
+See folder [tests](/tests).
+

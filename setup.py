@@ -2,6 +2,7 @@ from setuptools import setup
 
 setup(
     name="psl",
+    version="1.2",
     description="dynamic Systems Library in Python",
     license="MIT",
     author="Aaron Tuor, Jan Drgona, Elliott Skomski, Soumya Vasisht",

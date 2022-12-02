@@ -1,6 +1,7 @@
 import psl.autonomous as auto
 import psl.nonautonomous as nauto
 import psl.ssm as ssm
+import psl.coupled_systems as cs
 import psl.emulator as emulator
 import psl.plot as plot
 from psl.perturb import *
@@ -36,6 +37,6 @@ datasets = {
     }.items()
 }
 
-systems = {**auto.systems, **nauto.systems, **ssm.systems}
+systems = {**auto.systems, **nauto.systems, **ssm.systems, **cs.systems}
 emulators = systems
 
