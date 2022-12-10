@@ -84,7 +84,7 @@ class BuildingEnvelope(SSM):
     def path(self, system):
         return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'parameters/buildings', f'{system}.mat')
 
-    def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=False, seed=59):
+    def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=True, seed=59):
         super().__init__(nsim=nsim, ninit=ninit, seed=seed)
         self.system = system
         self.linear = linear  # if True use only linear building envelope model with Q as U
