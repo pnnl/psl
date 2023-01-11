@@ -66,9 +66,6 @@ class BuildingEnvelope(SSM):
     different building types are stored in ./emulators/buildings/*.mat
     documentation about the building systems is stored in ./emulators/buildings/building_type/*
     models obtained from:
-
-    + https://github.com/drgona/BeSim
-
     """
     systems = ['SimpleSingleZone', 'Reno_full', 'Reno_ROM40', 'RenoLight_full',
                'RenoLight_ROM40', 'Old_full', 'Old_ROM40',
