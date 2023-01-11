@@ -86,6 +86,7 @@ class BuildingEnvelope(SSM):
 
     def __init__(self, nsim=1000, ninit=1000, system='Reno_full', linear=True, seed=59):
         super().__init__(nsim=nsim, ninit=ninit, seed=seed)
+        self.seed = seed
         self.system = system
         self.linear = linear  # if True use only linear building envelope model with Q as U
         file = loadmat(self.path(system))
@@ -141,13 +142,19 @@ class BuildingEnvelope(SSM):
         self.nsim = np.min([nsim, self.D.shape[0]])
         self.U = self.get_U(self.nsim)
 
-    def get_U(self, nsim):
+    def get_U(self, nsim, rseed=1):
         if self.linear:
-            return Periodic(nx=self.nu, nsim=nsim, numPeriods=21, xmax=self.umax/2, xmin=self.umin, form='sin')
+            return Periodic(nx=self.nu, nsim=nsim, numPeriods=21, xmax=self.umax/2, xmin=self.umin, form='sin', rseed=rseed).astype(np.float32)
         else:
-            self.M_flow = self.mf_max/2+RandomWalk(nx=self.n_mf, nsim=nsim, xmax=self.mf_max/2, xmin=self.mf_min, sigma=0.05)
-            self.DT = RandomWalk(nx=self.n_dT, nsim=nsim, xmax=self.dT_max*0.6, xmin=self.dT_min, sigma=0.05)
-            return np.hstack([self.M_flow, self.DT])
+            self.M_flow = self.mf_max/2+RandomWalk(nx=self.n_mf, nsim=nsim, xmax=self.mf_max/2, xmin=self.mf_min, sigma=0.05, rseed=rseed)
+            self.DT = RandomWalk(nx=self.n_dT, nsim=nsim, xmax=self.dT_max*0.6, xmin=self.dT_min, sigma=0.05, rseed=rsead)
+            return np.hstack([self.M_flow, self.DT]).astype(np.float32)
+
+    def get_x0(self, rand=False):
+        if rand:
+            return np.random.uniform(low=-20, high=5, size=self.nx).astype(np.float32)
+        else:
+            return np.zeros(self.nx, dtype=np.float32)
 
     def equations(self, x, u, d):
         if self.linear:
@@ -159,5 +166,6 @@ class BuildingEnvelope(SSM):
         x = np.matmul(self.A, x) + np.matmul(self.B, q) + np.matmul(self.E, d) + self.G.ravel()
         y = np.matmul(self.C, x) + self.F.ravel()
         return x, y
+
 
 systems = {k: BuildingEnvelope for k in BuildingEnvelope.systems}
