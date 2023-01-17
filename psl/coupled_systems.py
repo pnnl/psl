@@ -23,7 +23,6 @@ def multidim(is_autonomous):
                 return out
         else:
             def sim_dec(self, U=None, ninit=None, nsim=None, Time=None, ts=None, x0=None, show_progress=False):
-                print(type(self))
                 x0 = x0 if x0 is not None else self.x0
                 shape = x0.shape
                 out = ode._simulate(self, U, ninit, nsim, Time, ts, x0.ravel(), show_progress)
@@ -110,7 +109,7 @@ class Coupled_NonAutonomous(ODE_NonAutonomous):
         pass
 
  
-
+ 
 class RC_Network(Coupled_NonAutonomous):
     def __init__(self, R = None, C = None, U=None, nsim=1001, ninit=0, ts=0.1, adj=None, nx=2, seed=59):
         """_summary_
@@ -125,10 +124,11 @@ class RC_Network(Coupled_NonAutonomous):
         :param seed: seed for random number generator, defaults to 59
         """
         super().__init__(nsim, ninit, ts, adj, nx, seed)
-        self.R = R if R is not None else self.get_R(self.adj_list.shape[1], amax=20, amin=5)
+        self.R = R if R is not None else self.get_R(
+            self.adj_list, amax=20, amin=5, symmetric=True)
         self.C = C if C is not None else self.get_C(nx)
         self.U = U if U is not None else self.get_U(nsim, nx)
-        self.R_ext = self.get_R(nx, amax=15)
+        self.R_ext = self.get_R(np.tile(np.arange(nx),(2,1)), amax=15, symmetric=False)
         
     def get_U(self, nsim, nx, periods = None):
         if periods is None:
@@ -137,9 +137,14 @@ class RC_Network(Coupled_NonAutonomous):
         ind_sources = Periodic(nx=nx, nsim=nsim, form = 'square', numPeriods=periods, xmax=294, xmin = 0)
         return np.hstack([global_source,ind_sources])
 
-    def get_R(self, num=1, Rval=3.5, amax=20, amin=0):
+    def get_R(self, adj_list, Rval=3.5, amax=20, amin=0, symmetric=True):
         #Default Rval is fiberglass insulation
+        num = adj_list.shape[1]
         m2 = np.random.rand(num) * (amax-amin) + amin #surface area
+        if symmetric:
+            edge_map = {(i,j) : idx for idx, (i,j) in enumerate(adj_list.T)}
+            edge_map = [edge_map[(d, s)] for (s,d) in adj_list.T]
+            m2 = (m2 + m2[edge_map]) / 2.0  
         m2 = np.maximum(m2, 0.0000001)
         R = Rval / m2
         return R
@@ -155,7 +160,7 @@ class RC_Network(Coupled_NonAutonomous):
     def message_passing(self, receivers, senders, t, u):
         R = self.R        
         if type(self.C) is np.ndarray:
-            C = C = self.C[self.adj_list[0]]
+            C = self.C[self.adj_list[0]]
         else:
             C = self.C
         messages = (1.0 / (R*C)) * (senders - receivers)
@@ -205,12 +210,8 @@ class Gravitational_System(Coupled_ODE):
         dx = np.zeros_like(x)
         acc = np.zeros((x.shape[0],2))
         np.add.at(acc, self.adj_list[0], messages)
-        #print('acc',acc)
         dx[:, self.vel_idx] = acc
-        #print('vel',x[:, self.vel_idx])
         dx[:, self.pos_idx] = x[:, self.vel_idx]
-        #print('dx',dx)
-        #print(dx)
         return dx
 
 @multidim(True)
@@ -260,7 +261,6 @@ class Boids(Coupled_ODE):
             s=adj[:,1]
             u, n = np.unique(r, return_counts=True)
             if len(u) < len(pos):
-                print(d2.diagonal(),self.visual_range)
                 return np.zeros_like(x)
             n = np.maximum(n[:,np.newaxis] -1, 1)
         

@@ -1,7 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from IPython.display import HTML
 from psl.coupled_systems import *
 
 #RC Network
