@@ -76,7 +76,7 @@ class BuildingEnvelope(SSM):
                   'Old_full': [40], 'Old_ROM40': [40],
                   'HollandschHuys_full': [221], 'HollandschHuys_ROM100':  [221],
                   'Infrax_full': [160], 'Infrax_ROM100': [160],
-                  'SimpleSingleZone': None}
+                  'SimpleSingleZone': [0]}
 
     def path(self, system):
         return os.path.join(os.path.dirname(os.path.abspath(__file__)), 'parameters/buildings', f'{system}.mat')
@@ -134,7 +134,10 @@ class BuildingEnvelope(SSM):
         #  steady states - linearization offsets
         self.x_ss = file['x_ss']
         self.y_ss = file['y_ss']
-        self.d_ss = np.asarray([273.15])
+        if self.system != 'SimpleSingleZone':
+            self.d_ss = np.asarray([273.15])
+        else:
+            self.d_ss = np.asarray([0.0])
         self.ninit = 0
         self.nsim = np.min([nsim, self.D.shape[0]])
         self.U = self.get_U(self.nsim)
