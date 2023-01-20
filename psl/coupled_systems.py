@@ -5,7 +5,7 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from psl.autonomous import ODE_Autonomous
 from psl.nonautonomous import ODE_NonAutonomous
-from psl.perturb import Periodic, Sawtooth
+from psl.perturb import Periodic, Sawtooth, WhiteNoise
 from sklearn.metrics.pairwise import euclidean_distances
 from tqdm.auto import tqdm
 
@@ -129,12 +129,19 @@ class RC_Network(Coupled_NonAutonomous):
         self.C = C if C is not None else self.get_C(nx)
         self.U = U if U is not None else self.get_U(nsim, nx)
         self.R_ext = self.get_R(np.tile(np.arange(nx),(2,1)), amax=15, symmetric=False)
+        self.R_int = self.get_R(np.tile(np.arange(nx),(2,1)), Rval=1.0, amax=15, symmetric=False)
+        self.x0 = (np.random.rand(nx) * (2)) + 279.15 
+        
+        self.R_extCi = (1.0 / (self.R_ext * self.C))
+        self.R_intCi = (1.0 / (self.R_int * self.C))
         
     def get_U(self, nsim, nx, periods = None):
         if periods is None:
-            periods = int(np.ceil(nsim / 2000))
-        global_source = Periodic(nsim=nsim, xmin=275.0, xmax=285.0)
-        ind_sources = Periodic(nx=nx, nsim=nsim, form = 'square', numPeriods=periods, xmax=294, xmin = 0)
+            periods = int(np.ceil(nsim / 500))
+        global_source = Periodic(nsim=nsim, xmin=275.0, xmax=285.0, numPeriods=48)
+        global_source += WhiteNoise(nsim=nsim, xmax=1, xmin=-1)
+        ind_sources = Periodic(nx=nx, nsim=nsim, numPeriods=periods, xmin = 275, xmax=285)
+        ind_sources += WhiteNoise(nx=nx, nsim=nsim, xmax=0.5, xmin=-0.5)
         return np.hstack([global_source,ind_sources])
 
     def get_R(self, adj_list, Rval=3.5, amax=20, amin=0, symmetric=True):
@@ -178,12 +185,11 @@ class RC_Network(Coupled_NonAutonomous):
         
         #Outside heat transfer
         deltas = external_source - x
-        dx += (1.0 / (self.R_ext * self.C)) * deltas
+        dx += self.R_extCi * deltas
         
         #Internal heat sources
         deltas = internal_sources - x
-        deltas[internal_sources==0] = 0
-        dx += (1.0 / self.C) * deltas
+        dx += self.R_intCi * deltas
         return dx
   
 @multidim(True)
