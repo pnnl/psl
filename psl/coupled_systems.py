@@ -109,7 +109,8 @@ class Coupled_NonAutonomous(ODE_NonAutonomous):
         pass
 
  
- 
+ #15.5 - 26.67
+ #60 - 80
 class RC_Network(Coupled_NonAutonomous):
     def __init__(self, R = None, C = None, U=None, nsim=1001, ninit=0, ts=0.1, adj=None, nx=2, seed=59):
         """_summary_
@@ -130,18 +131,27 @@ class RC_Network(Coupled_NonAutonomous):
         self.U = U if U is not None else self.get_U(nsim, nx)
         self.R_ext = self.get_R(np.tile(np.arange(nx),(2,1)), amax=15, symmetric=False)
         self.R_int = self.get_R(np.tile(np.arange(nx),(2,1)), Rval=1.0, amax=15, symmetric=False)
-        self.x0 = (np.random.rand(nx) * (2)) + 279.15 
+        self.x0 = self.get_x0(nx)
         
         self.R_extCi = (1.0 / (self.R_ext * self.C))
         self.R_intCi = (1.0 / (self.R_int * self.C))
-        
-    def get_U(self, nsim, nx, periods = None):
+     
+    def get_x0(self, nx = None, rseed=None):
+        if rseed is not None:
+            np.random.seed(rseed)
+        nx = nx if nx is not None else self.nx
+        x0 = (np.random.rand(nx) * (2)) + 279.15 
+        return x0
+
+    def get_U(self, nsim=None, nx=None, periods = None, rseed=1):
+        nsim = nsim if nsim is not None else self.nsim
+        nx = nx if nx is not None else self.nx
         if periods is None:
             periods = int(np.ceil(nsim / 500))
         global_source = Periodic(nsim=nsim, xmin=275.0, xmax=285.0, numPeriods=48)
-        global_source += WhiteNoise(nsim=nsim, xmax=1, xmin=-1)
+        global_source += WhiteNoise(nsim=nsim, xmax=1, xmin=-1, rseed=rseed)
         ind_sources = Periodic(nx=nx, nsim=nsim, numPeriods=periods, xmin = 275, xmax=285)
-        ind_sources += WhiteNoise(nx=nx, nsim=nsim, xmax=0.5, xmin=-0.5)
+        ind_sources += WhiteNoise(nx=nx, nsim=nsim, xmax=0.5, xmin=-0.5, rseed=rseed)
         return np.hstack([global_source,ind_sources])
 
     def get_R(self, adj_list, Rval=3.5, amax=20, amin=0, symmetric=True):
