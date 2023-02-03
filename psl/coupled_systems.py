@@ -108,15 +108,15 @@ class Coupled_NonAutonomous(ODE_NonAutonomous):
         """
         pass
 
- 
- #15.5 - 26.67
- #60 - 80
+#288.7 - 299.817
+ #00        40  50  60  80
+ #273.15 277.5 283 288 300
 class RC_Network(Coupled_NonAutonomous):
     def __init__(self, R = None, C = None, U=None, nsim=1001, ninit=0, ts=0.1, adj=None, nx=2, seed=59):
         """_summary_
 
         :param R: [float, np.array], Coupled Resistances
-        :param C:[float, np.array]. Room Capacitance
+        :param C: [float, np.array], Room Capacitance
         :param nsim: [int], length of simulation, defaults to 1001
         :param ninit: [int], starting time of simulation, defaults to 0
         :param ts: [float], rate of sampling, defaults to 0.1
@@ -140,17 +140,23 @@ class RC_Network(Coupled_NonAutonomous):
         if rseed is not None:
             np.random.seed(rseed)
         nx = nx if nx is not None else self.nx
-        x0 = (np.random.rand(nx) * (2)) + 279.15 
+        x0 = (np.random.rand(nx) * 12) + 288
         return x0
 
     def get_U(self, nsim=None, nx=None, periods = None, rseed=1):
+        period_length = 500
         nsim = nsim if nsim is not None else self.nsim
         nx = nx if nx is not None else self.nx
         if periods is None:
-            periods = int(np.ceil(nsim / 500))
-        global_source = Periodic(nsim=nsim, xmin=275.0, xmax=285.0, numPeriods=48)
+            periods = int(np.ceil(nsim / period_length))
+        global_source = Periodic(nsim=nsim, xmin=280.0, xmax=300.0, numPeriods=periods)
         global_source += WhiteNoise(nsim=nsim, xmax=1, xmin=-1, rseed=rseed)
-        ind_sources = Periodic(nx=nx, nsim=nsim, numPeriods=periods, xmin = 275, xmax=285)
+        
+        #Generate individual heat sources in each room, with random noise, and offset periods
+        ind_sources = Periodic(nx=nx, nsim=nsim+period_length, numPeriods=periods*2, xmin = 288, xmax=300)
+        offsets = np.random.randint(0,period_length,nx)
+        offsets = np.linspace(offsets, offsets + nsim-1, nsim, dtype=int)
+        ind_sources = np.take_along_axis(ind_sources, offsets, axis=0)
         ind_sources += WhiteNoise(nx=nx, nsim=nsim, xmax=0.5, xmin=-0.5, rseed=rseed)
         return np.hstack([global_source,ind_sources])
 

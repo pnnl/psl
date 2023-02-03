@@ -5,8 +5,7 @@ from psl.coupled_systems import *
 #RC Network
 adj = np.array([[0,1],[0,2],[0,3],[1,0],[1,3],[1,4],[2,0],[2,3],[3,0],[3,1],[3,2],[3,4],[4,1],[4,3]]).T
 network = RC_Network(nsim=10000, nx=5, adj=adj)
-x0 = (np.random.rand(5) * (10)) + 273
-sim = network.simulate(x0=x0, show_progress=True)
+sim = network.simulate(show_progress=True)
 
 fig, ax = plt.subplots(1,2)
 fig.text(0.5, 0.03, 'Time')
@@ -15,7 +14,7 @@ ax[0].plot(network.U[:,0])
 ax[0].set_title('Outdoor Temperature')
 ax[0].set_ylabel('Kelvin')
 ax[1].plot(network.U[:,1])
-ax[1].set_title('Internal Heat Source');
+ax[1].set_title('An Internal Heat Source');
 
 fig = plt.figure()
 fig.text(0.35, 0.9, 'Room Temperatures Over Time')
