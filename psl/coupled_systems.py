@@ -108,11 +108,8 @@ class Coupled_NonAutonomous(ODE_NonAutonomous):
         """
         pass
 
-#288.7 - 299.817
- #00        40  50  60  80
- #273.15 277.5 283 288 300
 class RC_Network(Coupled_NonAutonomous):
-    def __init__(self, R = None, C = None, U=None, nsim=1001, ninit=0, ts=0.1, adj=None, nx=2, seed=59):
+    def __init__(self, R = None, C = None, U=None, nsim=1001, ninit=0, ts=0.1, adj=None, nx=2, x0=None, seed=59):
         """_summary_
 
         :param R: [float, np.array], Coupled Resistances
@@ -131,7 +128,7 @@ class RC_Network(Coupled_NonAutonomous):
         self.U = U if U is not None else self.get_U(nsim, nx)
         self.R_ext = self.get_R(np.tile(np.arange(nx),(2,1)), amax=15, symmetric=False)
         self.R_int = self.get_R(np.tile(np.arange(nx),(2,1)), Rval=1.0, amax=15, symmetric=False)
-        self.x0 = self.get_x0(nx)
+        self.x0 = x0 if x0 is not None else self.get_x0(nx)
         
         self.R_extCi = (1.0 / (self.R_ext * self.C))
         self.R_intCi = (1.0 / (self.R_int * self.C))
@@ -207,16 +204,22 @@ class RC_Network(Coupled_NonAutonomous):
         deltas = internal_sources - x
         dx += self.R_intCi * deltas
         return dx
-  
+
+    @staticmethod
+    def make_5_room():
+        adj = np.array([[0,1],[0,2],[0,3],[1,0],[1,3],[1,4],[2,0],[2,3],[3,0],[3,1],[3,2],[3,4],[4,1],[4,3]]).T
+        return RC_Network(nsim=10000, nx=5, adj=adj)
+
 @multidim(True)
 class Gravitational_System(Coupled_ODE):
     mass_idx = [0]
     pos_idx = [1,2]
     vel_idx = [3,4]
         
-    def __init__(self, G=6.67e-11, nsim=1001, ninit=0, ts=0.1, adj=None, nx=1, seed=59):
+    def __init__(self, G=6.67e-11, nsim=10000, ninit=0, ts=0.1, adj=None, nx=4, seed=59, x0=None):
         super().__init__(nsim, ninit, ts, adj, nx, seed)
         self.G = G
+        self.x0 = x0 if x0 is not None else self.get_x0(nx)
 
     def message_passing(self, receivers, senders, t):
         #Assumes rows of the form [mass, x_pos, y_pos, x_vel, y_vel]
@@ -235,13 +238,34 @@ class Gravitational_System(Coupled_ODE):
         dx[:, self.vel_idx] = acc
         dx[:, self.pos_idx] = x[:, self.vel_idx]
         return dx
+    
+    def get_x0(self, nx = None, rseed=None):
+        if rseed is not None:
+            np.random.seed(rseed)
+        nx = nx if nx is not None else self.nx
+        x0 = np.random.rand(nx,5)
+        x0[:, self.mass_idx] *= 10
+        x0[:, self.pos_idx] *= 2
+        x0[:, self.vel_idx] *= 0.1
+        return x0
+    
+    @staticmethod
+    def make_4_body():
+        """
+        :returns: A system with 3 satelites orbiting one larger body
+        """
+        x0 = np.array([[1000000, 0, 0, 0, 0],
+         [1, 1, 0, 0, 8.167e-3],
+         [1, 0, 2, 4.0835e-3, 0],
+         [1, -1, -1, 4e-3, -4e-3]])
+        return Gravitational_System(x0=x0)
 
 @multidim(True)
 class Boids(Coupled_ODE):
     pos_idx = [0,1]
     vel_idx = [2,3]
     
-    def __init__(self, coherence=0.05, separation=0.01, alignment=0.05, avoidance_range = 0.2, visual_range=None, nsim=1001, ninit=0, ts=0.1, nx=1, seed=59):
+    def __init__(self, coherence=0.05, separation=0.01, alignment=0.05, avoidance_range = 0.2, visual_range=None, nsim=2000, ninit=0, ts=0.1, nx=50, x0=None, seed=59):
           super().__init__(nsim, ninit, ts, None, nx, seed)
           self.coherence = coherence
           self.separation = separation
@@ -251,6 +275,7 @@ class Boids(Coupled_ODE):
           
           self.max_speed = 0.03
           self.max_acc = 0.005
+          self.x0 = x0 if x0 is not None else self.get_x0(nx)
           
     def message_passing(self, receivers, senders, t):
         return senders-receivers
@@ -335,6 +360,15 @@ class Boids(Coupled_ODE):
 
         return np.hstack([vel, acc])        
     
+    def get_x0(self, nx=None, rseed=None):
+        if rseed is not None:
+            np.random.seed(rseed)
+        nx = nx if nx is not None else self.nx
+        pos_init = np.random.rand(nx,2) * 3 + np.array([[3,1]])
+        vel_init = np.random.rand(nx,2) * 0.06
+        x0 = np.hstack([pos_init,vel_init])
+        return x0
+         
 systems = {
     "RCNet" : RC_Network,
     "Gravitational": Gravitational_System,
