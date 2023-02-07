@@ -5,7 +5,7 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from psl.autonomous import ODE_Autonomous
 from psl.nonautonomous import ODE_NonAutonomous
-from psl.perturb import Periodic, Sawtooth
+from psl.perturb import Periodic, Sawtooth, WhiteNoise
 from sklearn.metrics.pairwise import euclidean_distances
 from tqdm.auto import tqdm
 
@@ -23,7 +23,6 @@ def multidim(is_autonomous):
                 return out
         else:
             def sim_dec(self, U=None, ninit=None, nsim=None, Time=None, ts=None, x0=None, show_progress=False):
-                print(type(self))
                 x0 = x0 if x0 is not None else self.x0
                 shape = x0.shape
                 out = ode._simulate(self, U, ninit, nsim, Time, ts, x0.ravel(), show_progress)
@@ -109,14 +108,12 @@ class Coupled_NonAutonomous(ODE_NonAutonomous):
         """
         pass
 
- 
-
 class RC_Network(Coupled_NonAutonomous):
-    def __init__(self, R = None, C = None, U=None, nsim=1001, ninit=0, ts=0.1, adj=None, nx=2, seed=59):
+    def __init__(self, R = None, C = None, U=None, nsim=1001, ninit=0, ts=0.1, adj=None, nx=2, x0=None, seed=59):
         """_summary_
 
         :param R: [float, np.array], Coupled Resistances
-        :param C:[float, np.array]. Room Capacitance
+        :param C: [float, np.array], Room Capacitance
         :param nsim: [int], length of simulation, defaults to 1001
         :param ninit: [int], starting time of simulation, defaults to 0
         :param ts: [float], rate of sampling, defaults to 0.1
@@ -125,21 +122,49 @@ class RC_Network(Coupled_NonAutonomous):
         :param seed: seed for random number generator, defaults to 59
         """
         super().__init__(nsim, ninit, ts, adj, nx, seed)
-        self.R = R if R is not None else self.get_R(self.adj_list.shape[1], amax=20, amin=5)
+        self.R = R if R is not None else self.get_R(
+            self.adj_list, amax=20, amin=5, symmetric=True)
         self.C = C if C is not None else self.get_C(nx)
         self.U = U if U is not None else self.get_U(nsim, nx)
-        self.R_ext = self.get_R(nx, amax=15)
+        self.R_ext = self.get_R(np.tile(np.arange(nx),(2,1)), amax=15, symmetric=False)
+        self.R_int = self.get_R(np.tile(np.arange(nx),(2,1)), Rval=1.0, amax=15, symmetric=False)
+        self.x0 = x0 if x0 is not None else self.get_x0(nx)
         
-    def get_U(self, nsim, nx, periods = None):
+        self.R_extCi = (1.0 / (self.R_ext * self.C))
+        self.R_intCi = (1.0 / (self.R_int * self.C))
+     
+    def get_x0(self, nx = None, rseed=None):
+        if rseed is not None:
+            np.random.seed(rseed)
+        nx = nx if nx is not None else self.nx
+        x0 = (np.random.rand(nx) * 12) + 288
+        return x0
+
+    def get_U(self, nsim=None, nx=None, periods = None, rseed=1):
+        period_length = 500
+        nsim = nsim if nsim is not None else self.nsim
+        nx = nx if nx is not None else self.nx
         if periods is None:
-            periods = int(np.ceil(nsim / 2000))
-        global_source = Periodic(nsim=nsim, xmin=275.0, xmax=285.0)
-        ind_sources = Periodic(nx=nx, nsim=nsim, form = 'square', numPeriods=periods, xmax=294, xmin = 0)
+            periods = int(np.ceil(nsim / period_length))
+        global_source = Periodic(nsim=nsim, xmin=280.0, xmax=300.0, numPeriods=periods)
+        global_source += WhiteNoise(nsim=nsim, xmax=1, xmin=-1, rseed=rseed)
+        
+        #Generate individual heat sources in each room, with random noise, and offset periods
+        ind_sources = Periodic(nx=nx, nsim=nsim+period_length, numPeriods=periods*2, xmin = 288, xmax=300)
+        offsets = np.random.randint(0,period_length,nx)
+        offsets = np.linspace(offsets, offsets + nsim-1, nsim, dtype=int)
+        ind_sources = np.take_along_axis(ind_sources, offsets, axis=0)
+        ind_sources += WhiteNoise(nx=nx, nsim=nsim, xmax=0.5, xmin=-0.5, rseed=rseed)
         return np.hstack([global_source,ind_sources])
 
-    def get_R(self, num=1, Rval=3.5, amax=20, amin=0):
+    def get_R(self, adj_list, Rval=3.5, amax=20, amin=0, symmetric=True):
         #Default Rval is fiberglass insulation
+        num = adj_list.shape[1]
         m2 = np.random.rand(num) * (amax-amin) + amin #surface area
+        if symmetric:
+            edge_map = {(i,j) : idx for idx, (i,j) in enumerate(adj_list.T)}
+            edge_map = [edge_map[(d, s)] for (s,d) in adj_list.T]
+            m2 = (m2 + m2[edge_map]) / 2.0  
         m2 = np.maximum(m2, 0.0000001)
         R = Rval / m2
         return R
@@ -155,7 +180,7 @@ class RC_Network(Coupled_NonAutonomous):
     def message_passing(self, receivers, senders, t, u):
         R = self.R        
         if type(self.C) is np.ndarray:
-            C = C = self.C[self.adj_list[0]]
+            C = self.C[self.adj_list[0]]
         else:
             C = self.C
         messages = (1.0 / (R*C)) * (senders - receivers)
@@ -173,23 +198,28 @@ class RC_Network(Coupled_NonAutonomous):
         
         #Outside heat transfer
         deltas = external_source - x
-        dx += (1.0 / (self.R_ext * self.C)) * deltas
+        dx += self.R_extCi * deltas
         
         #Internal heat sources
         deltas = internal_sources - x
-        deltas[internal_sources==0] = 0
-        dx += (1.0 / self.C) * deltas
+        dx += self.R_intCi * deltas
         return dx
-  
+
+    @staticmethod
+    def make_5_room():
+        adj = np.array([[0,1],[0,2],[0,3],[1,0],[1,3],[1,4],[2,0],[2,3],[3,0],[3,1],[3,2],[3,4],[4,1],[4,3]]).T
+        return RC_Network(nsim=10000, nx=5, adj=adj)
+
 @multidim(True)
 class Gravitational_System(Coupled_ODE):
     mass_idx = [0]
     pos_idx = [1,2]
     vel_idx = [3,4]
         
-    def __init__(self, G=6.67e-11, nsim=1001, ninit=0, ts=0.1, adj=None, nx=1, seed=59):
+    def __init__(self, G=6.67e-11, nsim=10000, ninit=0, ts=0.1, adj=None, nx=4, seed=59, x0=None):
         super().__init__(nsim, ninit, ts, adj, nx, seed)
         self.G = G
+        self.x0 = x0 if x0 is not None else self.get_x0(nx)
 
     def message_passing(self, receivers, senders, t):
         #Assumes rows of the form [mass, x_pos, y_pos, x_vel, y_vel]
@@ -205,20 +235,37 @@ class Gravitational_System(Coupled_ODE):
         dx = np.zeros_like(x)
         acc = np.zeros((x.shape[0],2))
         np.add.at(acc, self.adj_list[0], messages)
-        #print('acc',acc)
         dx[:, self.vel_idx] = acc
-        #print('vel',x[:, self.vel_idx])
         dx[:, self.pos_idx] = x[:, self.vel_idx]
-        #print('dx',dx)
-        #print(dx)
         return dx
+    
+    def get_x0(self, nx = None, rseed=None):
+        if rseed is not None:
+            np.random.seed(rseed)
+        nx = nx if nx is not None else self.nx
+        x0 = np.random.rand(nx,5)
+        x0[:, self.mass_idx] *= 10
+        x0[:, self.pos_idx] *= 2
+        x0[:, self.vel_idx] *= 0.1
+        return x0
+    
+    @staticmethod
+    def make_4_body():
+        """
+        :returns: A system with 3 satelites orbiting one larger body
+        """
+        x0 = np.array([[1000000, 0, 0, 0, 0],
+         [1, 1, 0, 0, 8.167e-3],
+         [1, 0, 2, 4.0835e-3, 0],
+         [1, -1, -1, 4e-3, -4e-3]])
+        return Gravitational_System(x0=x0)
 
 @multidim(True)
 class Boids(Coupled_ODE):
     pos_idx = [0,1]
     vel_idx = [2,3]
     
-    def __init__(self, coherence=0.05, separation=0.01, alignment=0.05, avoidance_range = 0.2, visual_range=None, nsim=1001, ninit=0, ts=0.1, nx=1, seed=59):
+    def __init__(self, coherence=0.05, separation=0.01, alignment=0.05, avoidance_range = 0.2, visual_range=None, nsim=2000, ninit=0, ts=0.1, nx=50, x0=None, seed=59):
           super().__init__(nsim, ninit, ts, None, nx, seed)
           self.coherence = coherence
           self.separation = separation
@@ -228,6 +275,7 @@ class Boids(Coupled_ODE):
           
           self.max_speed = 0.03
           self.max_acc = 0.005
+          self.x0 = x0 if x0 is not None else self.get_x0(nx)
           
     def message_passing(self, receivers, senders, t):
         return senders-receivers
@@ -260,7 +308,6 @@ class Boids(Coupled_ODE):
             s=adj[:,1]
             u, n = np.unique(r, return_counts=True)
             if len(u) < len(pos):
-                print(d2.diagonal(),self.visual_range)
                 return np.zeros_like(x)
             n = np.maximum(n[:,np.newaxis] -1, 1)
         
@@ -313,6 +360,15 @@ class Boids(Coupled_ODE):
 
         return np.hstack([vel, acc])        
     
+    def get_x0(self, nx=None, rseed=None):
+        if rseed is not None:
+            np.random.seed(rseed)
+        nx = nx if nx is not None else self.nx
+        pos_init = np.random.rand(nx,2) * 3 + np.array([[3,1]])
+        vel_init = np.random.rand(nx,2) * 0.06
+        x0 = np.hstack([pos_init,vel_init])
+        return x0
+         
 systems = {
     "RCNet" : RC_Network,
     "Gravitational": Gravitational_System,
