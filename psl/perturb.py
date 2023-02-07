@@ -51,7 +51,7 @@ def WhiteNoise(nx=1, nsim=100, xmax=1, xmin=0, rseed=1):
     :param rsee: (int) Set random seed
     """
 
-    rd.seed(rseed)
+    # rd.seed(rseed)
 
     if type(xmax) is not np.ndarray:
         xmax = np.asarray(nx*[xmax]).ravel()
@@ -75,7 +75,7 @@ def Step(nx=1, nsim=100, tstep=50, xmax=1, xmin=0, rseed=1):
     :param rseed: (int) Set random seed
     """
 
-    rd.seed(rseed)
+    # rd.seed(rseed)
 
     if type(xmax) is not np.ndarray:
         xmax = np.asarray(nx * [xmax]).ravel()
@@ -103,7 +103,7 @@ def Steps(nx=1, nsim=100, values=None, randsteps=5, xmax=1, xmin=0, rseed=1):
     :return:
     """
 
-    rd.seed(rseed)
+    # rd.seed(rseed)
 
     if values is None:
         values = np.round(np.random.rand(randsteps), 3)
