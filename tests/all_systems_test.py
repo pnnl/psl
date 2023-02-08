@@ -5,6 +5,7 @@ import os
 import psl.autonomous as auto
 import psl.nonautonomous as nauto
 import psl.ssm as ssm
+from psl.coupled_systems import Boids, Gravitational_System, RC_Network
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -39,5 +40,21 @@ if __name__ == '__main__':
         out = model.simulate()
         plot.pltOL(Y=out['Y'], figname="./figs/"+name+"_ol")  # plot trajectories
         plot.pltPhase(X=out['Y'], figname="./figs/"+name+"_phase")
+        plt.close('all')
+
+    for name, system in [('RC_Network', RC_Network)]:
+        print(name)
+        model = system(nsim=1000)
+        out = model.simulate()
+        plot.pltOL(Y=out['Y'], U=out['U'], figname="./figs/"+name+"_ol")  # plot trajectories
+        plot.pltPhase(X=out['Y'], figname="./figs/"+name+"_phase")
+        plt.close('all')
+
+    for name, system in [('Gravitational_system', Gravitational_System), ('Boids', Boids)]:
+        print(name)
+        model = system(nsim=100)
+        out = model.simulate(nsim=100)
+        plot.pltOL(Y=out['Y'].reshape(101, -1), figname="./figs/"+name+"_ol")  # plot trajectories
+        plot.pltPhase(X=out['Y'].reshape(101, -1), figname="./figs/"+name+"_phase")
         plt.close('all')
 

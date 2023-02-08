@@ -1,11 +1,16 @@
-# PSL: Python Systems Library v1.2
-
+# PSL: Python Systems Library v1.3.1
 PSL is a minimalistic library for simulating dynamical systems in Python
 using [SciPy](https://scipy.org/) library.
 
 Authors: Jan Drgona, Aaron Tuor, Stefan Dernbach, 
 James Koch, Soumya Vasisht, Wenceslao Shaw Cortez, Draguna Vrabie
 
+
+## 1.3.1 release notes
++ Optional pytorch backend via torchdiffeq for all systems in autonomous.py
++ Faster numpy integration for systems in autonomous.py
++ Sampling of initial conditions and control inputs over dynamic range via get_U, and get_x0 functions for all systems.
++ Coupled dynamical systems in coupled_systems.py module
 
 ## Documentation
 

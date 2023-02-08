@@ -21,14 +21,14 @@ fig = plt.figure()
 fig.text(0.35, 0.9, 'Room Temperatures Over Time')
 locs = [(0,0),(0,2),(1,0),(1,1),(1,3)]
 spans = [2,2,1,2,1]
-ax = [plt.subplot2grid((2,4), l, colspan=s) for l,s in zip(locs, spans)]
+ax = [plt.subplot2grid((2,4), l, colspan=s) for l, s in zip(locs, spans)]
 [ax[i].plot(sim['X'][:,i]) for i in range(len(locs))];
 miny = np.floor(np.min(sim['X']))
 maxy = np.ceil(np.max(sim['X']))
 [a.set_ylim(miny, maxy) for a in ax]
 [a.tick_params(labelbottom=False) for a in ax]
-[ax[i].tick_params(labelleft=False) for i in [1,3,4]]
-fig.subplots_adjust(hspace=0.1,wspace=0.1)
+[ax[i].tick_params(labelleft=False) for i in [1, 3, 4]]
+fig.subplots_adjust(hspace=0.1, wspace=0.1)
 
 
 """
@@ -36,7 +36,7 @@ Gravitational System
 """
 network = Gravitational_System.make_4_body()
 Sim = network.simulate(show_progress=True)
-sim=Sim['Y']
+sim = Sim['Y']
 
 fig, ax = plt.subplots()
 ax.set_xlim(-2.2,2.2)

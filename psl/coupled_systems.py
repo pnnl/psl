@@ -1,13 +1,58 @@
 """
-"""
 
+"""
 import numpy as np
 from scipy.sparse import coo_matrix
-from psl.autonomous import ODE_Autonomous
 from psl.nonautonomous import ODE_NonAutonomous
 from psl.perturb import Periodic, Sawtooth, WhiteNoise
 from sklearn.metrics.pairwise import euclidean_distances
 from tqdm.auto import tqdm
+from psl.emulator import EmulatorBase
+import numpy as np
+from scipy.integrate import odeint
+
+
+class ODE_Autonomous(EmulatorBase):
+    """
+    base class autonomous ODE
+    """
+
+    def simulate(self, ninit=None, nsim=None, Time=None, ts=None, x0=None, show_progress=False):
+
+        """
+        :param nsim: (int) Number of steps for open loop response
+        :param ninit: (float) initial simulation time
+        :param ts: (float) step size, sampling time
+        :param x0: (float) state initial conditions
+        :return: The response matrices, i.e. X
+        """
+
+        if ninit is None:
+            ninit = self.ninit
+        if nsim is None:
+            nsim = self.nsim
+        if ts is None:
+            ts = self.ts
+        if Time is None:
+            Time = np.arange(0, nsim+1) * ts + ninit
+        if x0 is None:
+            x = self.x0
+        else:
+            assert x0.shape[0] % self.nx == 0, "Mismatch in x0 size"
+            x = x0
+        X = [x]
+        simrange = tqdm(range(nsim)) if show_progress else range(nsim)
+        for N in simrange:
+            if len(Time) == 1:
+                dT = [Time[0], Time[0]+ts]
+            else:
+                dT = [Time[N], Time[N + 1]]
+            xdot = odeint(self.equations, x, dT)
+            x = xdot[-1]
+            X.append(x)
+        Yout = np.asarray(X).reshape(nsim+1, -1)
+        return {'Y': Yout, 'X': np.asarray(X)}
+
 
 def multidim(is_autonomous):
     def decorator(ode):
@@ -41,7 +86,8 @@ def multidim(is_autonomous):
         ode.equations = eq_dec
         return ode
     return decorator
-           
+
+
 class Coupled_ODE(ODE_Autonomous):
     def __init__(self, nsim=1001, ninit=0, ts=0.1, adj=None, nx=1, seed=59):
         super().__init__(nsim, ninit, ts, seed)
@@ -73,7 +119,8 @@ class Coupled_ODE(ODE_Autonomous):
         dx = np.zeros_like(x)
         np.add.at(dx, self.adj_list[0], messages)
         return dx
-    
+
+
 class Coupled_NonAutonomous(ODE_NonAutonomous):
     def __init__(self, nsim=1001, ninit=0, ts=0.1, adj=None, nx=1, seed=59):
         super().__init__(nsim, ninit, ts, seed)
@@ -107,6 +154,7 @@ class Coupled_NonAutonomous(ODE_NonAutonomous):
         :param u: Control Variables
         """
         pass
+
 
 class RC_Network(Coupled_NonAutonomous):
     def __init__(self, R = None, C = None, U=None, nsim=1001, ninit=0, ts=0.1, adj=None, nx=2, x0=None, seed=59):
@@ -210,6 +258,7 @@ class RC_Network(Coupled_NonAutonomous):
         adj = np.array([[0,1],[0,2],[0,3],[1,0],[1,3],[1,4],[2,0],[2,3],[3,0],[3,1],[3,2],[3,4],[4,1],[4,3]]).T
         return RC_Network(nsim=10000, nx=5, adj=adj)
 
+
 @multidim(True)
 class Gravitational_System(Coupled_ODE):
     mass_idx = [0]
@@ -259,6 +308,7 @@ class Gravitational_System(Coupled_ODE):
          [1, 0, 2, 4.0835e-3, 0],
          [1, -1, -1, 4e-3, -4e-3]])
         return Gravitational_System(x0=x0)
+
 
 @multidim(True)
 class Boids(Coupled_ODE):
