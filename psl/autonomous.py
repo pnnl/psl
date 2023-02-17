@@ -82,6 +82,14 @@ class ODE_Autonomous(torch.nn.Module):
                 'mean': X.mean(axis=0), 'var': X.var(axis=0),
                 'std': X.std(axis=0)}
 
+    def get_x0(self):
+        """
+        Randomly sample an initial condition
+
+        :param box: Dictionary with keys 'min' and 'max' and values np.arrays with shape=(nx,)
+        """
+        return np.random.uniform(low=self.xstats['min'], high=self.xstats['max'])
+
     def set_params(self, parameters, requires_grad):
         return [self.B.grad(self.B.cast(p), requires_grad) for p in parameters]
 

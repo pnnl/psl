@@ -426,8 +426,6 @@ class HindmarshRose(ODE_NonAutonomous):
 
     def get_U(self, nsim):
         return Steps(nx=1, nsim=nsim, randsteps=int(max(1, nsim/48)), xmin=2.99, xmax=3.1)
-        # return Periodic(nx=1, nsim=nsim, numPeriods=int(max(1, nsim/48)), xmax=3.1, xmin=1, form='sin') #+ 0.1*WhiteNoise(1, nsim)
-        # return 3 * np.asarray([np.ones((nsim))]).T + WhiteNoise(1, nsim)
 
     def equations(self, x, t, u):
         theta = -self.a*x[0]**3 + self.b*x[0]**2
@@ -448,7 +446,7 @@ class Iver_dyn_simplified(ODE_NonAutonomous):
         super().__init__(nsim=nsim, ninit=ninit, ts=ts, seed=seed)
         self.nx = 12    # Number of states (including actuator dynamics)
         self.nu = 3    # Number of control inputs
-        self.ts = 0.1
+        self.ts = ts
 
         self.Mq = -0.748        # Hydrodynamic coefficient (1/s)
         self.Nur = -0.441       # Hydrodynamic coefficient (1/m)

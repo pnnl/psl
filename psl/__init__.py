@@ -19,7 +19,6 @@ datasets = {
         "EED_building": "EED_building/EED_building.csv",
         "9bus_test": "9bus_test",
         "9bus_init": "9bus_perturbed_init_cond",
-        "200bus_boundary": "ACTIVSg200_case141_data/dyn_202.csv",
         "real_linear_xva": "Real_Linear_xva/Real_Linear_xva.csv",
         "pendulum_h_1": "Ideal_Pendulum/Ideal_Pendulum.csv"
     }.items()

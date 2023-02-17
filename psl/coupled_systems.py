@@ -254,9 +254,9 @@ class RC_Network(Coupled_NonAutonomous):
         return dx
 
     @staticmethod
-    def make_5_room():
+    def make_5_room(nsim=10000):
         adj = np.array([[0,1],[0,2],[0,3],[1,0],[1,3],[1,4],[2,0],[2,3],[3,0],[3,1],[3,2],[3,4],[4,1],[4,3]]).T
-        return RC_Network(nsim=10000, nx=5, adj=adj)
+        return RC_Network(nsim=nsim, nx=5, adj=adj)
 
 
 @multidim(True)
@@ -299,7 +299,7 @@ class Gravitational_System(Coupled_ODE):
         return x0
     
     @staticmethod
-    def make_4_body():
+    def make_4_body(nsim=10000):
         """
         :returns: A system with 3 satelites orbiting one larger body
         """
@@ -307,7 +307,7 @@ class Gravitational_System(Coupled_ODE):
          [1, 1, 0, 0, 8.167e-3],
          [1, 0, 2, 4.0835e-3, 0],
          [1, -1, -1, 4e-3, -4e-3]])
-        return Gravitational_System(x0=x0)
+        return Gravitational_System(nx=4, x0=x0, nsim=nsim)
 
 
 @multidim(True)
