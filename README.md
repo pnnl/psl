@@ -26,6 +26,7 @@ $ conda activate psl
 (psl) $ conda install matplotlib
 (psl) $ pip install pyts
 (psl) $ pip install tqdm
+(psl) $ conda install torchdiffeq
 ```
 
 ## Syntax and Use
