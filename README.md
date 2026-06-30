@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> This repository has been archived and is no longer maintained.
+> The code is provided for historical reference and may contain unpatched or unknown vulnerabilities.
+> It should not be used in production systems.
+
 # PSL: Python Systems Library v1.3.1
 PSL is a minimalistic library for simulating dynamical systems in Python
 using [SciPy](https://scipy.org/) library.
